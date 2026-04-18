@@ -1,0 +1,181 @@
+<div class="form-overlay">
+  <div class="form-modal">
+    <!-- Header -->
+    <div class="form-header">
+      <h2>Nueva Compra</h2>
+      <button class="btn-close" (click)="onCancel()" type="button">&times;</button>
+    </div>
+
+    <!-- Form Content -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+      
+      <!-- Success Message -->
+      <div *ngIf="success" class="alert alert-success">
+        {{ successMessage }}
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- Main Fields -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="supplier_id">Proveedor ID *</label>
+          <input
+            id="supplier_id"
+            type="text"
+            formControlName="supplier_id"
+            placeholder="UUID del proveedor"
+            class="form-input"
+            [class.form-input-error]="form.get('supplier_id')?.invalid && form.get('supplier_id')?.touched"
+          />
+          <span class="error-message">{{ getFormError('supplier_id') }}</span>
+        </div>
+
+        <div class="form-group">
+          <label for="warehouse_id">Almacén ID *</label>
+          <input
+            id="warehouse_id"
+            type="text"
+            formControlName="warehouse_id"
+            placeholder="UUID del almacén"
+            class="form-input"
+            [class.form-input-error]="form.get('warehouse_id')?.invalid && form.get('warehouse_id')?.touched"
+          />
+          <span class="error-message">{{ getFormError('warehouse_id') }}</span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label for="notes">Notas</label>
+        <textarea
+          id="notes"
+          formControlName="notes"
+          placeholder="Notas adicionales sobre la compra..."
+          class="form-input form-textarea"
+          rows="2"
+        ></textarea>
+      </div>
+
+      <!-- Items Section -->
+      <div class="items-section">
+        <div class="items-header">
+          <h3>Items de la Compra</h3>
+          <span class="error-message">{{ getItemsError() }}</span>
+        </div>
+
+        <div class="items-table">
+          <div class="items-thead">
+            <div class="items-row">
+              <div class="col-product">Producto ID</div>
+              <div class="col-quantity">Cantidad</div>
+              <div class="col-cost">Costo Unitario</div>
+              <div class="col-subtotal">Subtotal</div>
+              <div class="col-actions"></div>
+            </div>
+          </div>
+
+          <div class="items-tbody" formArrayName="items">
+            <div
+              *ngFor="let item of items.controls; let i = index"
+              class="items-row"
+              [formGroupName]="i"
+            >
+              <!-- Product ID -->
+              <div class="col-product">
+                <input
+                  type="text"
+                  formControlName="product_id"
+                  placeholder="UUID"
+                  class="form-input form-input-sm"
+                  [class.form-input-error]="item.get('product_id')?.invalid && item.get('product_id')?.touched"
+                />
+                <span class="error-message-sm">{{ getItemError(i, 'product_id') }}</span>
+              </div>
+
+              <!-- Quantity -->
+              <div class="col-quantity">
+                <input
+                  type="number"
+                  formControlName="quantity"
+                  placeholder="1"
+                  min="1"
+                  class="form-input form-input-sm"
+                  [class.form-input-error]="item.get('quantity')?.invalid && item.get('quantity')?.touched"
+                />
+                <span class="error-message-sm">{{ getItemError(i, 'quantity') }}</span>
+              </div>
+
+              <!-- Unit Cost -->
+              <div class="col-cost">
+                <input
+                  type="number"
+                  formControlName="unit_cost"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  class="form-input form-input-sm"
+                  [class.form-input-error]="item.get('unit_cost')?.invalid && item.get('unit_cost')?.touched"
+                />
+                <span class="error-message-sm">{{ getItemError(i, 'unit_cost') }}</span>
+              </div>
+
+              <!-- Subtotal -->
+              <div class="col-subtotal">
+                <span class="subtotal-value">
+                  {{ ((item.get('quantity')?.value || 0) * (item.get('unit_cost')?.value || 0)) | number: '1.2-2' }}
+                </span>
+              </div>
+
+              <!-- Remove Button -->
+              <div class="col-actions">
+                <button
+                  type="button"
+                  class="btn-remove"
+                  (click)="removeItem(i)"
+                  [disabled]="items.length === 1"
+                  title="Eliminar item"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Item Button -->
+        <button type="button" class="btn-add-item" (click)="addItem()">
+          + Agregar Item
+        </button>
+      </div>
+
+      <!-- Total -->
+      <div class="total-section">
+        <span class="total-label">Total:</span>
+        <span class="total-value">${{ calculateTotal() | number: '1.2-2' }}</span>
+      </div>
+
+      <!-- Buttons -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="onCancel()"
+          [disabled]="loading"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="loading || form.invalid"
+        >
+          {{ loading ? 'Guardando...' : 'Registrar Compra' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

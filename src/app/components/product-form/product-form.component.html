@@ -1,0 +1,146 @@
+<div class="form-overlay">
+  <div class="form-modal">
+    <!-- Header -->
+    <div class="form-header">
+      <h2>Nuevo Producto</h2>
+      <button class="btn-close" (click)="onCancel()" type="button">&times;</button>
+    </div>
+
+    <!-- Form Content -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
+      
+      <!-- Success Message -->
+      <div *ngIf="success" class="alert alert-success">
+        ✓ Producto creado exitosamente
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="alert alert-error">
+        {{ error }}
+      </div>
+
+      <!-- SKU -->
+      <div class="form-group">
+        <label for="sku">SKU *</label>
+        <input
+          id="sku"
+          type="text"
+          formControlName="sku"
+          placeholder="Ej: PROD-001"
+          class="form-input"
+          [class.form-input-error]="form.get('sku')?.invalid && form.get('sku')?.touched"
+        />
+        <span class="error-message">{{ getErrorMessage('sku') }}</span>
+      </div>
+
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="name">Nombre del Producto *</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Ej: Laptop Dell inspiron"
+          class="form-input"
+          [class.form-input-error]="form.get('name')?.invalid && form.get('name')?.touched"
+        />
+        <span class="error-message">{{ getErrorMessage('name') }}</span>
+      </div>
+
+      <!-- Código de Barras -->
+      <div class="form-group">
+        <label for="barcode">Código de Barras</label>
+        <input
+          id="barcode"
+          type="text"
+          formControlName="barcode"
+          placeholder="Ej: 1234567890"
+          class="form-input"
+        />
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          placeholder="Descripción del producto..."
+          class="form-input form-textarea"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <!-- Precios -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="sale_price">Precio de Venta *</label>
+          <input
+            id="sale_price"
+            type="number"
+            formControlName="sale_price"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            class="form-input"
+            [class.form-input-error]="form.get('sale_price')?.invalid && form.get('sale_price')?.touched"
+          />
+          <span class="error-message">{{ getErrorMessage('sale_price') }}</span>
+        </div>
+
+        <div class="form-group">
+          <label for="purchase_price">Precio de Compra *</label>
+          <input
+            id="purchase_price"
+            type="number"
+            formControlName="purchase_price"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            class="form-input"
+            [class.form-input-error]="form.get('purchase_price')?.invalid && form.get('purchase_price')?.touched"
+          />
+          <span class="error-message">{{ getErrorMessage('purchase_price') }}</span>
+        </div>
+      </div>
+
+      <!-- Stock Mínimo -->
+      <div class="form-group">
+        <label for="min_stock">Stock Mínimo *</label>
+        <input
+          id="min_stock"
+          type="number"
+          formControlName="min_stock"
+          placeholder="0"
+          min="0"
+          class="form-input"
+          [class.form-input-error]="form.get('min_stock')?.invalid && form.get('min_stock')?.touched"
+        />
+        <span class="error-message">{{ getErrorMessage('min_stock') }}</span>
+      </div>
+
+      <!-- IDs opcionales (hidden/null por ahora) -->
+      <input type="hidden" formControlName="category_id" />
+      <input type="hidden" formControlName="unit_id" />
+
+      <!-- Botones -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="onCancel()"
+          [disabled]="loading"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="loading || form.invalid"
+        >
+          {{ loading ? 'Guardando...' : 'Guardar Producto' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

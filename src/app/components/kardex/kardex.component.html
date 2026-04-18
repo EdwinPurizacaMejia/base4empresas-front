@@ -1,0 +1,151 @@
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1 class="title">Kardex</h1>
+      <p class="subtitle">Historial de movimientos de stock</p>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-form">
+      <div class="form-group">
+        <label for="product-id">ID del Producto:</label>
+        <input
+          id="product-id"
+          type="text"
+          [(ngModel)]="productId"
+          placeholder="Ej: 550e8400-e29b-41d4-a716-446655440000"
+          class="form-input"
+          (keypress)="onKeyPress($event)"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="warehouse-id">ID del Almacén:</label>
+        <input
+          id="warehouse-id"
+          type="text"
+          [(ngModel)]="warehouseId"
+          placeholder="Ej: warehouse-001"
+          class="form-input"
+          (keypress)="onKeyPress($event)"
+        />
+      </div>
+
+      <button class="btn-search" (click)="loadKardex()" [disabled]="loading">
+        {{ loading ? 'Cargando...' : '🔍 Consultar Kardex' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando historial de movimientos...</p>
+  </div>
+
+  <!-- Summary Section -->
+  <div *ngIf="!loading && movements.length > 0" class="summary-section">
+    <div class="summary-card">
+      <h3 class="summary-title">Resumen</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Total Entradas</span>
+          <span class="summary-value value-in">{{ totalIn }}</span>
+          <span class="summary-subtitle">{{ totalInValue | number: '1.2-2' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Total Salidas</span>
+          <span class="summary-value value-out">{{ totalOut }}</span>
+          <span class="summary-subtitle">{{ totalOutValue | number: '1.2-2' }}</span>
+        </div>
+        <div class="summary-item highlight">
+          <span class="summary-label">Balance</span>
+          <span class="summary-value" [ngClass]="balance >= 0 ? 'value-positive' : 'value-negative'">
+            {{ balance }}
+          </span>
+          <span class="summary-subtitle">
+            {{ (totalInValue - totalOutValue) | number: '1.2-2' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kardex Table -->
+  <div *ngIf="!loading && movements.length > 0" class="table-wrapper">
+    <table class="kardex-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Motivo</th>
+          <th>Referencia</th>
+          <th>Cantidad</th>
+          <th>Costo Unitario</th>
+          <th>Total</th>
+          <th>Nota</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let movement of movements" class="table-row" [ngClass]="'type-' + movement.movement_type">
+          <td class="cell-date">
+            {{ formatDate(movement.created_at) }}
+          </td>
+          <td class="cell-type">
+            <span class="badge" [ngClass]="'badge-' + movement.movement_type">
+              {{ getMovementTypeLabel(movement.movement_type) }}
+            </span>
+          </td>
+          <td class="cell-reason">
+            {{ getReasonLabel(movement.reason) }}
+          </td>
+          <td class="cell-reference">
+            <code>{{ movement.reference_id.substring(0, 8) }}...</code>
+          </td>
+          <td class="cell-quantity">
+            <span class="quantity" [ngClass]="'qty-' + movement.movement_type">
+              {{ movement.movement_type === 'IN' ? '+' : '-' }}{{ movement.quantity }}
+            </span>
+          </td>
+          <td class="cell-unit-cost">
+            {{ movement.unit_cost | number: '1.2-2' }}
+          </td>
+          <td class="cell-total">
+            <span class="total-value" [ngClass]="'total-' + movement.movement_type">
+              {{ (movement.quantity * movement.unit_cost) | number: '1.2-2' }}
+            </span>
+          </td>
+          <td class="cell-note">
+            <span class="note-text" [title]="movement.note">
+              {{ movement.note }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && movements.length === 0 && !initialLoad" class="empty-state">
+    <p class="empty-icon">📭</p>
+    <p class="empty-title">No hay movimientos registrados</p>
+    <p class="empty-text">
+      {{ error ? 'Verifica los IDs ingresados' : 'No se encontraron movimientos en el kardex para este producto y almacén' }}
+    </p>
+  </div>
+
+  <!-- Initial State -->
+  <div *ngIf="initialLoad && !loading" class="initial-state">
+    <p class="initial-icon">📋</p>
+    <p class="initial-title">Consulta el historial de movimientos</p>
+    <p class="initial-text">Ingresa el ID del producto y almacén para ver el kardex</p>
+  </div>
+</div>
