@@ -1,0 +1,66 @@
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">Resumen de tu sistema de inventario</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !loading">
+    <span class="error-icon">⚠️</span>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Dashboard Cards Grid -->
+  <div class="dashboard-grid" *ngIf="!loading && !error">
+    <div *ngFor="let card of cards" class="dashboard-card" [ngClass]="getCardClass(card)">
+      <div class="card-header">
+        <span class="card-icon">{{ card.icon }}</span>
+        <h3 class="card-title">{{ card.title }}</h3>
+      </div>
+      <div class="card-body">
+        <div class="card-value">{{ card.value }}</div>
+        <p class="card-subtitle" *ngIf="card.subtitle">{{ card.subtitle }}</p>
+      </div>
+      <div class="card-footer">
+        <div class="card-indicator"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && cards.length === 0 && !error">
+    <div class="empty-icon">📊</div>
+    <h2>No hay datos disponibles</h2>
+    <p>Comienza a crear productos, realizando ventas o compras</p>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions" *ngIf="!loading && cards.length > 0">
+    <h2>Acciones Rápidas</h2>
+    <div class="actions-grid">
+      <a href="/products" class="action-card">
+        <span class="action-icon">📦</span>
+        <span class="action-label">Crear Producto</span>
+      </a>
+      <a href="/sales" class="action-card">
+        <span class="action-icon">💰</span>
+        <span class="action-label">Registrar Venta</span>
+      </a>
+      <a href="/purchases" class="action-card">
+        <span class="action-icon">🛒</span>
+        <span class="action-label">Registrar Compra</span>
+      </a>
+      <a href="/stock" class="action-card">
+        <span class="action-icon">📈</span>
+        <span class="action-label">Ver Inventario</span>
+      </a>
+    </div>
+  </div>
+</div>
