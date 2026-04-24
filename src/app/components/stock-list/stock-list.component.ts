@@ -31,9 +31,11 @@ export class StockListComponent implements OnInit {
 
   ngOnInit(): void {
     // Cargar warehouse por defecto si lo hay
-    this.warehouseId = localStorage.getItem('lastWarehouseId') || '';
-    if (this.warehouseId) {
-      this.loadStock();
+    if (typeof localStorage !== 'undefined') {
+      this.warehouseId = localStorage.getItem('lastWarehouseId') || '';
+      if (this.warehouseId) {
+        this.loadStock();
+      }
     }
   }
 
@@ -49,7 +51,9 @@ export class StockListComponent implements OnInit {
     this.initialLoad = false;
 
     // Guardar warehouse ID para siguiente carga
-    localStorage.setItem('lastWarehouseId', this.warehouseId);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('lastWarehouseId', this.warehouseId);
+    }
 
     this.stockService.getStock(this.warehouseId).subscribe({
       next: (data) => {

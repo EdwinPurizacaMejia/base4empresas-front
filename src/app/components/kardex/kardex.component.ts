@@ -25,7 +25,9 @@ export class KardexComponent implements OnInit {
 
   ngOnInit(): void {
     // Intentar cargar workspace ID por localStorage
-    this.warehouseId = localStorage.getItem('lastWarehouseId') || '';
+    if (typeof localStorage !== 'undefined') {
+      this.warehouseId = localStorage.getItem('lastWarehouseId') || '';
+    }
   }
 
   loadKardex(): void {
