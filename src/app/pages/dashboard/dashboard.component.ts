@@ -90,7 +90,7 @@ export class DashboardComponent implements OnInit {
           this.cards.push({
             title: 'Total Ventas',
             icon: '💰',
-            value: `$${totalSales.toFixed(2)}`,
+            value: `S/${totalSales.toFixed(2)}`,
             subtitle: `${data.length} transacciones`,
             color: 'green'
           });
@@ -100,7 +100,7 @@ export class DashboardComponent implements OnInit {
           this.cards.push({
             title: 'Total Ventas',
             icon: '💰',
-            value: '$0.00',
+            value: 'S/0.00',
             color: 'green'
           });
           resolve();
@@ -117,7 +117,7 @@ export class DashboardComponent implements OnInit {
           this.cards.push({
             title: 'Total Compras',
             icon: '🛒',
-            value: `$${totalPurchases.toFixed(2)}`,
+            value: `S/${totalPurchases.toFixed(2)}`,
             subtitle: `${data.length} pedidos`,
             color: 'orange'
           });
@@ -127,7 +127,7 @@ export class DashboardComponent implements OnInit {
           this.cards.push({
             title: 'Total Compras',
             icon: '🛒',
-            value: '$0.00',
+            value: 'S/0.00',
             color: 'orange'
           });
           resolve();

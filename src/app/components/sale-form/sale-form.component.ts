@@ -111,7 +111,7 @@ export class SaleFormComponent implements OnInit {
     this.salesService.createSale(payload).subscribe({
       next: (response) => {
         this.loading = false;
-        this.successMessage = `Venta ${response.number} registrada exitosamente. Total: $${response.total.toFixed(2)}`;
+        this.successMessage = `Venta ${response.number} registrada exitosamente. Total: S/${response.total.toFixed(2)}`;
         this.form.reset();
         this.items.clear();
         this.items.push(this.createItemControl());
