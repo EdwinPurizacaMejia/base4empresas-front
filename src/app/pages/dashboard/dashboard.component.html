@@ -1,66 +1,89 @@
 <div class="dashboard-container">
   <!-- Page Header -->
-  <div class="page-header">
-    <h1>Dashboard</h1>
-    <p class="subtitle">Resumen de tu sistema de inventario</p>
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h1 class="dashboard-title">Dashboard</h1>
+      <p class="header-date">{{ currentDate }}</p>
+    </div>
   </div>
 
   <!-- Loading State -->
   <div class="loading-state" *ngIf="loading">
-    <div class="spinner"></div>
+    <mat-spinner diameter="50"></mat-spinner>
     <p>Cargando datos...</p>
   </div>
 
-  <!-- Error State -->
-  <div class="error-state" *ngIf="error && !loading">
-    <span class="error-icon">⚠️</span>
-    <p>{{ error }}</p>
-  </div>
-
-  <!-- Dashboard Cards Grid -->
-  <div class="dashboard-grid" *ngIf="!loading && !error">
-    <div *ngFor="let card of cards" class="dashboard-card" [ngClass]="getCardClass(card)">
-      <div class="card-header">
-        <span class="card-icon">{{ card.icon }}</span>
-        <h3 class="card-title">{{ card.title }}</h3>
-      </div>
-      <div class="card-body">
-        <div class="card-value">{{ card.value }}</div>
-        <p class="card-subtitle" *ngIf="card.subtitle">{{ card.subtitle }}</p>
-      </div>
-      <div class="card-footer">
-        <div class="card-indicator"></div>
+  <!-- Main Content -->
+  <div class="dashboard-content" *ngIf="!loading">
+    <!-- KPI Cards Grid -->
+    <div class="kpi-grid">
+      <div *ngFor="let kpi of kpiCards" class="kpi-card" [style.borderLeftColor]="kpi.color">
+        <div class="kpi-icon-box" [style.backgroundColor]="kpi.backgroundColor">
+          <span class="kpi-icon-emoji">{{ getIconEmoji(kpi.icon) }}</span>
+        </div>
+        <div class="kpi-info">
+          <p class="kpi-label">{{ kpi.title }}</p>
+          <h3 class="kpi-value">{{ kpi.value }}</h3>
+          <div class="kpi-change" [class.positive]="(kpi.change || 0) > 0" 
+               [class.negative]="(kpi.change || 0) < 0">
+            <span class="change-emoji">{{ (kpi.change || 0) > 0 ? '↑' : '↓' }}</span>
+            <span>{{ (kpi.change || 0) > 0 ? '+' : '' }}{{ kpi.change }}% vs mes anterior</span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="!loading && cards.length === 0 && !error">
-    <div class="empty-icon">📊</div>
-    <h2>No hay datos disponibles</h2>
-    <p>Comienza a crear productos, realizando ventas o compras</p>
-  </div>
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <!-- Sales Trend Chart -->
+      <mat-card class="chart-card full-width">
+        <mat-card-header>
+          <mat-card-title>Ventas vs Compras - Últimos 6 Meses</mat-card-title>
+          <mat-card-subtitle>Análisis de tendencias mensuales</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrapper">
+            <canvas id="salesChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-  <!-- Quick Actions -->
-  <div class="quick-actions" *ngIf="!loading && cards.length > 0">
-    <h2>Acciones Rápidas</h2>
-    <div class="actions-grid">
-      <a href="/products" class="action-card">
-        <span class="action-icon">📦</span>
-        <span class="action-label">Crear Producto</span>
-      </a>
-      <a href="/sales" class="action-card">
-        <span class="action-icon">💰</span>
-        <span class="action-label">Registrar Venta</span>
-      </a>
-      <a href="/purchases" class="action-card">
-        <span class="action-icon">🛒</span>
-        <span class="action-label">Registrar Compra</span>
-      </a>
-      <a href="/stock" class="action-card">
-        <span class="action-icon">📈</span>
-        <span class="action-label">Ver Inventario</span>
-      </a>
+      <!-- Category Distribution Chart -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Distribución de Productos</mat-card-title>
+          <mat-card-subtitle>Por categoría</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-wrapper">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Acciones Rápidas</h2>
+      <div class="actions-grid">
+        <button mat-raised-button color="primary" class="action-btn">
+          <span class="action-emoji">➕</span>
+          <span>Nuevo Producto</span>
+        </button>
+        <button mat-raised-button color="primary" class="action-btn">
+          <span class="action-emoji">🛒</span>
+          <span>Nueva Compra</span>
+        </button>
+        <button mat-raised-button color="primary" class="action-btn">
+          <span class="action-emoji">💰</span>
+          <span>Nueva Venta</span>
+        </button>
+        <button mat-raised-button color="primary" class="action-btn">
+          <span class="action-emoji">📊</span>
+          <span>Ver Reportes</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
+
