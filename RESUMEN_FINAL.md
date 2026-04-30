@@ -27,6 +27,7 @@
 ## 🚀 CÓMO EMPEZAR
 
 ### 1️⃣ Verificar Rama Actual
+
 ```bash
 git branch
 
@@ -36,6 +37,7 @@ git branch
 ```
 
 ### 2️⃣ Ejecutar Proyecto
+
 ```bash
 ng serve
 
@@ -43,11 +45,13 @@ ng serve
 ```
 
 ### 3️⃣ Ver en Navegador
+
 - **Desktop:** Toolbar + Sidebar visible
 - **Mobile:** Hamburguesa + Sidebar drawer
 - **Búsqueda:** Input funcional en toolbar
 
 ### 4️⃣ Compilar Proyecto
+
 ```bash
 ng build
 
@@ -83,6 +87,7 @@ ng build
 ## 📦 ARCHIVOS CREADOS/MODIFICADOS
 
 ### ✨ NUEVOS ARCHIVOS (6)
+
 ```
 ✅ src/app/layout/toolbar.component.ts
    - Barra superior con logo, búsqueda y usuario
@@ -117,6 +122,7 @@ ng build
 ```
 
 ### 🔄 ARCHIVOS MODIFICADOS (5)
+
 ```
 ✅ src/app/layout/layout.component.ts
    - Refactorizado para orquestar nuevos componentes
@@ -154,6 +160,7 @@ ng build
 ## 🎨 CARACTERÍSTICAS CLAVE
 
 ### Toolbar
+
 - ✅ Logo SGI con icono
 - ✅ Búsqueda global (input funcional)
 - ✅ Botón hamburguesa (móvil)
@@ -163,6 +170,7 @@ ng build
 - ✅ Responsive: Search oculta en móvil small
 
 ### Sidebar
+
 - ✅ Navegación con 6 menús
 - ✅ Colapsable: 260px ↔ 80px
 - ✅ Drawer flotante en móvil
@@ -173,6 +181,7 @@ ng build
 - ✅ Iconos emoji (pueden cambiarse a Material Icons)
 
 ### Content Area
+
 - ✅ Flex: 1 (ocupa espacio restante)
 - ✅ Scroll independiente
 - ✅ Padding responsivo (24px → 12px)
@@ -180,6 +189,7 @@ ng build
 - ✅ Background consistente
 
 ### Responsive Design
+
 ```
 Desktop (≥769px)
 ├─ Sidebar 260px visible
@@ -210,15 +220,15 @@ Small Mobile (<480px)
 
 ```css
 /* Colores Principales */
---primary-color: #667eea;          /* Morado principal */
---primary-dark: #764ba2;            /* Morado oscuro */
---primary-light: #8b9ef7;           /* Morado claro */
+--primary-color: #667eea; /* Morado principal */
+--primary-dark: #764ba2; /* Morado oscuro */
+--primary-light: #8b9ef7; /* Morado claro */
 
 /* Colores de Estado */
---success-color: #28a745;           /* Verde */
---warning-color: #ffc107;           /* Amarillo */
---danger-color: #dc3545;            /* Rojo */
---info-color: #17a2b8;              /* Cyan */
+--success-color: #28a745; /* Verde */
+--warning-color: #ffc107; /* Amarillo */
+--danger-color: #dc3545; /* Rojo */
+--info-color: #17a2b8; /* Cyan */
 
 /* Espaciado */
 --spacing-xs: 4px;
@@ -252,6 +262,7 @@ Small Mobile (<480px)
 ## 🚀 PRÓXIMOS PASOS (Fase 2)
 
 ### Inmediato (esta semana)
+
 ```bash
 1. Review y PR en GitHub
 2. Merge a rama main
@@ -259,15 +270,16 @@ Small Mobile (<480px)
 ```
 
 ### Corto Plazo (próximas 2 semanas)
+
 ```bash
 1. Dashboard con gráficos
    npm install chart.js ng2-charts
-   
+
 2. Tablas mejoradas
    - Paginación (Material Paginator)
    - Ordenamiento
    - Búsqueda por columna
-   
+
 3. Formularios avanzados
    - Validación en tiempo real
    - Autocompletado
@@ -275,22 +287,24 @@ Small Mobile (<480px)
 ```
 
 ### Mediano Plazo (próximas 4-6 semanas)
+
 ```bash
 1. Módulos faltantes
    - Clientes (CRUD)
    - Proveedores (CRUD)
    - Categorías
    - Almacenes
-   
+
 2. Material Icons
    - Reemplazar emojis con iconos vectoriales
-   
+
 3. Reportes
    - PDF/Excel
    - Análisis de datos
 ```
 
 ### Largo Plazo (próximos 2-3 meses)
+
 ```bash
 1. Tema oscuro/claro
 2. Notificaciones en tiempo real
@@ -305,58 +319,67 @@ Small Mobile (<480px)
 ## 📚 DOCUMENTACIÓN DISPONIBLE
 
 ### 1️⃣ **LAYOUT_GUIDE.md**
-   📖 Guía técnica completa
-   ```
-   - Descripción general
-   - Estructura de componentes
-   - Interfaz MenuItem
-   - Casos de uso
-   - Instalación paso a paso
-   - Variables CSS
-   - Testing
-   - Referencias
-   ```
+
+📖 Guía técnica completa
+
+```
+- Descripción general
+- Estructura de componentes
+- Interfaz MenuItem
+- Casos de uso
+- Instalación paso a paso
+- Variables CSS
+- Testing
+- Referencias
+```
 
 ### 2️⃣ **CAMBIOS_LAYOUT_GENERAL.md**
-   📊 Resumen de cambios
-   ```
-   - QUÉ se ha completado
-   - Cambios de archivos
-   - Características implementadas
-   - Cómo usar
-   - Notas importantes
-   - Próximos pasos
-   - Checklist final
-   ```
+
+📊 Resumen de cambios
+
+```
+- QUÉ se ha completado
+- Cambios de archivos
+- Características implementadas
+- Cómo usar
+- Notas importantes
+- Próximos pasos
+- Checklist final
+```
 
 ### 3️⃣ **leeme.txt** (Actualizado)
-   📝 Instrucciones rápidas
-   ```
-   - Ejecución del proyecto
-   - Comandos Git
-   - Cambios principales
-   - Vista del layout
-   - Tecnología usada
-   ```
+
+📝 Instrucciones rápidas
+
+```
+- Ejecución del proyecto
+- Comandos Git
+- Cambios principales
+- Vista del layout
+- Tecnología usada
+```
 
 ### 4️⃣ **Informe_Actualizacion_Base4Empresas.html**
-   📋 Informe visual completo
-   ```
-   - Evaluación del entorno
-   - Análisis de UI/UX
-   - Problemas identificados
-   - Comparativa profesional
-   - Recomendaciones
-   - Hoja de ruta
-   - Conclusiones
-   (Abrir en navegador)
-   ```
+
+📋 Informe visual completo
+
+```
+- Evaluación del entorno
+- Análisis de UI/UX
+- Problemas identificados
+- Comparativa profesional
+- Recomendaciones
+- Hoja de ruta
+- Conclusiones
+(Abrir en navegador)
+```
 
 ---
 
 ## ✨ EJEMPLO DE USO
 
 ### Cambiar Menú Items
+
 ```typescript
 // src/app/layout/layout.component.ts
 
@@ -368,18 +391,20 @@ menuItems: MenuItem[] = [
 ```
 
 ### Personalizar Colores
+
 ```css
 /* src/styles.css */
 
 :root {
-  --primary-color: #FF6B6B;      /* Rojo */
-  --primary-dark: #C92A2A;
-  --success-color: #51CF66;       /* Verde */
+  --primary-color: #ff6b6b; /* Rojo */
+  --primary-dark: #c92a2a;
+  --success-color: #51cf66; /* Verde */
   /* ... más colores */
 }
 ```
 
 ### Manejar Búsqueda Global
+
 ```typescript
 // src/app/layout/layout.component.ts
 
@@ -397,6 +422,7 @@ onGlobalSearch(query: string): void {
 ## 🔍 VERIFI CACIÓN
 
 ### Build Status
+
 ```bash
 ✅ ng build
    - Output location: dist/base4empresas
@@ -408,6 +434,7 @@ onGlobalSearch(query: string): void {
 ```
 
 ### Lint & Errors
+
 ```bash
 ✅ Sin errores de compilación
 ✅ Sin errores de TypeScript
@@ -416,6 +443,7 @@ onGlobalSearch(query: string): void {
 ```
 
 ### Tests
+
 ```bash
 ⏳ Tests: Configurar en próxima fase
    (Estructura lista, solo agregar specs)
@@ -450,6 +478,7 @@ onGlobalSearch(query: string): void {
 ## 📞 INSTRUCCIONES FINALES
 
 ### Para desarrollar
+
 ```bash
 git checkout feature/layout-general
 ng serve
@@ -457,12 +486,14 @@ ng serve
 ```
 
 ### Para revisar cambios
+
 ```bash
 git log --oneline feature/layout-general
 # Ver commits realizados
 ```
 
 ### Para hacer PR
+
 ```bash
 1. Ir a: https://github.com/[repo]
 2. Click "Compare & pull request"
@@ -472,6 +503,7 @@ git log --oneline feature/layout-general
 ```
 
 ### Para mergear a main
+
 ```bash
 git checkout main
 git pull origin main

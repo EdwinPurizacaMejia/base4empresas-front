@@ -1,66 +1,221 @@
 <div class="dashboard-container">
   <!-- Page Header -->
   <div class="page-header">
-    <h1>Dashboard</h1>
-    <p class="subtitle">Resumen de tu sistema de inventario</p>
+    <div class="header-content">
+      <h1>Dashboard Administrativo</h1>
+      <p class="subtitle">Resumen completo de tu negocio</p>
+    </div>
+    <div class="header-date">
+      {{ currentDate }}
+    </div>
   </div>
 
   <!-- Loading State -->
   <div class="loading-state" *ngIf="loading">
     <div class="spinner"></div>
-    <p>Cargando datos...</p>
+    <p>Cargando datos del dashboard...</p>
   </div>
 
   <!-- Error State -->
   <div class="error-state" *ngIf="error && !loading">
     <span class="error-icon">⚠️</span>
     <p>{{ error }}</p>
+    <button class="error-btn" (click)="ngOnInit()">Reintentar</button>
   </div>
 
-  <!-- Dashboard Cards Grid -->
-  <div class="dashboard-grid" *ngIf="!loading && !error">
-    <div *ngFor="let card of cards" class="dashboard-card" [ngClass]="getCardClass(card)">
-      <div class="card-header">
-        <span class="card-icon">{{ card.icon }}</span>
-        <h3 class="card-title">{{ card.title }}</h3>
+  <!-- Dashboard Content -->
+  <div class="dashboard-content" *ngIf="!loading && !error">
+    <!-- KPI Cards Section -->
+    <section class="kpi-section">
+      <div class="section-title">
+        <h2>Indicadores Clave (KPIs)</h2>
+        <p>Métricas principales de tu negocio</p>
       </div>
-      <div class="card-body">
-        <div class="card-value">{{ card.value }}</div>
-        <p class="card-subtitle" *ngIf="card.subtitle">{{ card.subtitle }}</p>
+      
+      <div class="kpi-grid">
+        <div *ngFor="let card of cards" class="kpi-card" [ngClass]="getCardClass(card)">
+          <div class="kpi-header">
+            <div class="kpi-icon-wrapper">
+              <span class="kpi-icon">{{ card.icon }}</span>
+            </div>
+            <div class="kpi-title-section">
+              <h3 class="kpi-title">{{ card.title }}</h3>
+              <p class="kpi-subtitle">{{ card.subtitle }}</p>
+            </div>
+          </div>
+
+          <div class="kpi-body">
+            <div class="kpi-value">{{ card.value }}</div>
+            <div class="kpi-trend" *ngIf="card.trend" [ngClass]="getTrendClass(card.trend)">
+              <span class="trend-icon">{{ getTrendIcon(card.trend) }}</span>
+              <span class="trend-text">{{ card.trend }}% vs mes anterior</span>
+            </div>
+          </div>
+
+          <div class="kpi-footer">
+            <div class="kpi-bar">
+              <div class="kpi-progress" [style.width.%]="80"></div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card-footer">
-        <div class="card-indicator"></div>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts-section">
+      <div class="section-title">
+        <h2>Análisis y Tendencias</h2>
+        <p>Visualización de datos importantes</p>
       </div>
-    </div>
+
+      <div class="charts-grid">
+        <!-- Sales Trend Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Ventas vs Compras (6 Meses)</h3>
+            <p class="chart-subtitle">Análisis de tendencias</p>
+          </div>
+          <div class="chart-body">
+            <div class="chart-container">
+              <!-- Gráfico deshabilitado por incompatibilidad de ng2-charts -->
+              <p style="text-align: center; color: #999; padding: 40px;">Gráfico de línea no disponible</p>
+              <!-- <canvas
+                baseChart
+                [type]="'line'"
+                [data]="salesLineChartConfig.data"
+                [options]="salesLineChartConfig.options"
+              ></canvas> -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Category Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Productos por Categoría</h3>
+            <p class="chart-subtitle">Distribución de inventario</p>
+          </div>
+          <div class="chart-body">
+            <div class="chart-container">
+              <!-- Gráfico deshabilitado por incompatibilidad de ng2-charts -->
+              <p style="text-align: center; color: #999; padding: 40px;">Gráfico de barras no disponible</p>
+              <!-- <canvas
+                baseChart
+                [type]="'bar'"
+                [data]="productCategoryChartConfig.data"
+                [options]="productCategoryChartConfig.options"
+              ></canvas> -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Distribution Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Distribución de Ingresos</h3>
+            <p class="chart-subtitle">Proporción de ventas, compras y otros</p>
+          </div>
+          <div class="chart-body">
+            <div class="chart-container chart-container-doughnut">
+              <!-- Gráfico deshabilitado por incompatibilidad de ng2-charts -->
+              <p style="text-align: center; color: #999; padding: 40px;">Gráfico de donut no disponible</p>
+              <!-- <canvas
+                baseChart
+                [type]="'doughnut'"
+                [data]="revenueChartConfig.data"
+                [options]="revenueChartConfig.options"
+              ></canvas> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions Section -->
+    <section class="actions-section" *ngIf="cards.length > 0">
+      <div class="section-title">
+        <h2>Acciones Rápidas</h2>
+        <p>Accede rápidamente a las funciones principales</p>
+      </div>
+
+      <div class="actions-grid">
+        <a href="/products" class="action-card products-card">
+          <div class="action-icon-wrapper">
+            <span class="action-icon">📦</span>
+          </div>
+          <div class="action-content">
+            <h4>Productos</h4>
+            <p>Gestionar inventario</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </a>
+
+        <a href="/sales" class="action-card sales-card">
+          <div class="action-icon-wrapper">
+            <span class="action-icon">💰</span>
+          </div>
+          <div class="action-content">
+            <h4>Ventas</h4>
+            <p>Registrar nuevas ventas</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </a>
+
+        <a href="/purchases" class="action-card purchases-card">
+          <div class="action-icon-wrapper">
+            <span class="action-icon">🛒</span>
+          </div>
+          <div class="action-content">
+            <h4>Compras</h4>
+            <p>Gestionar órdenes</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </a>
+
+        <a href="/stock" class="action-card stock-card">
+          <div class="action-icon-wrapper">
+            <span class="action-icon">📊</span>
+          </div>
+          <div class="action-content">
+            <h4>Inventario</h4>
+            <p>Ver stock disponible</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </a>
+
+        <a href="/kardex" class="action-card kardex-card">
+          <div class="action-icon-wrapper">
+            <span class="action-icon">📋</span>
+          </div>
+          <div class="action-content">
+            <h4>Kardex</h4>
+            <p>Historial de movimientos</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </a>
+
+        <a href="#" class="action-card reports-card">
+          <div class="action-icon-wrapper">
+            <span class="action-icon">📈</span>
+          </div>
+          <div class="action-content">
+            <h4>Reportes</h4>
+            <p>Generar reportes</p>
+          </div>
+          <div class="action-arrow">→</div>
+        </a>
+      </div>
+    </section>
   </div>
 
   <!-- Empty State -->
   <div class="empty-state" *ngIf="!loading && cards.length === 0 && !error">
     <div class="empty-icon">📊</div>
     <h2>No hay datos disponibles</h2>
-    <p>Comienza a crear productos, realizando ventas o compras</p>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="quick-actions" *ngIf="!loading && cards.length > 0">
-    <h2>Acciones Rápidas</h2>
-    <div class="actions-grid">
-      <a href="/products" class="action-card">
-        <span class="action-icon">📦</span>
-        <span class="action-label">Crear Producto</span>
-      </a>
-      <a href="/sales" class="action-card">
-        <span class="action-icon">💰</span>
-        <span class="action-label">Registrar Venta</span>
-      </a>
-      <a href="/purchases" class="action-card">
-        <span class="action-icon">🛒</span>
-        <span class="action-label">Registrar Compra</span>
-      </a>
-      <a href="/stock" class="action-card">
-        <span class="action-icon">📈</span>
-        <span class="action-label">Ver Inventario</span>
-      </a>
+    <p>Comienza a crear productos, realizando ventas o compras para ver el dashboard</p>
+    <div class="empty-actions">
+      <a href="/products" class="empty-btn">Crear Producto</a>
+      <a href="/sales" class="empty-btn secondary">Registrar Venta</a>
     </div>
   </div>
 </div>

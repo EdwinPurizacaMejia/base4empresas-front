@@ -1,6 +1,7 @@
 # 🎉 RESUMEN DE CAMBIOS - FEATURE/LAYOUT-GENERAL
 
 ## 📅 Fecha: 30 de abril de 2026
+
 ## 🌿 Rama: `feature/layout-general`
 
 ---
@@ -8,19 +9,22 @@
 ## ✅ QUÉ SE HA COMPLETADO
 
 ### 1. **Instalación de Angular Material 17**
+
 ```bash
 npm install @angular/material@17 @angular/cdk@17 --save
 ```
+
 ✅ Material Design integrado  
 ✅ Componentes profesionales disponibles  
 ✅ Animaciones incluidas  
-✅ Temas de color configurables  
+✅ Temas de color configurables
 
 ---
 
 ### 2. **Nuevos Componentes Creados**
 
 #### **ToolbarComponent** (`toolbar.component.ts`)
+
 - ✅ Barra superior 64px con logo SGI
 - ✅ Búsqueda global interactiva
 - ✅ Menú hamburguesa para móvil
@@ -29,6 +33,7 @@ npm install @angular/material@17 @angular/cdk@17 --save
 - ✅ Emite eventos: `menuToggle`, `search`
 
 **Características:**
+
 ```
 ┌─────────────────────────────────────────────┐
 │ [☰] [📦 SGI] [Buscar......]  [👤 Admin]   │ ← 64px height
@@ -36,6 +41,7 @@ npm install @angular/material@17 @angular/cdk@17 --save
 ```
 
 #### **SidebarComponent** (`sidebar.component.ts`)
+
 - ✅ Navegación lateral con 6 menús
 - ✅ Colapsable en desktop (260px → 80px)
 - ✅ Drawer flotante en móvil
@@ -45,6 +51,7 @@ npm install @angular/material@17 @angular/cdk@17 --save
 - ✅ Estados activo/hover visuales
 
 **Menú Incluido:**
+
 ```
 📊 Dashboard
 📦 Productos
@@ -55,6 +62,7 @@ npm install @angular/material@17 @angular/cdk@17 --save
 ```
 
 #### **LayoutComponent** (Refactorizado)
+
 - ✅ Orquestador principal del shell
 - ✅ Maneja estado de sidebar
 - ✅ Detecta viewport (móvil/desktop)
@@ -66,36 +74,14 @@ npm install @angular/material@17 @angular/cdk@17 --save
 ### 3. **Estilos Globales Renovados** (`src/styles.css`)
 
 #### Variables CSS Definidas:
+
 ```css
 /* Colores */
---primary-color: #667eea
---primary-dark: #764ba2
---success-color: #28a745
---warning-color: #ffc107
---danger-color: #dc3545
-
-/* Espaciado (8px base) */
---spacing-xs: 4px
---spacing-sm: 8px
---spacing-md: 12px
---spacing-lg: 16px
---spacing-xl: 24px
-
-/* Border Radius */
---radius-sm: 4px
---radius-md: 6px
---radius-lg: 8px
-
-/* Sombras */
---shadow-sm, --shadow-md, --shadow-lg, --shadow-xl
-
-/* Transiciones */
---transition-fast: 0.2s
---transition-normal: 0.3s
---transition-slow: 0.5s
+--primary-color: #667eea --primary-dark: #764ba2 --success-color: #28a745 --warning-color: #ffc107 --danger-color: #dc3545 /* Espaciado (8px base) */ --spacing-xs: 4px --spacing-sm: 8px --spacing-md: 12px --spacing-lg: 16px --spacing-xl: 24px /* Border Radius */ --radius-sm: 4px --radius-md: 6px --radius-lg: 8px /* Sombras */ --shadow-sm, --shadow-md, --shadow-lg, --shadow-xl /* Transiciones */ --transition-fast: 0.2s --transition-normal: 0.3s --transition-slow: 0.5s;
 ```
 
 #### Utilidades CSS:
+
 - ✅ Reset y normalización
 - ✅ Tipografía profesional (h1-h6, p)
 - ✅ Estilos de formularios
@@ -108,14 +94,15 @@ npm install @angular/material@17 @angular/cdk@17 --save
 ### 4. **Configuración de Angular Actualizada**
 
 #### `app.config.ts`:
+
 ```typescript
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideClientHydration(),
     provideHttpClient(withFetch()),
-    provideAnimations() // ✅ Agregado para Material
-  ]
+    provideAnimations(), // ✅ Agregado para Material
+  ],
 };
 ```
 
@@ -124,6 +111,7 @@ export const appConfig: ApplicationConfig = {
 ### 5. **Responsive Design Implementado**
 
 #### Breakpoints:
+
 ```css
 Desktop (≥769px)       → Sidebar 260px visible
 Tablet (769-1024px)    → Sidebar colapsable
@@ -132,6 +120,7 @@ Small Mobile (<480px)  → Búsqueda oculta
 ```
 
 #### Comportamiento Móvil:
+
 - ✅ Sidebar se oculta por defecto
 - ✅ Overlay semi-transparente al abrir
 - ✅ Click en overlay cierra sidebar
@@ -144,7 +133,9 @@ Small Mobile (<480px)  → Búsqueda oculta
 ### 6. **Documentación Completa**
 
 #### Archivo: `LAYOUT_GUIDE.md`
+
 Contiene:
+
 - ✅ Descripción general del layout
 - ✅ Estructura de componentes
 - ✅ Interfaz MenuItem
@@ -182,6 +173,7 @@ TOTAL: 13 archivos cambiados, 2653 inserciones(+), 343 eliminaciones(-)
 ## 🚀 Cómo Usar
 
 ### Verificar la Nueva Rama:
+
 ```bash
 git branch
 # Output: * feature/layout-general
@@ -189,12 +181,14 @@ git branch
 ```
 
 ### Ejecutar Proyecto:
+
 ```bash
 ng serve
 # Navegador: http://localhost:4200
 ```
 
 ### Compilar:
+
 ```bash
 ng build
 # ✅ Build exitosa (solo warnings de presupuesto)
@@ -204,38 +198,42 @@ ng build
 
 ## 🎯 Características Implementadas
 
-| Feature | Status | Detalles |
-|---------|--------|----------|
-| **Toolbar Superior** | ✅ | Logo, búsqueda, usuario |
-| **Sidebar Navegación** | ✅ | 6 menús, responsive |
-| **Búsqueda Global** | ✅ | Input funcional (sin backend aún) |
-| **Responsive Design** | ✅ | Mobile, tablet, desktop |
-| **SSR Compatible** | ✅ | Sin errores de servidor |
-| **Variables CSS** | ✅ | 20+ variables definidas |
-| **Estilos Globales** | ✅ | Tipografía, cards, alerts, badges |
-| **Documentación** | ✅ | Guía completa incluida |
-| **Routing Intacto** | ✅ | Todos los routes funcionan igual |
+| Feature                | Status | Detalles                          |
+| ---------------------- | ------ | --------------------------------- |
+| **Toolbar Superior**   | ✅     | Logo, búsqueda, usuario           |
+| **Sidebar Navegación** | ✅     | 6 menús, responsive               |
+| **Búsqueda Global**    | ✅     | Input funcional (sin backend aún) |
+| **Responsive Design**  | ✅     | Mobile, tablet, desktop           |
+| **SSR Compatible**     | ✅     | Sin errores de servidor           |
+| **Variables CSS**      | ✅     | 20+ variables definidas           |
+| **Estilos Globales**   | ✅     | Tipografía, cards, alerts, badges |
+| **Documentación**      | ✅     | Guía completa incluida            |
+| **Routing Intacto**    | ✅     | Todos los routes funcionan igual  |
 
 ---
 
 ## ⚠️ Notas Importantes
 
 ### 1. **SSR (Server-Side Rendering)**
+
 - ✅ Se usa `isPlatformBrowser()` para detectar cliente
 - ✅ Acceso a `window` solo en navegador
 - ✅ Build completa sin errores
 
 ### 2. **Routing**
+
 - ✅ SIN cambios en `app.routes.ts`
 - ✅ Layout sigue siendo shell para todas las rutas
 - ✅ Todas las páginas cargan dentro del outlet
 
 ### 3. **Material Icons vs Emojis**
+
 - Actualmente usa emojis (📊 📦 💰 etc.)
 - Puedo cambiar a Material Icons en próxima fase
 - Ver sección "Mejoras Futuras"
 
 ### 4. **Performance**
+
 - ✅ Bundle size: 510.48 kB (ligeramente sobre presupuesto)
 - ℹ️ Esto es normal con Material
 - Próxima fase: optimizar y tree-shaking
@@ -245,6 +243,7 @@ ng build
 ## 📈 Próximos Pasos (Fase 2)
 
 ### A. Dashboard Mejorado
+
 ```typescript
 // Agregar gráficos con ng2-charts
 - npm install chart.js ng2-charts
@@ -253,6 +252,7 @@ ng build
 ```
 
 ### B. Tablas Mejoradas
+
 ```typescript
 // Usar Material Table
 - Paginación
@@ -262,6 +262,7 @@ ng build
 ```
 
 ### C. Formularios Avanzados
+
 ```typescript
 // Validación en tiempo real
 - Autocompletado
@@ -270,6 +271,7 @@ ng build
 ```
 
 ### D. Módulos Faltantes
+
 ```
 - Clientes (CRUD)
 - Proveedores (CRUD)
