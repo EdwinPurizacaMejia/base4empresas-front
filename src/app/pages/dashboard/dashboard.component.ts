@@ -1,110 +1,224 @@
-import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTabsModule } from '@angular/material/tabs';
 import { ProductsService } from '../../services/products.service';
 import { SalesService } from '../../services/sales.service';
 import { PurchaseService } from '../../services/purchase.service';
-import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { NgChartsModule } from 'ng2-charts';
+import { ChartConfiguration } from 'chart.js';
 
-// Register Chart.js
-Chart.register(...registerables);
-
-interface KPICard {
+interface DashboardCard {
   title: string;
-  value: number | string;
-  change?: number;
-  changeType?: 'increase' | 'decrease' | 'neutral';
   icon: string;
-  color: string;
-  backgroundColor?: string;
+  value: number | string;
+  subtitle?: string;
+  color: 'blue' | 'green' | 'orange' | 'red' | 'purple';
+  loading?: boolean;
+  trend?: number;
 }
 
-interface SalesData {
+interface MonthlyData {
   month: string;
   sales: number;
   purchases: number;
+  revenue: number;
 }
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatButtonModule,
-    MatTabsModule
-  ],
+  imports: [CommonModule, NgChartsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   // KPI Cards
-  kpiCards: KPICard[] = [];
-  
-  // Charts data
-  salesData: SalesData[] = [];
-  
-  // Chart references
-  salesChart: Chart | null = null;
-  categoryChart: Chart | null = null;
-  
-  // Loading and error states
-  loading = true;
-  error = '';
+  cards: DashboardCard[] = [];
   currentDate: string = '';
   
-  // Stats from services
-  totalSalesThisMonth = 0;
-  totalPurchasesThisMonth = 0;
-  activeProducts = 0;
-  lowStockProducts = 0;
+  // Chart Data
+  monthlySalesData: MonthlyData[] = [];
+  productCategories: string[] = [];
+  productCounts: number[] = [];
+  salesTrendData: number[] = [];
+  
+  // Chart Configurations
+  salesLineChartConfig: ChartConfiguration<'line'> = {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: 'Ventas Mensuales',
+          data: [],
+          borderColor: '#667eea',
+          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#667eea',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        },
+        {
+          label: 'Compras Mensuales',
+          data: [],
+          borderColor: '#764ba2',
+          backgroundColor: 'rgba(118, 75, 162, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#764ba2',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#667eea'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        }
+      }
+    }
+  };
+
+  productCategoryChartConfig: ChartConfiguration<'bar'> = {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: 'Productos por Categoría',
+          data: [],
+          backgroundColor: [
+            'rgba(102, 126, 234, 0.8)',
+            'rgba(118, 75, 162, 0.8)',
+            'rgba(40, 167, 69, 0.8)',
+            'rgba(255, 193, 7, 0.8)',
+            'rgba(220, 53, 69, 0.8)',
+            'rgba(23, 162, 184, 0.8)'
+          ],
+          borderColor: [
+            '#667eea',
+            '#764ba2',
+            '#28a745',
+            '#ffc107',
+            '#dc3545',
+            '#17a2b8'
+          ],
+          borderWidth: 2,
+          borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: true
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#667eea'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      }
+    }
+  };
+
+  revenueChartConfig: ChartConfiguration<'doughnut'> = {
+    type: 'doughnut',
+    data: {
+      labels: ['Ventas', 'Compras', 'Otros'],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: ['#667eea', '#764ba2', '#17a2b8'],
+          borderColor: ['#fff', '#fff', '#fff'],
+          borderWidth: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  };
+
+  loading = true;
+  error = '';
 
   constructor(
     private productsService: ProductsService,
     private salesService: SalesService,
-    private purchaseService: PurchaseService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    private purchaseService: PurchaseService
   ) {}
 
   ngOnInit(): void {
-    this.setCurrentDate();
-    this.loadDashboardData();
-  }
-
-  private setCurrentDate(): void {
     this.currentDate = new Date().toLocaleDateString('es-ES', { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
     });
+    this.loadDashboardData();
   }
 
   private loadDashboardData(): void {
     this.loading = true;
     this.error = '';
 
+    // Cargar datos en paralelo
     Promise.all([
       this.loadProducts(),
       this.loadSales(),
-      this.loadPurchases()
+      this.loadPurchases(),
+      this.loadChartData()
     ])
       .then(() => {
-        this.initializeKPICards();
-        this.generateMockSalesData();
-        setTimeout(() => this.initializeCharts(), 100);
         this.loading = false;
       })
       .catch((err) => {
         console.error('Error loading dashboard data:', err);
-        this.loadMockData();
+        this.error = 'Error al cargar datos del dashboard';
         this.loading = false;
       });
   }
@@ -113,11 +227,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return new Promise((resolve) => {
       this.productsService.getProducts().subscribe({
         next: (data) => {
-          this.activeProducts = data?.length || 0;
-          this.lowStockProducts = Math.ceil((data?.length || 0) * 0.12);
+          const totalProducts = data.length;
+          this.cards.push({
+            title: 'Total Productos',
+            icon: '📦',
+            value: totalProducts,
+            subtitle: 'En el sistema',
+            color: 'blue',
+            trend: 5
+          });
           resolve();
         },
         error: () => {
+          this.cards.push({
+            title: 'Total Productos',
+            icon: '📦',
+            value: 0,
+            color: 'blue'
+          });
           resolve();
         }
       });
@@ -128,10 +255,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return new Promise((resolve) => {
       this.salesService.getSales().subscribe({
         next: (data) => {
-          this.totalSalesThisMonth = data?.reduce((sum, sale: any) => sum + (sale.total || 0), 0) || 0;
+          const totalSales = data.reduce((sum, sale) => sum + (sale.total || 0), 0);
+          this.cards.push({
+            title: 'Ventas Totales',
+            icon: '💵',
+            value: `S/${totalSales.toFixed(2)}`,
+            subtitle: `${data.length} transacciones`,
+            color: 'green',
+            trend: 12
+          });
           resolve();
         },
         error: () => {
+          this.cards.push({
+            title: 'Ventas Totales',
+            icon: '💵',
+            value: 'S/0.00',
+            color: 'green'
+          });
           resolve();
         }
       });
@@ -142,267 +283,90 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return new Promise((resolve) => {
       this.purchaseService.getPurchases().subscribe({
         next: (data) => {
-          this.totalPurchasesThisMonth = data?.reduce((sum, purchase: any) => sum + (purchase.total || 0), 0) || 0;
+          const totalPurchases = data.reduce((sum, purchase) => sum + (purchase.total || 0), 0);
+          this.cards.push({
+            title: 'Compras Totales',
+            icon: '🛒',
+            value: `S/${totalPurchases.toFixed(2)}`,
+            subtitle: `${data.length} órdenes`,
+            color: 'orange',
+            trend: 8
+          });
+
+          // Cuarta tarjeta: Margen de Ganancia
+          const sales = this.cards.find(c => c.title === 'Ventas Totales');
+          if (sales) {
+            const salesValue = parseFloat(String(sales.value).replace('S/', '')) || 0;
+            const margin = ((salesValue - totalPurchases) / salesValue * 100) || 0;
+            this.cards.push({
+              title: 'Margen de Ganancia',
+              icon: '📈',
+              value: `${margin.toFixed(1)}%`,
+              subtitle: 'Margen actual',
+              color: 'purple',
+              trend: 3
+            });
+          }
+
           resolve();
         },
         error: () => {
+          this.cards.push({
+            title: 'Compras Totales',
+            icon: '🛒',
+            value: 'S/0.00',
+            color: 'orange'
+          });
           resolve();
         }
       });
     });
   }
 
-  private loadMockData(): void {
-    this.activeProducts = 156;
-    this.lowStockProducts = 18;
-    this.totalSalesThisMonth = 45230;
-    this.totalPurchasesThisMonth = 28150;
-    this.initializeKPICards();
-    this.generateMockSalesData();
-    setTimeout(() => this.initializeCharts(), 100);
+  private loadChartData(): Promise<void> {
+    return new Promise((resolve) => {
+      // Simular datos mensuales para gráficos
+      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
+      const salesData = [15000, 18000, 22000, 19000, 25000, 28000];
+      const purchasesData = [8000, 9000, 11000, 10000, 12000, 14000];
+
+      // Actualizar gráfico de línea
+      this.salesLineChartConfig.data.labels = months;
+      this.salesLineChartConfig.data.datasets[0].data = salesData;
+      this.salesLineChartConfig.data.datasets[1].data = purchasesData;
+
+      // Datos para gráfico de barras (categorías de productos)
+      this.productCategoryChartConfig.data.labels = [
+        'Electrónica',
+        'Ropa',
+        'Alimentos',
+        'Muebles',
+        'Libros',
+        'Otros'
+      ];
+      this.productCategoryChartConfig.data.datasets[0].data = [45, 38, 52, 28, 35, 22];
+
+      // Datos para gráfico doughnut
+      const totalSales = salesData.reduce((a, b) => a + b, 0);
+      const totalPurchases = purchasesData.reduce((a, b) => a + b, 0);
+      const others = totalSales * 0.15;
+      this.revenueChartConfig.data.datasets[0].data = [totalSales, totalPurchases, others];
+
+      resolve();
+    });
   }
 
-  private generateMockSalesData(): void {
-    this.salesData = [
-      { month: 'Enero', sales: 4200, purchases: 3800 },
-      { month: 'Febrero', sales: 5800, purchases: 4200 },
-      { month: 'Marzo', sales: 4500, purchases: 3900 },
-      { month: 'Abril', sales: 6200, purchases: 4800 },
-      { month: 'Mayo', sales: 7100, purchases: 5200 },
-      { month: 'Junio', sales: 6500, purchases: 4900 }
-    ];
+  getCardClass(card: DashboardCard): string {
+    return `card-${card.color}`;
   }
 
-  private initializeKPICards(): void {
-    this.kpiCards = [
-      {
-        title: 'Ingresos Totales',
-        value: this.formatCurrency(this.totalSalesThisMonth),
-        change: 12.5,
-        changeType: 'increase',
-        icon: 'trending_up',
-        color: '#667eea',
-        backgroundColor: 'rgba(102, 126, 234, 0.1)'
-      },
-      {
-        title: 'Gastos Totales',
-        value: this.formatCurrency(this.totalPurchasesThisMonth),
-        change: -5.2,
-        changeType: 'decrease',
-        icon: 'trending_down',
-        color: '#764ba2',
-        backgroundColor: 'rgba(118, 75, 162, 0.1)'
-      },
-      {
-        title: 'Productos en Stock',
-        value: this.activeProducts,
-        change: 8.1,
-        changeType: 'increase',
-        icon: 'inventory_2',
-        color: '#f093fb',
-        backgroundColor: 'rgba(240, 147, 251, 0.1)'
-      },
-      {
-        title: 'Stock Crítico',
-        value: this.lowStockProducts,
-        change: 2.3,
-        changeType: 'increase',
-        icon: 'warning',
-        color: '#ff6b6b',
-        backgroundColor: 'rgba(255, 107, 107, 0.1)'
-      }
-    ];
+  getTrendClass(trend?: number): string {
+    if (!trend) return '';
+    return trend > 0 ? 'trend-up' : 'trend-down';
   }
 
-  private initializeCharts(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.createSalesChart();
-      this.createCategoryChart();
-    }
-  }
-
-  private createSalesChart(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    
-    if (this.salesChart) {
-      this.salesChart.destroy();
-    }
-    
-    const ctx = document.getElementById('salesChart') as HTMLCanvasElement;
-    if (!ctx) return;
-
-    const chartConfig: ChartConfiguration = {
-      type: 'line',
-      data: {
-        labels: this.salesData.map(d => d.month),
-        datasets: [
-          {
-            label: 'Ventas',
-            data: this.salesData.map(d => d.sales),
-            borderColor: '#667eea',
-            backgroundColor: 'rgba(102, 126, 234, 0.05)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#667eea',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointHoverBackgroundColor: '#667eea'
-          },
-          {
-            label: 'Compras',
-            data: this.salesData.map(d => d.purchases),
-            borderColor: '#764ba2',
-            backgroundColor: 'rgba(118, 75, 162, 0.05)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#764ba2',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointHoverBackgroundColor: '#764ba2'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-            labels: {
-              usePointStyle: true,
-              padding: 20,
-              font: {
-                size: 13,
-                weight: 500
-              }
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
-            },
-            ticks: {
-              font: {
-                size: 12
-              }
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              font: {
-                size: 12
-              }
-            }
-          }
-        }
-      }
-    };
-
-    this.salesChart = new Chart(ctx, chartConfig);
-  }
-
-  private createCategoryChart(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    
-    if (this.categoryChart) {
-      this.categoryChart.destroy();
-    }
-    
-    const ctx = document.getElementById('categoryChart') as HTMLCanvasElement;
-    if (!ctx) return;
-
-    const chartConfig: ChartConfiguration = {
-      type: 'doughnut',
-      data: {
-        labels: ['Electrónica', 'Ropa', 'Alimentos', 'Hogar', 'Otros'],
-        datasets: [
-          {
-            data: [28, 22, 18, 20, 12],
-            backgroundColor: [
-              '#667eea',
-              '#764ba2',
-              '#f093fb',
-              '#4facfe',
-              '#43e97b'
-            ],
-            borderColor: '#fff',
-            borderWidth: 2
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              usePointStyle: true,
-              padding: 20,
-              font: {
-                size: 12
-              }
-            }
-          }
-        }
-      }
-    };
-
-    this.categoryChart = new Chart(ctx, chartConfig);
-  }
-
-  private formatCurrency(value: number): string {
-    return new Intl.NumberFormat('es-PE', {
-      style: 'currency',
-      currency: 'PEN',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value);
-  }
-
-  getChangeIcon(changeType?: string): string {
-    switch (changeType) {
-      case 'increase':
-        return 'arrow_upward';
-      case 'decrease':
-        return 'arrow_downward';
-      default:
-        return 'remove';
-    }
-  }
-
-  getIconEmoji(iconName: string): string {
-    const emojiMap: { [key: string]: string } = {
-      'trending_up': '📈',
-      'trending_down': '📉',
-      'inventory_2': '📦',
-      'warning': '⚠️',
-      'arrow_upward': '↑',
-      'arrow_downward': '↓'
-    };
-    return emojiMap[iconName] || '•';
-  }
-
-  ngOnDestroy(): void {
-    if (this.salesChart) {
-      this.salesChart.destroy();
-    }
-    if (this.categoryChart) {
-      this.categoryChart.destroy();
-    }
+  getTrendIcon(trend?: number): string {
+    if (!trend) return '';
+    return trend > 0 ? '↑' : '↓';
   }
 }
-
