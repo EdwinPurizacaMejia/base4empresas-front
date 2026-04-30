@@ -1,2 +1,12 @@
+Para ejecutar en local el proyecto:
+1. #para construir el proyecto
 ng build
+2. #arranca la aplicación para que se pueda ver en el navegador
+ng serve
 
+Para terminar la aplicación presionar ctrl + c (back y front)
+
+--subir tus cambios a la rama remota desde tu rama local, en la terminal hacer:
+git add .
+git commit -m "Se corrigieron errores en el servicio de almacen"
+git push origin
