@@ -1,2 +1,141 @@
-ng build
+BASE4EMPRESAS - SISTEMA DE GESTIÓN DE INVENTARIO
+=================================================
 
+## ✨ RAMA ACTUAL: feature/layout-general
+
+Esta es una rama de mejora que incluye un layout completamente renovado.
+
+## 🚀 EJECUCIÓN DEL PROYECTO
+
+### Para desarrollar:
+1. ng serve
+   (Inicia servidor en http://localhost:4200)
+
+### Para compilar:
+1. ng build
+   (Compila el proyecto con SSR)
+
+### Para terminar:
+   Presionar Ctrl + C (back y front)
+
+## 📦 GIT - Comandos Básicos
+
+### Ver ramas:
+git branch
+# Output: * feature/layout-general
+#         main
+
+### Cambiar a main:
+git checkout main
+
+### Volver a feature/layout-general:
+git checkout feature/layout-general
+
+### Subir cambios a rama remota:
+git add .
+git commit -m "Descripción de los cambios"
+git push origin feature/layout-general
+
+### Hacer Pull Request (PR):
+1. Ir a GitHub
+2. Click en "Compare & pull request"
+3. Describir cambios
+4. Submit para revisión
+
+## 📄 DOCUMENTACIÓN
+
+📖 LAYOUT_GUIDE.md
+   Guía técnica completa de la nueva arquitectura de layout.
+   Incluye: componentes, uso, responsive, ejemplos.
+
+📊 CAMBIOS_LAYOUT_GENERAL.md
+   Resumen detallado de todos los cambios realizados.
+   QUÉ se hizo, CÓMO usarlo, PRÓXIMOS PASOS.
+
+📋 Informe_Actualizacion_Base4Empresas.html
+   Informe visual completo sobre estado del proyecto.
+   (Abrir en navegador)
+
+## 🎯 CAMBIOS PRINCIPALES EN ESTA RAMA
+
+✅ Instalación de Angular Material 17
+✅ Nuevo ToolbarComponent (búsqueda global)
+✅ Nuevo SidebarComponent (navegación mejorada)
+✅ Estilos globales renovados
+✅ Responsive design (mobile, tablet, desktop)
+✅ Corregido para SSR (Server-Side Rendering)
+✅ Variables CSS para personalización
+
+## 📱 VISTA DEL LAYOUT
+
+┌─────────────────────────────────────┐
+│    TOOLBAR (búsqueda global)        │
+├──────────┬─────────────────────────┤
+│          │                         │
+│ SIDEBAR  │    CONTENIDO            │
+│          │  (router-outlet)        │
+│          │                         │
+│          │                         │
+└──────────┴─────────────────────────┘
+
+Responsive: Desktop → Tablet → Mobile
+Menú: Dashboard, Productos, Inventario, Kardex, Compras, Ventas
+
+## ✨ CARACTERÍSTICAS IMPLEMENTADAS
+
+✅ Toolbar superior (64px)
+   - Logo SGI
+   - Búsqueda global
+   - Menú hamburguesa (móvil)
+   - Información de usuario
+
+✅ Sidebar navegación
+   - 6 menús funcionales
+   - Colapsable en desktop
+   - Drawer en móvil
+   - Badges de notificaciones
+
+✅ Responsive design
+   - Desktop (≥769px): Sidebar visible
+   - Tablet: Sidebar colapsable
+   - Mobile (<769px): Sidebar drawer
+   - Small mobile: Búsqueda oculta
+
+✅ Estilos profesionales
+   - Variables CSS globales
+   - Paleta de colores consistente
+   - Tipografía moderna
+   - Animaciones suaves
+
+## 🔧 TECNOLOGÍA USADA
+
+Angular 17.3.0
+TypeScript 5.4.2
+Angular Material 17
+Node.js 18+
+npm 9+
+
+## 📈 PRÓXIMOS PASOS (Fase 2)
+
+1. Dashboard con gráficos (ng2-charts)
+2. Tablas mejoradas con paginación
+3. Formularios avanzados
+4. Módulos de Clientes y Proveedores
+5. Reportes y exportación PDF/Excel
+
+## ⚠️ NOTAS IMPORTANTES
+
+- El routing NO ha cambiado, funciona exactamente igual
+- SSR (Server-Side Rendering) está completamente funcional
+- Material Icons se pueden agregar en próxima fase
+- Bundle size está ligeramente sobre presupuesto (normal con Material)
+
+## 📞 DUDAS / PROBLEMAS
+
+Revisar LAYOUT_GUIDE.md para preguntas técnicas específicas.
+Revisar CAMBIOS_LAYOUT_GENERAL.md para resumen de cambios.
+
+=================================================
+Última actualización: 30 de abril de 2026
+Rama: feature/layout-general
+Status: ✅ Ready para Pull Request

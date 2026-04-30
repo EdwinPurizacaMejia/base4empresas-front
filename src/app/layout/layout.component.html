@@ -1,56 +1,31 @@
+<!-- Shell Layout: Toolbar + Sidebar + Content -->
 <div class="layout-container">
-  <!-- Sidebar -->
-  <aside class="sidebar" [class.collapsed]="!sidebarOpen">
-    <!-- Logo -->
-    <div class="sidebar-header">
-      <div class="logo-container">
-        <span class="logo-icon">📦</span>
-        <span class="logo-text" *ngIf="sidebarOpen">SGI</span>
-      </div>
-      <button class="toggle-btn" (click)="toggleSidebar()" title="Contraer/Expandir">
-        {{ sidebarOpen ? '◀' : '▶' }}
-      </button>
-    </div>
+  <!-- Toolbar Superior -->
+  <app-toolbar 
+    (menuToggle)="toggleSidebar()" 
+    (search)="onGlobalSearch($event)">
+  </app-toolbar>
 
-    <!-- Menu Items -->
-    <nav class="sidebar-nav">
-      <a 
-        *ngFor="let item of menuItems"
-        [routerLink]="item.route"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-        class="nav-item"
-        (click)="closeSidebar()"
-      >
-        <span class="nav-icon">{{ item.icon }}</span>
-        <span class="nav-label" *ngIf="sidebarOpen">{{ item.label }}</span>
-      </a>
-    </nav>
+  <!-- Layout Principal -->
+  <div class="layout-main">
+    <!-- Sidebar Navegación -->
+    <app-sidebar
+      [isOpen]="sidebarOpen"
+      [menuItems]="menuItems"
+      (toggleSidebar)="toggleSidebar()"
+    ></app-sidebar>
 
-    <!-- Footer -->
-    <div class="sidebar-footer" *ngIf="sidebarOpen">
-      <p>© 2026 SGI</p>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <div class="main-container">
-    <!-- Header -->
-    <header class="header">
-      <div class="header-left">
-        <button class="menu-toggle" (click)="toggleSidebar()" title="Menú">
-          ☰
-        </button>
-        <h1 class="system-title">SGI - Sistema de Gestión de Inventario</h1>
-      </div>
-      <div class="header-right">
-        <span class="user-info">👤 Usuario Admin</span>
-      </div>
-    </header>
-
-    <!-- Content Area -->
-    <main class="content">
+    <!-- Área de Contenido -->
+    <main class="layout-content">
       <router-outlet></router-outlet>
     </main>
+
+    <!-- Overlay para móvil cuando sidebar está abierto -->
+    <div
+      class="layout-overlay"
+      *ngIf="sidebarOpen && isMobileView"
+      (click)="toggleSidebar()"
+      [@fadeInOut]
+    ></div>
   </div>
 </div>
