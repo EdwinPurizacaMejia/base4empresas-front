@@ -77,14 +77,17 @@
           </div>
           <div class="chart-body">
             <div class="chart-container">
-              <!-- Gráfico deshabilitado por incompatibilidad de ng2-charts -->
-              <p style="text-align: center; color: #999; padding: 40px;">Gráfico de línea no disponible</p>
-              <!-- <canvas
-                baseChart
-                [type]="'line'"
-                [data]="salesLineChartConfig.data"
-                [options]="salesLineChartConfig.options"
-              ></canvas> -->
+              <div class="simple-chart">
+                <div class="chart-bars">
+                  <div class="chart-bar" *ngFor="let month of salesLineChartConfig.data.labels">
+                    <div class="bar-group">
+                      <div class="bar" [style.height]="'20px'" style="background: #667eea;"></div>
+                      <div class="bar" [style.height]="'12px'" style="background: #764ba2;"></div>
+                    </div>
+                    <div class="bar-label">{{ month }}</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -97,14 +100,16 @@
           </div>
           <div class="chart-body">
             <div class="chart-container">
-              <!-- Gráfico deshabilitado por incompatibilidad de ng2-charts -->
-              <p style="text-align: center; color: #999; padding: 40px;">Gráfico de barras no disponible</p>
-              <!-- <canvas
-                baseChart
-                [type]="'bar'"
-                [data]="productCategoryChartConfig.data"
-                [options]="productCategoryChartConfig.options"
-              ></canvas> -->
+              <div class="simple-chart">
+                <div class="horizontal-bars">
+                  <div class="h-bar-item" *ngFor="let label of productCategoryChartConfig.data.labels; let i = index">
+                    <div class="h-bar-label">{{ label }}</div>
+                    <div class="h-bar-track">
+                      <div class="h-bar-fill" [style.width.%]="getBarWidth(productCategoryChartConfig.data.datasets[0].data[i])"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -117,14 +122,24 @@
           </div>
           <div class="chart-body">
             <div class="chart-container chart-container-doughnut">
-              <!-- Gráfico deshabilitado por incompatibilidad de ng2-charts -->
-              <p style="text-align: center; color: #999; padding: 40px;">Gráfico de donut no disponible</p>
-              <!-- <canvas
-                baseChart
-                [type]="'doughnut'"
-                [data]="revenueChartConfig.data"
-                [options]="revenueChartConfig.options"
-              ></canvas> -->
+              <div class="simple-chart">
+                <div class="donut-chart">
+                  <div class="donut-legend">
+                    <div class="legend-item">
+                      <div class="legend-color" style="background: #667eea;"></div>
+                      <span>Ventas</span>
+                    </div>
+                    <div class="legend-item">
+                      <div class="legend-color" style="background: #764ba2;"></div>
+                      <span>Compras</span>
+                    </div>
+                    <div class="legend-item">
+                      <div class="legend-color" style="background: #17a2b8;"></div>
+                      <span>Otros</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

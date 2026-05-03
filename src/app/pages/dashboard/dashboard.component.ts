@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ProductsService } from '../../services/products.service';
 import { SalesService } from '../../services/sales.service';
 import { PurchaseService } from '../../services/purchase.service';
-import { NgChartsModule } from 'ng2-charts';
 import { ChartConfiguration } from 'chart.js';
 
 interface DashboardCard {
@@ -26,7 +25,7 @@ interface MonthlyData {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, NgChartsModule],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -368,5 +367,10 @@ export class DashboardComponent implements OnInit {
   getTrendIcon(trend?: number): string {
     if (!trend) return '';
     return trend > 0 ? '↑' : '↓';
+  }
+
+  getBarWidth(dataValue: any): number {
+    if (typeof dataValue !== 'number') return 0;
+    return (dataValue / 52) * 100;
   }
 }
