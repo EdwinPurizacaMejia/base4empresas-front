@@ -6,7 +6,8 @@
       <p class="subtitle">Gestiona tu inventario de productos</p>
     </div>
     <button class="btn-primary" (click)="onNewProduct()">
-      <span class="btn-icon">+</span> Nuevo producto
+      <mat-icon>add</mat-icon>
+      Nuevo producto
     </button>
   </div>
 
@@ -15,84 +16,16 @@
     {{ successMessage }}
   </div>
 
-  <!-- Search Bar -->
-  <div class="search-bar">
-    <div class="search-input-group">
-      <input
-        type="text"
-        [(ngModel)]="searchInput"
-        placeholder="Buscar por nombre o SKU..."
-        class="search-input"
-        (keypress)="onKeyPress($event)"
-      />
-      <button class="btn-search" (click)="onSearch()" title="Buscar">
-        🔍
-      </button>
-      <button
-        *ngIf="searchInput"
-        class="btn-clear"
-        (click)="clearSearch()"
-        title="Limpiar búsqueda"
-      >
-        ✕
-      </button>
-    </div>
-  </div>
-
-  <!-- Error Message -->
-  <div *ngIf="error" class="alert alert-error">
-    {{ error }}
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner"></div>
-    <p>Cargando productos...</p>
-  </div>
-
-  <!-- Products Table -->
-  <div *ngIf="!loading && products.length > 0" class="table-wrapper">
-    <table class="products-table">
-      <thead>
-        <tr>
-          <th>SKU</th>
-          <th>Nombre</th>
-          <th>Precio Venta</th>
-          <th>Stock Mínimo</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let product of products" class="table-row">
-          <td class="cell-sku">
-            <code>{{ product.sku }}</code>
-          </td>
-          <td class="cell-name">{{ product.name }}</td>
-          <td class="cell-price">
-            {{ product.sale_price | number: '1.2-2' }}
-          </td>
-          <td class="cell-stock">{{ product.min_stock }}</td>
-          <td class="cell-status">
-            <span
-              class="badge"
-              [ngClass]="product.is_active ? 'badge-active' : 'badge-inactive'"
-            >
-              {{ product.is_active ? 'Activo' : 'Inactivo' }}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Empty State -->
-  <div *ngIf="!loading && products.length === 0 && !error" class="empty-state">
-    <p class="empty-icon">📦</p>
-    <p class="empty-title">No se encontraron productos</p>
-    <p class="empty-text">
-      {{ searchInput ? 'Intenta con otros términos de búsqueda' : 'Comienza agregando tu primer producto' }}
-    </p>
-  </div>
+  <!-- Data Table -->
+  <app-generic-data-table
+    [data]="products"
+    [config]="tableConfig"
+    [loading]="loading"
+    [error]="error"
+    [totalItems]="products.length"
+    (actionClick)="onTableAction($event)"
+    (searchChange)="onSearch($event)"
+  ></app-generic-data-table>
 </div>
 
 <!-- Product Form Modal -->
