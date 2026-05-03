@@ -105,7 +105,7 @@
                   <div class="h-bar-item" *ngFor="let label of productCategoryChartConfig.data.labels; let i = index">
                     <div class="h-bar-label">{{ label }}</div>
                     <div class="h-bar-track">
-                      <div class="h-bar-fill" [style.width.%]="(productCategoryChartConfig.data.datasets[0].data[i] / 52) * 100"></div>
+                      <div class="h-bar-fill" [style.width.%]="getBarWidth(productCategoryChartConfig.data.datasets[0].data[i])"></div>
                     </div>
                   </div>
                 </div>

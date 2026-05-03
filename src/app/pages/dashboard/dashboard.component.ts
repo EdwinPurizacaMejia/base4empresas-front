@@ -368,4 +368,9 @@ export class DashboardComponent implements OnInit {
     if (!trend) return '';
     return trend > 0 ? '↑' : '↓';
   }
+
+  getBarWidth(dataValue: any): number {
+    if (typeof dataValue !== 'number') return 0;
+    return (dataValue / 52) * 100;
+  }
 }
