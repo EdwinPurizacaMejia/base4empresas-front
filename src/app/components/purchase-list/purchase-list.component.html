@@ -6,7 +6,8 @@
       <p class="subtitle">Gestiona tus pedidos de compra</p>
     </div>
     <button class="btn-primary" (click)="onNewPurchase()">
-      <span class="btn-icon">+</span> Nueva Compra
+      <mat-icon>add</mat-icon>
+      Nueva Compra
     </button>
   </div>
 
@@ -15,63 +16,16 @@
     {{ successMessage }}
   </div>
 
-  <!-- Error Message -->
-  <div *ngIf="error" class="alert alert-error">
-    {{ error }}
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner"></div>
-    <p>Cargando compras...</p>
-  </div>
-
-  <!-- Purchases Table -->
-  <div *ngIf="!loading && purchases.length > 0" class="table-wrapper">
-    <table class="purchases-table">
-      <thead>
-        <tr>
-          <th>Número</th>
-          <th>Fecha</th>
-          <th>Proveedor ID</th>
-          <th>Almacén ID</th>
-          <th>Estado</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let purchase of purchases" class="table-row">
-          <td class="cell-number">
-            <code>{{ purchase.number }}</code>
-          </td>
-          <td class="cell-date">
-            {{ formatDate(purchase.created_at) }}
-          </td>
-          <td class="cell-supplier">
-            <code>{{ purchase.supplier_id.substring(0, 8) }}...</code>
-          </td>
-          <td class="cell-warehouse">
-            <code>{{ purchase.warehouse_id.substring(0, 8) }}...</code>
-          </td>
-          <td class="cell-status">
-            <span class="badge badge-completed">
-              {{ getStatusLabel(purchase.status) }}
-            </span>
-          </td>
-          <td class="cell-total">
-            <span class="total-value">S/{{ purchase.total | number: '1.2-2' }}</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Empty State -->
-  <div *ngIf="!loading && purchases.length === 0 && !error" class="empty-state">
-    <p class="empty-icon">📦</p>
-    <p class="empty-title">No hay compras registradas</p>
-    <p class="empty-text">Comienza registrando tu primera compra</p>
-  </div>
+  <!-- Data Table -->
+  <app-generic-data-table
+    [data]="purchases"
+    [config]="tableConfig"
+    [loading]="loading"
+    [error]="error"
+    [totalItems]="purchases.length"
+    (actionClick)="onTableAction($event)"
+    (searchChange)="onSearch($event)"
+  ></app-generic-data-table>
 </div>
 
 <!-- Purchase Form Modal -->

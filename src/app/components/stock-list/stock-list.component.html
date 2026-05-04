@@ -30,58 +30,16 @@
     {{ error }}
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner"></div>
-    <p>Cargando datos de stock...</p>
-  </div>
-
-  <!-- Stock Table -->
-  <div *ngIf="!loading && stocks.length > 0" class="table-wrapper">
-    <table class="stock-table">
-      <thead>
-        <tr>
-          <th>SKU</th>
-          <th>Producto</th>
-          <th>Stock Actual</th>
-          <th>Stock Mínimo</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of stocks" class="table-row" [ngClass]="'status-' + item.status">
-          <td class="cell-sku">
-            <code>{{ item.sku }}</code>
-          </td>
-          <td class="cell-name">{{ item.name }}</td>
-          <td class="cell-stock">
-            <span class="stock-value">{{ item.stock }}</span>
-          </td>
-          <td class="cell-min-stock">
-            <span class="min-stock-value">
-              {{ item.min_stock ? item.min_stock : '—' }}
-            </span>
-          </td>
-          <td class="cell-status">
-            <div class="status-indicator">
-              <div class="status-bar">
-                <div class="status-fill" [style.width.%]="item.percentage" [ngClass]="'fill-' + item.status"></div>
-              </div>
-              <span class="status-label" [ngClass]="'label-' + item.status">
-                {{ getStatusLabel(item.status) }}
-              </span>
-            </div>
-          </td>
-          <td class="cell-actions">
-            <button class="btn-kardex" (click)="onViewKardex(item)" title="Ver Kardex">
-              📋 Kardex
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- Data Table with Loading State -->
+  <app-generic-data-table
+    [data]="stocks"
+    [config]="tableConfig"
+    [loading]="loading"
+    [error]="error"
+    [totalItems]="stocks.length"
+    (actionClick)="onTableAction($event)"
+    (searchChange)="onSearch($event)"
+  ></app-generic-data-table>
 
   <!-- Empty State -->
   <div *ngIf="!loading && stocks.length === 0 && !initialLoad" class="empty-state">

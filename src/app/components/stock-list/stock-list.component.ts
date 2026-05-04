@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { Stock } from '../../models/stock.model';
 import { StockService } from '../../services/stock.service';
+import { GenericDataTableComponent, TableConfig } from '../generic-data-table/generic-data-table.component';
 
 type StockStatus = 'ok' | 'warning' | 'critical';
 
@@ -15,7 +17,7 @@ interface StockWithStatus extends Stock {
 @Component({
   selector: 'app-stock-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, GenericDataTableComponent],
   templateUrl: './stock-list.component.html',
   styleUrl: './stock-list.component.css'
 })
@@ -26,6 +28,23 @@ export class StockListComponent implements OnInit {
   loading = false;
   error: string | null = null;
   initialLoad = true;
+
+  tableConfig: TableConfig = {
+    columns: [
+      { key: 'sku', label: 'SKU', sortable: true, width: '120px' },
+      { key: 'name', label: 'Producto', sortable: true },
+      { key: 'stock', label: 'Stock Actual', type: 'number', sortable: true, width: '130px' },
+      { key: 'min_stock', label: 'Stock Mínimo', type: 'number', sortable: true, width: '130px', formatter: (val) => val ? val.toString() : '—' },
+      { key: 'status', label: 'Estado', type: 'badge', sortable: true, width: '120px', formatter: (val) => this.getStatusLabel(val) }
+    ],
+    actions: [
+      { id: 'kardex', label: 'Ver Kardex', icon: 'description' }
+    ],
+    pageSize: 10,
+    pageSizeOptions: [5, 10, 25, 50],
+    showSearch: true,
+    searchPlaceholder: 'Buscar por SKU o producto...'
+  };
 
   constructor(private stockService: StockService) {}
 
@@ -100,6 +119,31 @@ export class StockListComponent implements OnInit {
   onKeyPress(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
       this.loadStock();
+    }
+  }
+
+  onSearch(searchTerm: string): void {
+    // Filtrar stocks localmente basado en búsqueda
+    this.loading = true;
+    setTimeout(() => {
+      if (!searchTerm) {
+        this.loadStock();
+      } else {
+        const filtered = this.stocks.filter(s => 
+          s.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          s.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        this.stocks = filtered;
+        this.loading = false;
+      }
+    }, 300);
+  }
+
+  onTableAction(event: { action: string; row: StockWithStatus }): void {
+    switch (event.action) {
+      case 'kardex':
+        this.onViewKardex(event.row);
+        break;
     }
   }
 

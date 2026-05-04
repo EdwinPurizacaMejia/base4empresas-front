@@ -10,7 +10,7 @@ Esta es una rama de mejora que incluye un layout completamente renovado.
 ### Para desarrollar:
 1. ng serve
    (Inicia servidor en http://localhost:4200)
-
+f
 ### Para compilar:
 1. ng build
    (Compila el proyecto con SSR)
@@ -18,9 +18,9 @@ Esta es una rama de mejora que incluye un layout completamente renovado.
 ### Para terminar:
    Presionar Ctrl + C (back y front)
 
-## 📦 GIT - Comandos Básicos
+## 📦 GIT - Comandos Básicosf
 
-### Ver ramas:
+### Ver ramas:f
 git branch
 # Output: * feature/layout-general
 #         main
@@ -34,7 +34,7 @@ git checkout feature/layout-general
 ### Subir cambios a rama remota:
 git add .
 git commit -m "Descripción de los cambios"
-git push origin feature/layout-general
+f
 
 ### Hacer Pull Request (PR):
 1. Ir a GitHub
