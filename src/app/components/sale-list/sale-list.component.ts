@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { SalesService } from '../../services/sales.service';
@@ -42,7 +43,10 @@ export class SaleListComponent implements OnInit {
     searchPlaceholder: 'Buscar por número o cliente...'
   };
 
-  constructor(private salesService: SalesService) {}
+  constructor(
+    private salesService: SalesService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadSales();
@@ -119,7 +123,7 @@ export class SaleListComponent implements OnInit {
   }
 
   onViewSale(sale: SaleListItem): void {
-    console.log('Ver detalle de venta:', sale);
+    this.router.navigate(['/sales', sale.id]);
   }
 
   onEditSale(sale: SaleListItem): void {

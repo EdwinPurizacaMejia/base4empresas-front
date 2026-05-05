@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -38,6 +39,7 @@ export class StockListComponent implements OnInit {
       { key: 'status', label: 'Estado', type: 'badge', sortable: true, width: '120px', formatter: (val) => this.getStatusLabel(val) }
     ],
     actions: [
+      { id: 'view', label: 'Ver detalle', icon: 'visibility' },
       { id: 'kardex', label: 'Ver Kardex', icon: 'description' }
     ],
     pageSize: 10,
@@ -46,7 +48,10 @@ export class StockListComponent implements OnInit {
     searchPlaceholder: 'Buscar por SKU o producto...'
   };
 
-  constructor(private stockService: StockService) {}
+  constructor(
+    private stockService: StockService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     // Cargar warehouse por defecto si lo hay
@@ -141,10 +146,17 @@ export class StockListComponent implements OnInit {
 
   onTableAction(event: { action: string; row: StockWithStatus }): void {
     switch (event.action) {
+      case 'view':
+        this.onViewStock(event.row);
+        break;
       case 'kardex':
         this.onViewKardex(event.row);
         break;
     }
+  }
+
+  onViewStock(product: Stock): void {
+    this.router.navigate(['/stock', product.product_id]);
   }
 
   onViewKardex(product: Stock): void {

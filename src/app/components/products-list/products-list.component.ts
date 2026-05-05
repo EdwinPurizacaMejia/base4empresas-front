@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -71,7 +72,8 @@ export class ProductsListComponent implements OnInit {
 
   constructor(
     private productService: ProductsService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -136,7 +138,7 @@ export class ProductsListComponent implements OnInit {
   }
 
   onViewProduct(product: Product): void {
-    console.log('View product:', product);
+    this.router.navigate(['/products', product.id]);
   }
 
   onEditProduct(product: Product): void {

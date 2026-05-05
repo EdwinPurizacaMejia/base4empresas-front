@@ -1,0 +1,125 @@
+<div class="detail-container">
+  <!-- Header con navegación -->
+  <div class="detail-header">
+    <div class="header-content">
+      <button mat-icon-button (click)="onGoBack()" class="back-button" matTooltip="Volver al listado">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-title">
+        <h1>Detalle de Venta</h1>
+        <p class="breadcrumb">Ventas / Detalle</p>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="sale">
+      <button mat-raised-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <app-loading-spinner
+    *ngIf="loading && !sale"
+    message="Cargando detalles de la venta..."
+  ></app-loading-spinner>
+
+  <!-- Error State -->
+  <app-error-state
+    *ngIf="error && !loading"
+    icon="error_outline"
+    title="Error al cargar"
+    [message]="error"
+    (onRetry)="onRetry()"
+    (onGoBack)="onGoBack()"
+  ></app-error-state>
+
+  <!-- Sale Detail -->
+  <div *ngIf="sale && !loading && !error" class="detail-content">
+    <!-- Información Principal -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Información Principal</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Número de Venta</label>
+            <p class="info-value">{{ sale.number }}</p>
+          </div>
+          <div class="info-item">
+            <label>Estado</label>
+            <mat-chip-set>
+              <mat-chip
+                [highlighted]="true"
+                [color]="getStatusColor(sale.status)"
+              >
+                {{ getStatusLabel(sale.status) }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          <div class="info-item">
+            <label>Fecha de Venta</label>
+            <p class="info-value">{{ sale.created_at | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <label>ID de Cliente</label>
+          <p class="info-text">{{ sale.customer_id || 'Cliente sin especificar' }}</p>
+        </div>
+
+        <div class="info-section" *ngIf="sale.notes">
+          <label>Notas</label>
+          <p class="info-text">{{ sale.notes }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Información de Pago -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Información de Pago</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Total</label>
+            <p class="info-value currency">
+              {{ sale.total | currency : 'USD' : 'symbol' : '1.2-2' }}
+            </p>
+          </div>
+          <div class="info-item">
+            <label>Estado de Pago</label>
+            <mat-chip-set>
+              <mat-chip
+                [highlighted]="true"
+                [color]="getPaymentStatusColor(sale.payment_status)"
+              >
+                {{ getPaymentStatusLabel(sale.payment_status) }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          <div class="info-item">
+            <label>Almacén</label>
+            <p class="info-value">{{ sale.warehouse_id }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Acciones -->
+    <div class="action-section">
+      <button mat-raised-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar Venta
+      </button>
+      <button mat-stroked-button (click)="onGoBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver al Listado
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,129 @@
+<div class="detail-container">
+  <!-- Header con navegación -->
+  <div class="detail-header">
+    <div class="header-content">
+      <button mat-icon-button (click)="onGoBack()" class="back-button" matTooltip="Volver al listado">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-title">
+        <h1>Detalle de Inventario</h1>
+        <p class="breadcrumb">Inventario / Detalle</p>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="stock">
+      <button mat-raised-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <app-loading-spinner
+    *ngIf="loading && !stock"
+    message="Cargando detalles del inventario..."
+  ></app-loading-spinner>
+
+  <!-- Error State -->
+  <app-error-state
+    *ngIf="error && !loading"
+    icon="error_outline"
+    title="Error al cargar"
+    [message]="error"
+    (onRetry)="onRetry()"
+    (onGoBack)="onGoBack()"
+  ></app-error-state>
+
+  <!-- Stock Detail -->
+  <div *ngIf="stock && !loading && !error" class="detail-content">
+    <!-- Información Principal -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Información del Producto</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>SKU</label>
+            <p class="info-value">{{ stock.sku }}</p>
+          </div>
+          <div class="info-item">
+            <label>Nombre del Producto</label>
+            <p class="info-value">{{ stock.name }}</p>
+          </div>
+          <div class="info-item">
+            <label>Estado de Stock</label>
+            <mat-chip-set>
+              <mat-chip
+                [highlighted]="true"
+                [color]="getStockStatusColor()"
+              >
+                {{ getStockStatusLabel() }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Información de Stock -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Niveles de Stock</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="stock-info">
+          <div class="stock-item">
+            <div class="stock-header">
+              <label>Stock Actual</label>
+              <p class="stock-value">{{ stock.stock }} unidades</p>
+            </div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="stockPercentage"
+              [style.background-color]="getProgressColor()"
+            ></mat-progress-bar>
+            <p class="stock-percentage">{{ stockPercentage | number: '1.0-0' }}% de capacidad</p>
+          </div>
+
+          <div class="info-grid" style="margin-top: 1.5rem;">
+            <div class="info-item">
+              <label>Stock Mínimo</label>
+              <p class="info-value" [style.color]="stock.stock < (stock.min_stock || 0) ? '#f44336' : '#4caf50'">
+                {{ stock.min_stock }} unidades
+              </p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Alerta de Stock -->
+    <mat-card class="detail-section alert-section" *ngIf="stock.stock < (stock.min_stock || 0) && stock.min_stock">
+      <mat-card-header>
+        <mat-card-title style="display: flex; align-items: center; gap: 0.5rem;">
+          <mat-icon style="color: #f44336;">warning</mat-icon>
+          Alerta de Stock Bajo
+        </mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <p>El stock actual está por debajo del nivel mínimo configurado. Se recomienda realizar una compra próximamente.</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Acciones -->
+    <div class="action-section">
+      <button mat-raised-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Ajustar Stock
+      </button>
+      <button mat-stroked-button (click)="onGoBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver al Listado
+      </button>
+    </div>
+  </div>
+</div>
