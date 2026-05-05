@@ -1,181 +1,191 @@
-<div class="form-overlay">
-  <div class="form-modal">
-    <!-- Header -->
+<mat-card class="form-card">
+  <!-- Header -->
+  <mat-card-header>
     <div class="form-header">
       <h2>Nueva Compra</h2>
-      <button class="btn-close" (click)="onCancel()" type="button">&times;</button>
+      <button 
+        mat-icon-button 
+        (click)="onCancel()"
+        [disabled]="loading"
+        class="btn-close"
+        title="Cerrar formulario">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
+  </mat-card-header>
 
-    <!-- Form Content -->
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content">
-      
-      <!-- Success Message -->
-      <div *ngIf="success" class="alert alert-success">
-        {{ successMessage }}
-      </div>
+  <!-- Form Content -->
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
 
-      <!-- Error Message -->
-      <div *ngIf="error" class="alert alert-error">
-        {{ error }}
-      </div>
+      <div class="form-grid">
 
-      <!-- Main Fields -->
-      <div class="form-row">
-        <div class="form-group">
-          <label for="supplier_id">Proveedor ID *</label>
-          <input
-            id="supplier_id"
-            type="text"
-            formControlName="supplier_id"
-            placeholder="UUID del proveedor"
-            class="form-input"
-            [class.form-input-error]="form.get('supplier_id')?.invalid && form.get('supplier_id')?.touched"
-          />
-          <span class="error-message">{{ getFormError('supplier_id') }}</span>
-        </div>
+        <!-- Proveedor -->
+        <mat-form-field class="half-width">
+          <mat-label>Proveedor *</mat-label>
+          <mat-select formControlName="supplier_id" [attr.aria-invalid]="hasError('supplier_id')">
+            <mat-option value="">-- Seleccionar --</mat-option>
+            <mat-option value="1">Proveedor A</mat-option>
+            <mat-option value="2">Proveedor B</mat-option>
+            <mat-option value="3">Proveedor C</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>business</mat-icon>
+          <mat-error *ngIf="hasError('supplier_id')">
+            {{ getErrorMessage('supplier_id') }}
+          </mat-error>
+        </mat-form-field>
 
-        <div class="form-group">
-          <label for="warehouse_id">Almacén ID *</label>
-          <input
-            id="warehouse_id"
-            type="text"
-            formControlName="warehouse_id"
-            placeholder="UUID del almacén"
-            class="form-input"
-            [class.form-input-error]="form.get('warehouse_id')?.invalid && form.get('warehouse_id')?.touched"
-          />
-          <span class="error-message">{{ getFormError('warehouse_id') }}</span>
-        </div>
-      </div>
+        <!-- Almacén -->
+        <mat-form-field class="half-width">
+          <mat-label>Almacén *</mat-label>
+          <mat-select formControlName="warehouse_id" [attr.aria-invalid]="hasError('warehouse_id')">
+            <mat-option value="">-- Seleccionar --</mat-option>
+            <mat-option value="1">Almacén Central</mat-option>
+            <mat-option value="2">Almacén Secundario</mat-option>
+          </mat-select>
+          <mat-icon matPrefix>warehouse</mat-icon>
+          <mat-error *ngIf="hasError('warehouse_id')">
+            {{ getErrorMessage('warehouse_id') }}
+          </mat-error>
+        </mat-form-field>
 
-      <!-- Notes -->
-      <div class="form-group">
-        <label for="notes">Notas</label>
-        <textarea
-          id="notes"
-          formControlName="notes"
-          placeholder="Notas adicionales sobre la compra..."
-          class="form-input form-textarea"
-          rows="2"
-        ></textarea>
+        <!-- Notas -->
+        <mat-form-field class="full-width">
+          <mat-label>Notas</mat-label>
+          <textarea 
+            matInput 
+            formControlName="notes" 
+            rows="2"
+            placeholder="Notas adicionales sobre esta compra"
+            [attr.aria-invalid]="hasError('notes')">
+          </textarea>
+          <mat-icon matPrefix>note</mat-icon>
+          <mat-hint *ngIf="!hasError('notes')">
+            {{ form.get('notes')?.value?.length || 0 }}/500 caracteres
+          </mat-hint>
+          <mat-error *ngIf="hasError('notes')">
+            {{ getErrorMessage('notes') }}
+          </mat-error>
+        </mat-form-field>
+
       </div>
 
       <!-- Items Section -->
       <div class="items-section">
-        <div class="items-header">
-          <h3>Items de la Compra</h3>
-          <span class="error-message">{{ getItemsError() }}</span>
+        <div class="section-header">
+          <h3>Items de Compra</h3>
+          <button 
+            type="button" 
+            mat-mini-fab 
+            color="primary" 
+            (click)="addItem()"
+            [disabled]="loading"
+            title="Agregar nuevo item">
+            <mat-icon>add</mat-icon>
+          </button>
         </div>
 
-        <div class="items-table">
-          <div class="items-thead">
-            <div class="items-row">
-              <div class="col-product">Producto ID</div>
-              <div class="col-quantity">Cantidad</div>
-              <div class="col-cost">Costo Unitario</div>
-              <div class="col-subtotal">Subtotal</div>
-              <div class="col-actions"></div>
-            </div>
-          </div>
-
-          <div class="items-tbody" formArrayName="items">
-            <div
-              *ngFor="let item of items.controls; let i = index"
-              class="items-row"
-              [formGroupName]="i"
-            >
-              <!-- Product ID -->
-              <div class="col-product">
-                <input
-                  type="text"
-                  formControlName="product_id"
-                  placeholder="UUID"
-                  class="form-input form-input-sm"
-                  [class.form-input-error]="item.get('product_id')?.invalid && item.get('product_id')?.touched"
-                />
-                <span class="error-message-sm">{{ getItemError(i, 'product_id') }}</span>
-              </div>
-
-              <!-- Quantity -->
-              <div class="col-quantity">
-                <input
-                  type="number"
-                  formControlName="quantity"
-                  placeholder="1"
-                  min="1"
-                  class="form-input form-input-sm"
-                  [class.form-input-error]="item.get('quantity')?.invalid && item.get('quantity')?.touched"
-                />
-                <span class="error-message-sm">{{ getItemError(i, 'quantity') }}</span>
-              </div>
-
-              <!-- Unit Cost -->
-              <div class="col-cost">
-                <input
-                  type="number"
-                  formControlName="unit_cost"
-                  placeholder="0.00"
-                  step="0.01"
-                  min="0"
-                  class="form-input form-input-sm"
-                  [class.form-input-error]="item.get('unit_cost')?.invalid && item.get('unit_cost')?.touched"
-                />
-                <span class="error-message-sm">{{ getItemError(i, 'unit_cost') }}</span>
-              </div>
-
-              <!-- Subtotal -->
-              <div class="col-subtotal">
-                <span class="subtotal-value">
-                  {{ ((item.get('quantity')?.value || 0) * (item.get('unit_cost')?.value || 0)) | number: '1.2-2' }}
-                </span>
-              </div>
-
-              <!-- Remove Button -->
-              <div class="col-actions">
-                <button
-                  type="button"
-                  class="btn-remove"
-                  (click)="removeItem(i)"
-                  [disabled]="items.length === 1"
-                  title="Eliminar item"
-                >
-                  🗑️
-                </button>
-              </div>
-            </div>
-          </div>
+        <div *ngIf="items.length === 0" class="empty-state">
+          <mat-icon>shopping_cart</mat-icon>
+          <p>No hay items. Haz clic en "+" para agregar.</p>
         </div>
 
-        <!-- Add Item Button -->
-        <button type="button" class="btn-add-item" (click)="addItem()">
-          + Agregar Item
-        </button>
+        <div *ngFor="let item of items.controls; let i = index" class="item-card">
+          <div [formGroupName]="i" class="item-form">
+            <mat-form-field class="item-field">
+              <mat-label>Producto *</mat-label>
+              <mat-select formControlName="product_id" [attr.aria-invalid]="hasItemError(i, 'product_id')">
+                <mat-option value="">-- Seleccionar --</mat-option>
+                <mat-option value="1">Producto 1</mat-option>
+                <mat-option value="2">Producto 2</mat-option>
+                <mat-option value="3">Producto 3</mat-option>
+              </mat-select>
+              <mat-error *ngIf="hasItemError(i, 'product_id')">
+                {{ getItemError(i, 'product_id') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="item-field">
+              <mat-label>Cantidad *</mat-label>
+              <input 
+                matInput 
+                formControlName="quantity" 
+                type="number" 
+                min="1"
+                [attr.aria-invalid]="hasItemError(i, 'quantity')">
+              <mat-icon matPrefix>numbers</mat-icon>
+              <mat-error *ngIf="hasItemError(i, 'quantity')">
+                {{ getItemError(i, 'quantity') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="item-field">
+              <mat-label>Costo Unitario *</mat-label>
+              <input 
+                matInput 
+                formControlName="unit_cost" 
+                type="number" 
+                step="0.01"
+                min="0"
+                [attr.aria-invalid]="hasItemError(i, 'unit_cost')">
+              <mat-icon matPrefix>attach_money</mat-icon>
+              <mat-error *ngIf="hasItemError(i, 'unit_cost')">
+                {{ getItemError(i, 'unit_cost') }}
+              </mat-error>
+            </mat-form-field>
+
+            <div class="item-subtotal">
+              <span class="subtotal-label">Subtotal:</span>
+              <span class="subtotal-value">
+                {{ ((item.get('quantity')?.value || 0) * (item.get('unit_cost')?.value || 0)) | number: '1.2-2' }}
+              </span>
+            </div>
+
+            <button 
+              type="button" 
+              mat-icon-button 
+              color="warn" 
+              (click)="removeItem(i)"
+              [disabled]="loading || items.length === 1"
+              title="Eliminar este item">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Total -->
       <div class="total-section">
-        <span class="total-label">Total:</span>
+        <span class="total-label">Total de Compra:</span>
         <span class="total-value">S/{{ calculateTotal() | number: '1.2-2' }}</span>
       </div>
 
-      <!-- Buttons -->
-      <div class="form-actions">
-        <button
-          type="button"
-          class="btn-secondary"
-          (click)="onCancel()"
-          [disabled]="loading"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          class="btn-primary"
-          [disabled]="loading || form.invalid"
-        >
-          {{ loading ? 'Guardando...' : 'Registrar Compra' }}
-        </button>
-      </div>
     </form>
-  </div>
-</div>
+  </mat-card-content>
+
+  <!-- Actions -->
+  <mat-card-footer>
+    <div class="form-actions">
+      <button 
+        mat-stroked-button 
+        (click)="onCancel()"
+        [disabled]="loading"
+        class="btn-secondary">
+        Cancelar
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onSubmit()"
+        [disabled]="loading || form.invalid"
+        class="btn-primary">
+        <mat-icon *ngIf="!loading">save</mat-icon>
+        <span *ngIf="loading" class="spinner-text">
+          <mat-icon class="spinner">hourglass_empty</mat-icon>
+        </span>
+        {{ loading ? 'Guardando...' : 'Registrar Compra' }}
+      </button>
+    </div>
+  </mat-card-footer>
+
+</mat-card>

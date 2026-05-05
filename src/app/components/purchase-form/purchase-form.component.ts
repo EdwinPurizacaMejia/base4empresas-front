@@ -1,110 +1,193 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { PurchaseService } from '../../services/purchase.service';
 import { PurchaseCreate, PurchaseItemCreate } from '../../models/purchase.model';
+import { ConfirmationService } from '../../services/confirmation.service';
 
 @Component({
   selector: 'app-purchase-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatSnackBarModule,
+    MatSelectModule,
+    MatTableModule
+  ],
   templateUrl: './purchase-form.component.html',
   styleUrl: './purchase-form.component.css'
 })
-export class PurchaseFormComponent {
+export class PurchaseFormComponent implements OnDestroy {
   @Output() purchaseCreated = new EventEmitter<void>();
   @Output() formClosed = new EventEmitter<void>();
 
   form: FormGroup;
   loading = false;
-  error: string | null = null;
-  success = false;
-  successMessage: string = '';
-
-  constructor(private fb: FormBuilder, private purchaseService: PurchaseService) {
-    this.form = this.fb.group({
-      supplier_id: ['', [Validators.required]],
-      warehouse_id: ['', [Validators.required]],
-      notes: [''],
-      items: this.fb.array(
-        [this.createItemFormGroup()],
-        [Validators.required, Validators.minLength(1)]
-      )
-    });
-  }
+  private destroy$ = new Subject<void>();
 
   get items(): FormArray {
     return this.form.get('items') as FormArray;
   }
 
-  createItemFormGroup(): FormGroup {
+  constructor(
+    private fb: FormBuilder,
+    private purchaseService: PurchaseService,
+    private snackBar: MatSnackBar,
+    private confirmationService: ConfirmationService
+  ) {
+    this.form = this.createForm();
+  }
+
+  private createForm(): FormGroup {
     return this.fb.group({
-      product_id: ['', [Validators.required]],
-      quantity: [1, [Validators.required, Validators.min(1)]],
-      unit_cost: [0, [Validators.required, Validators.min(0)]]
+      supplier_id: ['', [Validators.required]],
+      warehouse_id: ['', [Validators.required]],
+      notes: ['', [Validators.maxLength(500)]],
+      items: this.fb.array(
+        [this.createItemGroup()],
+        [Validators.required, Validators.minLength(1)]
+      )
     });
   }
 
-  addItem(): void {
-    this.items.push(this.createItemFormGroup());
+  private createItemGroup(): FormGroup {
+    return this.fb.group({
+      product_id: ['', [Validators.required]],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      unit_cost: [0, [Validators.required, Validators.min(0.01)]]
+    });
   }
 
-  removeItem(index: number): void {
-    if (this.items.length > 1) {
-      this.items.removeAt(index);
-    } else {
-      // Mostrar alerta o mensaje
-      console.warn('Debe tener al menos un item');
-    }
-  }
-
-  getItemError(itemIndex: number, fieldName: string): string | null {
-    const control = this.items.at(itemIndex).get(fieldName);
-
-    if (!control || !control.errors || !control.touched) {
-      return null;
-    }
-
-    if (control.errors['required']) {
-      return `${fieldName} es requerido`;
-    }
-
-    if (control.errors['min']) {
-      return `${fieldName} debe ser mayor a ${control.errors['min'].min}`;
-    }
-
-    return 'Campo inválido';
-  }
-
-  getFormError(fieldName: string): string | null {
+  /**
+   * Obtiene mensaje de error específico
+   */
+  getErrorMessage(fieldName: string): string {
     const control = this.form.get(fieldName);
 
-    if (!control || !control.errors || !control.touched) {
-      return null;
+    if (!control || !control.errors) {
+      return '';
     }
 
-    if (control.errors['required']) {
-      return `${fieldName} es requerido`;
+    const errors = control.errors;
+
+    if (errors['required']) {
+      return `${this.getFieldLabel(fieldName)} es requerido`;
+    }
+
+    if (errors['maxLength']) {
+      return `${this.getFieldLabel(fieldName)} no puede exceder ${errors['maxLength'].requiredLength} caracteres`;
     }
 
     return 'Campo inválido';
   }
 
-  getItemsError(): string | null {
-    const control = this.form.get('items');
-
-    if (!control || !control.errors) {
-      return null;
-    }
-
-    if (control.errors['required'] || control.errors['minlength']) {
-      return 'Debe tener al menos 1 item';
-    }
-
-    return null;
+  /**
+   * Obtiene etiqueta legible del campo
+   */
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      supplier_id: 'Proveedor',
+      warehouse_id: 'Almacén',
+      notes: 'Notas',
+      product_id: 'Producto',
+      quantity: 'Cantidad',
+      unit_cost: 'Costo Unitario'
+    };
+    return labels[fieldName] || fieldName;
   }
 
+  /**
+   * Obtiene mensaje de error para items
+   */
+  getItemError(itemIndex: number, fieldName: string): string {
+    const control = this.items.at(itemIndex).get(fieldName);
+
+    if (!control || !control.errors) {
+      return '';
+    }
+
+    const errors = control.errors;
+
+    if (errors['required']) {
+      return `${this.getFieldLabel(fieldName)} requerido`;
+    }
+
+    if (errors['min']) {
+      return `Mínimo ${errors['min'].min}`;
+    }
+
+    return 'Inválido';
+  }
+
+  /**
+   * Verifica si un campo tiene error
+   */
+  hasError(fieldName: string): boolean {
+    const control = this.form.get(fieldName);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  /**
+   * Verifica si un item tiene error
+   */
+  hasItemError(itemIndex: number, fieldName: string): boolean {
+    const control = this.items.at(itemIndex).get(fieldName);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  /**
+   * Agrega un nuevo item
+   */
+  addItem(): void {
+    this.items.push(this.createItemGroup());
+  }
+
+  /**
+   * Elimina un item con confirmación
+   */
+  removeItem(index: number): void {
+    if (this.items.length === 1) {
+      this.snackBar.open('Debes mantener al menos un item', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['snackbar-warning']
+      });
+      return;
+    }
+
+    this.confirmationService
+      .confirmDelete(`Item ${index + 1}`)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(confirmed => {
+        if (confirmed) {
+          this.items.removeAt(index);
+          this.snackBar.open('Item eliminado', 'Cerrar', {
+            duration: 2000,
+            panelClass: ['snackbar-success']
+          });
+        }
+      });
+  }
+
+  /**
+   * Calcula el total de la compra
+   */
   calculateTotal(): number {
     return this.items.controls.reduce((sum, item) => {
       const quantity = item.get('quantity')?.value || 0;
@@ -113,31 +196,53 @@ export class PurchaseFormComponent {
     }, 0);
   }
 
+  /**
+   * Marca todos los campos como tocados
+   */
+  private markAllAsTouched(): void {
+    Object.keys(this.form.controls).forEach(key => {
+      const control = this.form.get(key);
+      control?.markAsTouched();
+    });
+
+    this.items.controls.forEach(item => {
+      Object.keys((item as FormGroup).controls).forEach(key => {
+        (item as FormGroup).get(key)?.markAsTouched();
+      });
+    });
+  }
+
+  /**
+   * Maneja el envío del formulario
+   */
   onSubmit(): void {
     if (this.form.invalid) {
-      // Marcar controles principales como tocados
-      for (const key in this.form.controls) {
-        if (this.form.controls.hasOwnProperty(key)) {
-          this.form.get(key)?.markAsTouched();
-        }
-      }
-      
-      // Marcar items como tocados
-      this.items.controls.forEach(item => {
-        if (item instanceof FormGroup) {
-          for (const key in item.controls) {
-            if (item.controls.hasOwnProperty(key)) {
-              item.get(key)?.markAsTouched();
-            }
-          }
-        }
+      this.markAllAsTouched();
+      this.snackBar.open('Por favor completa todos los campos requeridos', 'Cerrar', {
+        duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+        panelClass: ['snackbar-error']
       });
       return;
     }
 
+    // Confirmar antes de guardar
+    this.confirmationService
+      .confirmSave('esta compra')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(confirmed => {
+        if (confirmed) {
+          this.submitForm();
+        }
+      });
+  }
+
+  /**
+   * Envía el formulario (API call)
+   */
+  private submitForm(): void {
     this.loading = true;
-    this.error = null;
-    this.success = false;
 
     const payload: PurchaseCreate = {
       supplier_id: this.form.get('supplier_id')?.value,
@@ -150,33 +255,72 @@ export class PurchaseFormComponent {
       }))
     };
 
-    this.purchaseService.createPurchase(payload).subscribe({
-      next: (response) => {
-        this.success = true;
-        this.successMessage = `✓ Compra ${response.number} registrada exitosamente. Total: $${response.total}`;
-        this.loading = false;
-        this.form.reset();
-        this.items.clear();
-        this.items.push(this.createItemFormGroup());
+    this.purchaseService.createPurchase(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          this.loading = false;
+          this.form.reset();
+          this.items.clear();
+          this.items.push(this.createItemGroup());
 
-        setTimeout(() => {
-          this.purchaseCreated.emit();
-        }, 500);
-      },
-      error: (err) => {
-        console.error(err);
-        this.error = err.error?.detail || 'Error al registrar la compra. Intenta nuevamente.';
-        this.loading = false;
-      }
-    });
+          this.snackBar.open(
+            `✓ Compra registrada exitosamente. Total: $${response.total}`,
+            'Cerrar',
+            {
+              duration: 4000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top',
+              panelClass: ['snackbar-success']
+            }
+          );
+
+          setTimeout(() => {
+            this.purchaseCreated.emit();
+          }, 300);
+        },
+        error: (err) => {
+          this.loading = false;
+          const errorMsg = err.error?.detail || 'Error al registrar la compra';
+
+          this.snackBar.open(errorMsg, 'Cerrar', {
+            duration: 5000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
+
+          console.error('Error:', err);
+        }
+      });
   }
 
+  /**
+   * Maneja el cancelar del formulario
+   */
   onCancel(): void {
-    this.form.reset();
-    this.items.clear();
-    this.items.push(this.createItemFormGroup());
-    this.error = null;
-    this.success = false;
-    this.formClosed.emit();
+    if (this.form.dirty) {
+      this.confirmationService
+        .confirmCancel()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(confirmed => {
+          if (confirmed) {
+            this.form.reset();
+            this.items.clear();
+            this.items.push(this.createItemGroup());
+            this.formClosed.emit();
+          }
+        });
+    } else {
+      this.formClosed.emit();
+    }
+  }
+
+  /**
+   * Limpia recursos
+   */
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
