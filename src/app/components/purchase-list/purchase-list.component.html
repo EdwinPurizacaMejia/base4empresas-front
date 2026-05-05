@@ -11,17 +11,38 @@
     </button>
   </div>
 
-  <!-- Success Message -->
-  <div *ngIf="successMessage" class="alert alert-success">
-    {{ successMessage }}
-  </div>
+  <!-- Loading State -->
+  <app-loading-spinner
+    *ngIf="loading && purchases.length === 0"
+    message="Cargando compras..."
+  ></app-loading-spinner>
+
+  <!-- Error State -->
+  <app-error-state
+    *ngIf="error && !loading"
+    title="Error al cargar compras"
+    [message]="error"
+    (onRetry)="loadPurchases()"
+    (onGoBack)="error = null"
+  ></app-error-state>
+
+  <!-- Empty State -->
+  <app-empty-state
+    *ngIf="!loading && !error && purchases.length === 0"
+    icon="shopping_cart"
+    title="Sin compras"
+    description="No hay compras registradas. Crea una nueva compra para comenzar."
+    [showAction]="true"
+    actionLabel="Crear primera compra"
+    (onAction)="onNewPurchase()"
+  ></app-empty-state>
 
   <!-- Data Table -->
   <app-generic-data-table
+    *ngIf="!error && purchases.length > 0"
     [data]="purchases"
     [config]="tableConfig"
     [loading]="loading"
-    [error]="error"
     [totalItems]="purchases.length"
     (actionClick)="onTableAction($event)"
     (searchChange)="onSearch($event)"

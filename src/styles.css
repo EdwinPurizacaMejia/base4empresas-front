@@ -5,6 +5,9 @@
  * Basados en Material Design 3 y buenas prácticas modernas
  */
 
+/* Importar estilos para notificaciones */
+@import 'styles-notifications.css';
+
 /* ============ CSS VARIABLES (Color Palette) ============ */
 :root {
   /* Primary Colors */
