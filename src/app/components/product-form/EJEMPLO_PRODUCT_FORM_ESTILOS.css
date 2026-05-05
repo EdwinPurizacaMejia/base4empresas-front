@@ -1,0 +1,224 @@
+/* EJEMPLO DE ESTILOS MEJORADOS PARA PRODUCT-FORM */
+
+/* Form Card */
+.form-card {
+  max-width: 700px;
+  margin: 20px auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Header */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+.form-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: #333;
+}
+
+.btn-close {
+  color: #999;
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover:not([disabled]) {
+  color: #333;
+}
+
+/* Form Container */
+.form-container {
+  padding: 20px 0;
+}
+
+/* Grid de campos */
+.form-grid {
+  display: grid;
+  gap: 16px;
+  padding: 0 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: calc(50% - 8px);
+}
+
+/* Material Form Field */
+mat-form-field {
+  display: block;
+}
+
+/* Inputs */
+input[matInput],
+textarea[matInput] {
+  font-family: 'Roboto', sans-serif;
+}
+
+textarea[matInput] {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Icons */
+mat-icon[matPrefix] {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+/* Validación visual */
+mat-form-field.mat-form-field-invalid {
+  .mat-form-field-label {
+    color: #f44336 !important;
+  }
+}
+
+/* Error messages y hints */
+mat-error {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+mat-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+.btn-primary {
+  min-width: 140px;
+}
+
+.btn-secondary {
+  min-width: 100px;
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block !important;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Estados de botones */
+button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+button:not([disabled]) {
+  cursor: pointer;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 600px) {
+  .form-card {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+
+  .form-header {
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+
+  .form-header h2 {
+    font-size: 18px;
+  }
+
+  .half-width {
+    width: 100%;
+  }
+
+  .form-grid {
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .form-actions {
+    padding: 16px;
+    flex-direction: column-reverse;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* Responsive - Tablet */
+@media (min-width: 601px) and (max-width: 960px) {
+  .form-card {
+    max-width: calc(100% - 40px);
+    margin: 20px;
+  }
+
+  .form-grid {
+    gap: 14px;
+  }
+}
+
+/* Focus states para accesibilidad */
+mat-form-field.mat-focused {
+  .mat-form-field-label {
+    color: var(--primary-color, #1976d2);
+  }
+}
+
+/* Transition suave */
+mat-form-field,
+button {
+  transition: all 0.2s ease;
+}
+
+/* Dark mode support (opcional) */
+@media (prefers-color-scheme: dark) {
+  .form-card {
+    background-color: #424242;
+    color: #fff;
+  }
+
+  .form-header {
+    border-bottom-color: #616161;
+    background-color: #333;
+  }
+
+  .form-header h2 {
+    color: #fff;
+  }
+
+  .form-actions {
+    border-top-color: #616161;
+    background-color: #333;
+  }
+
+  .btn-close {
+    color: #bbb;
+  }
+
+  .btn-close:hover {
+    color: #fff;
+  }
+}
