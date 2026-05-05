@@ -7,16 +7,34 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-import { ProductsService } from '../../services/products.service';
-import { ProductCreate } from '../../models/product.model';
 import { ConfirmationService } from '../../services/confirmation.service';
 
+/**
+ * EJEMPLO DE FORMULARIO MEJORADO CON ANGULAR MATERIAL
+ * 
+ * Este componente demuestra:
+ * - Uso de Angular Material para campos consistentes
+ * - Validaciones reactivas con mensajes de error por campo
+ * - Confirmación de acciones críticas (guardar, cancelar)
+ * - Mejor UX con snackbars y loading state
+ * - Estructura escalable y limpia
+ */
+
+interface ProductFormData {
+  sku: string;
+  name: string;
+  description: string;
+  category: string;
+  price: number;
+  minStock: number;
+}
+
 @Component({
-  selector: 'app-product-form',
+  selector: 'app-improved-form-example',
   standalone: true,
   imports: [
     CommonModule,
@@ -27,35 +45,42 @@ import { ConfirmationService } from '../../services/confirmation.service';
     MatIconModule,
     MatCardModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
     MatSelectModule
   ],
-  templateUrl: './product-form.component.html',
-  styleUrl: './product-form.component.css'
+  templateUrl: './improved-form-example.component.html',
+  styleUrl: './improved-form-example.component.css'
 })
-export class ProductFormComponent implements OnDestroy {
-  @Output() productCreated = new EventEmitter<void>();
+export class ImprovedFormExampleComponent implements OnDestroy {
+  @Output() formSubmitted = new EventEmitter<ProductFormData>();
   @Output() formClosed = new EventEmitter<void>();
 
   form: FormGroup;
   loading = false;
   private destroy$ = new Subject<void>();
 
+  categories = [
+    { value: 'electronics', label: 'Electrónica' },
+    { value: 'furniture', label: 'Muebles' },
+    { value: 'software', label: 'Software' }
+  ];
+
   constructor(
     private fb: FormBuilder,
-    private productsService: ProductsService,
     private snackBar: MatSnackBar,
     private confirmationService: ConfirmationService
   ) {
-    this.form = this.fb.group({
+    this.form = this.createForm();
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
       sku: ['', [Validators.required, Validators.minLength(3)]],
       name: ['', [Validators.required, Validators.minLength(3)]],
-      barcode: [''],
       description: ['', [Validators.maxLength(500)]],
-      category_id: [null, [Validators.required]],
-      unit_id: [null, [Validators.required]],
-      sale_price: [0, [Validators.required, Validators.min(0.01)]],
-      purchase_price: [0, [Validators.required, Validators.min(0.01)]],
-      min_stock: [0, [Validators.required, Validators.min(0)]]
+      category: ['', [Validators.required]],
+      price: [0, [Validators.required, Validators.min(0.01)]],
+      minStock: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -97,13 +122,10 @@ export class ProductFormComponent implements OnDestroy {
     const labels: { [key: string]: string } = {
       sku: 'SKU',
       name: 'Nombre',
-      barcode: 'Código de Barras',
       description: 'Descripción',
-      category_id: 'Categoría',
-      unit_id: 'Unidad',
-      sale_price: 'Precio Venta',
-      purchase_price: 'Precio Compra',
-      min_stock: 'Stock Mínimo'
+      category: 'Categoría',
+      price: 'Precio',
+      minStock: 'Stock mínimo'
     };
     return labels[fieldName] || fieldName;
   }
@@ -152,55 +174,34 @@ export class ProductFormComponent implements OnDestroy {
   }
 
   /**
-   * Envía el formulario (API call)
+   * Envía el formulario (simula API call)
    */
   private submitForm(): void {
     this.loading = true;
 
-    const payload: ProductCreate = {
-      sku: this.form.get('sku')?.value,
-      name: this.form.get('name')?.value,
-      barcode: this.form.get('barcode')?.value || null,
-      description: this.form.get('description')?.value || null,
-      category_id: this.form.get('category_id')?.value || null,
-      unit_id: this.form.get('unit_id')?.value || null,
-      sale_price: parseFloat(this.form.get('sale_price')?.value) || 0,
-      purchase_price: parseFloat(this.form.get('purchase_price')?.value) || 0,
-      min_stock: parseInt(this.form.get('min_stock')?.value) || 0
-    };
+    // Simular llamada a API
+    setTimeout(() => {
+      const formData: ProductFormData = {
+        sku: this.form.get('sku')?.value,
+        name: this.form.get('name')?.value,
+        description: this.form.get('description')?.value,
+        category: this.form.get('category')?.value,
+        price: parseFloat(this.form.get('price')?.value),
+        minStock: parseInt(this.form.get('minStock')?.value)
+      };
 
-    this.productsService.createProduct(payload)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.loading = false;
-          this.form.reset();
+      this.loading = false;
+      this.form.reset();
 
-          this.snackBar.open('✓ Producto guardado exitosamente', 'Cerrar', {
-            duration: 4000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top',
-            panelClass: ['snackbar-success']
-          });
-
-          setTimeout(() => {
-            this.productCreated.emit();
-          }, 300);
-        },
-        error: (err) => {
-          this.loading = false;
-          const errorMsg = err.error?.detail || 'Error al guardar el producto';
-
-          this.snackBar.open(errorMsg, 'Cerrar', {
-            duration: 5000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top',
-            panelClass: ['snackbar-error']
-          });
-
-          console.error('Error:', err);
-        }
+      this.snackBar.open('✓ Producto guardado exitosamente', 'Cerrar', {
+        duration: 4000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+        panelClass: ['snackbar-success']
       });
+
+      this.formSubmitted.emit(formData);
+    }, 1500);
   }
 
   /**

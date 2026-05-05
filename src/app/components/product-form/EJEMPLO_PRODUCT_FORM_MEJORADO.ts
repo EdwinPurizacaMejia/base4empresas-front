@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -14,6 +15,19 @@ import { takeUntil } from 'rxjs/operators';
 import { ProductsService } from '../../services/products.service';
 import { ProductCreate } from '../../models/product.model';
 import { ConfirmationService } from '../../services/confirmation.service';
+
+/**
+ * EJEMPLO DE PRODUCT-FORM MEJORADO
+ * 
+ * Cambios principales:
+ * 1. Imports de Angular Material
+ * 2. Inyección de ConfirmationService y MatSnackBar
+ * 3. Confirmación antes de guardar
+ * 4. Snackbars para notificaciones
+ * 5. Método hasError() para validación visual
+ * 6. Subject para unsubscribe
+ * 7. Loading state mejorado
+ */
 
 @Component({
   selector: 'app-product-form',
@@ -27,12 +41,13 @@ import { ConfirmationService } from '../../services/confirmation.service';
     MatIconModule,
     MatCardModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
     MatSelectModule
   ],
-  templateUrl: './product-form.component.html',
-  styleUrl: './product-form.component.css'
+  templateUrl: './product-form-improved.component.html',
+  styleUrl: './product-form-improved.component.css'
 })
-export class ProductFormComponent implements OnDestroy {
+export class ProductFormImprovedComponent implements OnDestroy {
   @Output() productCreated = new EventEmitter<void>();
   @Output() formClosed = new EventEmitter<void>();
 
@@ -40,13 +55,29 @@ export class ProductFormComponent implements OnDestroy {
   loading = false;
   private destroy$ = new Subject<void>();
 
+  categories = [
+    { value: 1, label: 'Electrónica' },
+    { value: 2, label: 'Muebles' },
+    { value: 3, label: 'Software' }
+  ];
+
+  units = [
+    { value: 1, label: 'Unidad' },
+    { value: 2, label: 'Caja' },
+    { value: 3, label: 'Paquete' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private productsService: ProductsService,
     private snackBar: MatSnackBar,
     private confirmationService: ConfirmationService
   ) {
-    this.form = this.fb.group({
+    this.form = this.createForm();
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
       sku: ['', [Validators.required, Validators.minLength(3)]],
       name: ['', [Validators.required, Validators.minLength(3)]],
       barcode: [''],
@@ -60,7 +91,7 @@ export class ProductFormComponent implements OnDestroy {
   }
 
   /**
-   * Obtiene mensaje de error específico para cada campo
+   * Obtiene mensaje de error específico
    */
   getErrorMessage(fieldName: string): string {
     const control = this.form.get(fieldName);
@@ -91,7 +122,7 @@ export class ProductFormComponent implements OnDestroy {
   }
 
   /**
-   * Obtiene la etiqueta legible del campo
+   * Etiqueta legible del campo
    */
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
@@ -109,7 +140,7 @@ export class ProductFormComponent implements OnDestroy {
   }
 
   /**
-   * Verifica si un campo tiene error y ha sido tocado
+   * Verifica si hay error
    */
   hasError(fieldName: string): boolean {
     const control = this.form.get(fieldName);
@@ -117,7 +148,7 @@ export class ProductFormComponent implements OnDestroy {
   }
 
   /**
-   * Marca todos los campos como tocados para mostrar errores
+   * Marca todos como tocados
    */
   private markAllAsTouched(): void {
     Object.keys(this.form.controls).forEach(key => {
@@ -126,7 +157,7 @@ export class ProductFormComponent implements OnDestroy {
   }
 
   /**
-   * Maneja el envío del formulario
+   * Manejo del envío
    */
   onSubmit(): void {
     if (this.form.invalid) {
@@ -140,7 +171,7 @@ export class ProductFormComponent implements OnDestroy {
       return;
     }
 
-    // Confirmar antes de guardar
+    // Confirmación de guardado
     this.confirmationService
       .confirmSave(this.form.get('name')?.value)
       .pipe(takeUntil(this.destroy$))
@@ -152,7 +183,7 @@ export class ProductFormComponent implements OnDestroy {
   }
 
   /**
-   * Envía el formulario (API call)
+   * Envío efectivo del formulario
    */
   private submitForm(): void {
     this.loading = true;
@@ -204,7 +235,7 @@ export class ProductFormComponent implements OnDestroy {
   }
 
   /**
-   * Maneja el cancelar del formulario
+   * Cancelar con confirmación si hay cambios
    */
   onCancel(): void {
     if (this.form.dirty) {
@@ -222,9 +253,6 @@ export class ProductFormComponent implements OnDestroy {
     }
   }
 
-  /**
-   * Limpia recursos
-   */
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();

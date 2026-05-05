@@ -1,3 +1,5 @@
+<!-- EJEMPLO DE TEMPLATE MEJORADO PARA PRODUCT-FORM -->
+
 <mat-card class="form-card">
   <!-- Header -->
   <mat-card-header>
@@ -18,7 +20,6 @@
   <mat-card-content>
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
 
-      <!-- Grid de campos -->
       <div class="form-grid">
 
         <!-- SKU -->
@@ -35,13 +36,13 @@
           </mat-error>
         </mat-form-field>
 
-        <!-- Nombre del Producto -->
+        <!-- Nombre -->
         <mat-form-field class="full-width">
           <mat-label>Nombre del Producto *</mat-label>
           <input 
             matInput 
             formControlName="name" 
-            placeholder="Ej: Laptop Dell Inspiron 15"
+            placeholder="Ej: Laptop Dell Inspiron"
             [attr.aria-invalid]="hasError('name')">
           <mat-icon matPrefix>inventory_2</mat-icon>
           <mat-error *ngIf="hasError('name')">
@@ -55,7 +56,7 @@
           <input 
             matInput 
             formControlName="barcode" 
-            placeholder="Código opcional"
+            placeholder="Código de barras opcional"
             [attr.aria-invalid]="hasError('barcode')">
           <mat-icon matPrefix>barcode</mat-icon>
         </mat-form-field>
@@ -65,9 +66,9 @@
           <mat-label>Categoría *</mat-label>
           <mat-select formControlName="category_id" [attr.aria-invalid]="hasError('category_id')">
             <mat-option value="">-- Seleccionar --</mat-option>
-            <mat-option value="1">Electrónica</mat-option>
-            <mat-option value="2">Muebles</mat-option>
-            <mat-option value="3">Software</mat-option>
+            <mat-option *ngFor="let cat of categories" [value]="cat.value">
+              {{ cat.label }}
+            </mat-option>
           </mat-select>
           <mat-icon matPrefix>category</mat-icon>
           <mat-error *ngIf="hasError('category_id')">
@@ -80,9 +81,9 @@
           <mat-label>Unidad *</mat-label>
           <mat-select formControlName="unit_id" [attr.aria-invalid]="hasError('unit_id')">
             <mat-option value="">-- Seleccionar --</mat-option>
-            <mat-option value="1">Unidad</mat-option>
-            <mat-option value="2">Caja</mat-option>
-            <mat-option value="3">Paquete</mat-option>
+            <mat-option *ngFor="let unit of units" [value]="unit.value">
+              {{ unit.label }}
+            </mat-option>
           </mat-select>
           <mat-icon matPrefix>straighten</mat-icon>
           <mat-error *ngIf="hasError('unit_id')">
@@ -143,7 +144,7 @@
           <textarea 
             matInput 
             formControlName="description" 
-            rows="4"
+            rows="3"
             placeholder="Descripción opcional del producto"
             [attr.aria-invalid]="hasError('description')">
           </textarea>
@@ -178,9 +179,7 @@
         [disabled]="loading || form.invalid"
         class="btn-primary">
         <mat-icon *ngIf="!loading">save</mat-icon>
-        <span *ngIf="loading" class="spinner-text">
-          <mat-icon class="spinner">hourglass_empty</mat-icon>
-        </span>
+        <mat-spinner *ngIf="loading" [diameter]="20" class="spinner"></mat-spinner>
         {{ loading ? 'Guardando...' : 'Guardar Producto' }}
       </button>
     </div>

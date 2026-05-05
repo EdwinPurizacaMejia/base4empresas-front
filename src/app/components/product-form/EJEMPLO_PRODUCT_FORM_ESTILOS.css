@@ -1,3 +1,5 @@
+/* EJEMPLO DE ESTILOS MEJORADOS PARA PRODUCT-FORM */
+
 /* Form Card */
 .form-card {
   max-width: 700px;
@@ -106,10 +108,6 @@ mat-hint {
 
 .btn-primary {
   min-width: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 
 .btn-secondary {
@@ -117,29 +115,16 @@ mat-hint {
 }
 
 /* Loading Spinner */
-.spinner-text {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .spinner {
-  animation: spin 1s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  display: inline-block !important;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 /* Estados de botones */
 button[disabled] {
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 button:not([disabled]) {

@@ -1,0 +1,173 @@
+/* Form Card */
+.form-card {
+  max-width: 600px;
+  margin: 20px auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* Header */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.form-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: #333;
+}
+
+.btn-close {
+  color: #999;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: #333;
+}
+
+/* Form Container */
+.form-container {
+  padding: 20px 0;
+}
+
+/* Grid de campos */
+.form-grid {
+  display: grid;
+  gap: 16px;
+  padding: 0 20px;
+}
+
+/* Ancho de campos */
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: calc(50% - 8px);
+}
+
+/* Media query para mobile */
+@media (max-width: 600px) {
+  .half-width {
+    width: 100%;
+  }
+
+  .form-grid {
+    gap: 12px;
+    padding: 0 12px;
+  }
+}
+
+/* Material Form Field */
+mat-form-field {
+  display: block;
+}
+
+/* Inputs */
+input[matInput],
+textarea[matInput] {
+  font-family: inherit;
+}
+
+textarea[matInput] {
+  resize: vertical;
+}
+
+/* Icons */
+mat-icon[matPrefix] {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+/* Error states */
+mat-error {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Hints */
+mat-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+.btn-primary {
+  min-width: 140px;
+}
+
+.btn-secondary {
+  min-width: 100px;
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block !important;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Button estados */
+button[disabled] {
+  cursor: not-allowed;
+}
+
+button:not([disabled]) {
+  cursor: pointer;
+}
+
+/* Estilos específicos para estados */
+mat-form-field.mat-focused .mat-form-field-label {
+  color: var(--primary-color, #1976d2);
+}
+
+/* Validación visual */
+mat-form-field.mat-form-field-invalid {
+  .mat-form-field-label {
+    color: #f44336 !important;
+  }
+}
+
+/* Responsive - Tablet */
+@media (max-width: 768px) {
+  .form-card {
+    margin: 16px;
+    max-width: calc(100% - 32px);
+  }
+
+  .form-header {
+    padding: 16px;
+  }
+
+  .form-grid {
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .form-actions {
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    flex: 1 1 auto;
+    min-width: 100px;
+  }
+}
