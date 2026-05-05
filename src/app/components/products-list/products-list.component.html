@@ -11,17 +11,38 @@
     </button>
   </div>
 
-  <!-- Success Message -->
-  <div *ngIf="successMessage" class="alert alert-success">
-    {{ successMessage }}
-  </div>
+  <!-- Loading State -->
+  <app-loading-spinner
+    *ngIf="loading && products.length === 0"
+    message="Cargando productos..."
+  ></app-loading-spinner>
+
+  <!-- Error State -->
+  <app-error-state
+    *ngIf="error && !loading"
+    title="Error al cargar"
+    [message]="error"
+    (onRetry)="loadProducts()"
+    (onGoBack)="error = null"
+  ></app-error-state>
+
+  <!-- Empty State -->
+  <app-empty-state
+    *ngIf="!loading && !error && products.length === 0"
+    icon="inventory_2"
+    title="Sin productos"
+    description="No hay productos registrados. Crea uno nuevo para comenzar."
+    [showAction]="true"
+    actionLabel="Crear primer producto"
+    (onAction)="onNewProduct()"
+  ></app-empty-state>
 
   <!-- Data Table -->
   <app-generic-data-table
+    *ngIf="!error && products.length > 0"
     [data]="products"
     [config]="tableConfig"
     [loading]="loading"
-    [error]="error"
     [totalItems]="products.length"
     (actionClick)="onTableAction($event)"
     (searchChange)="onSearch($event)"

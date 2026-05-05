@@ -1,0 +1,205 @@
+/* Estilos Globales para Notificaciones - NotificationService */
+
+/* Variables CSS para notificaciones */
+:root {
+  /* Colores de notificaciones */
+  --notification-success-bg: #4caf50;
+  --notification-success-light: #e8f5e9;
+  --notification-error-bg: #f44336;
+  --notification-error-light: #ffebee;
+  --notification-warning-bg: #ff9800;
+  --notification-warning-light: #fff3e0;
+  --notification-info-bg: #2196f3;
+  --notification-info-light: #e3f2fd;
+
+  /* Colores de texto */
+  --color-text-primary: #333;
+  --color-text-secondary: #666;
+  --color-text-tertiary: #999;
+  --color-error: #d32f2f;
+  --color-error-border: #ffcdd2;
+  --color-error-light: #ffebee;
+}
+
+/* Estilos base del MatSnackBar */
+.notification-success::ng-deep {
+  background-color: var(--notification-success-bg) !important;
+  color: white !important;
+}
+
+.notification-success::ng-deep .mat-simple-snackbar-content {
+  color: white !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.notification-success::ng-deep button {
+  color: white !important;
+  opacity: 0.8;
+}
+
+.notification-success::ng-deep button:hover {
+  opacity: 1;
+}
+
+/* Error */
+.notification-error::ng-deep {
+  background-color: var(--notification-error-bg) !important;
+  color: white !important;
+}
+
+.notification-error::ng-deep .mat-simple-snackbar-content {
+  color: white !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.notification-error::ng-deep button {
+  color: white !important;
+  opacity: 0.8;
+}
+
+.notification-error::ng-deep button:hover {
+  opacity: 1;
+}
+
+/* Warning */
+.notification-warning::ng-deep {
+  background-color: var(--notification-warning-bg) !important;
+  color: white !important;
+}
+
+.notification-warning::ng-deep .mat-simple-snackbar-content {
+  color: white !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.notification-warning::ng-deep button {
+  color: white !important;
+  opacity: 0.8;
+}
+
+.notification-warning::ng-deep button:hover {
+  opacity: 1;
+}
+
+/* Info */
+.notification-info::ng-deep {
+  background-color: var(--notification-info-bg) !important;
+  color: white !important;
+}
+
+.notification-info::ng-deep .mat-simple-snackbar-content {
+  color: white !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.notification-info::ng-deep button {
+  color: white !important;
+  opacity: 0.8;
+}
+
+.notification-info::ng-deep button:hover {
+  opacity: 1;
+}
+
+/* Responsive para notificaciones */
+@media (max-width: 600px) {
+  .notification-success::ng-deep,
+  .notification-error::ng-deep,
+  .notification-warning::ng-deep,
+  .notification-info::ng-deep {
+    bottom: 1rem !important;
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+    width: auto !important;
+  }
+
+  .notification-success::ng-deep .mat-simple-snackbar-content,
+  .notification-error::ng-deep .mat-simple-snackbar-content,
+  .notification-warning::ng-deep .mat-simple-snackbar-content,
+  .notification-info::ng-deep .mat-simple-snackbar-content {
+    font-size: 0.9rem;
+  }
+}
+
+/* Animación de entrada suave para notificaciones */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.notification-success::ng-deep,
+.notification-error::ng-deep,
+.notification-warning::ng-deep,
+.notification-info::ng-deep {
+  animation: slideInUp 0.3s ease-out !important;
+}
+
+/* Sombra elegante */
+.notification-success::ng-deep,
+.notification-error::ng-deep,
+.notification-warning::ng-deep,
+.notification-info::ng-deep {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 4px !important;
+}
+
+/* Estilos para componentes de estado compartidos */
+
+/* LoadingSpinnerComponent - spinner color */
+::ng-deep .mat-mdc-progress-spinner {
+  --mdc-theme-primary: #2196f3;
+}
+
+/* EmptyStateComponent - estilos de iconos */
+::ng-deep app-empty-state .empty-state-icon {
+  color: #90a4ae;
+}
+
+/* ErrorStateComponent - estilos de error */
+::ng-deep app-error-state {
+  --color-error: #d32f2f;
+  --color-error-light: #ffebee;
+  --color-error-border: #ffcdd2;
+}
+
+/* Accesibilidad - focus visible para botones */
+::ng-deep app-empty-state button:focus-visible,
+::ng-deep app-error-state button:focus-visible {
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
+}
+
+/* Soporte para tema oscuro (opcional) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-primary: #f0f0f0;
+    --color-text-secondary: #b0b0b0;
+    --color-text-tertiary: #808080;
+  }
+
+  .notification-success::ng-deep {
+    background-color: #388e3c !important;
+  }
+
+  .notification-error::ng-deep {
+    background-color: #d32f2f !important;
+  }
+
+  .notification-warning::ng-deep {
+    background-color: #f57c00 !important;
+  }
+
+  .notification-info::ng-deep {
+    background-color: #1976d2 !important;
+  }
+}

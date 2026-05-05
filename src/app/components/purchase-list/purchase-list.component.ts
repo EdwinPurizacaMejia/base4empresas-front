@@ -5,13 +5,26 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { PurchaseListItem } from '../../models/purchase.model';
 import { PurchaseService } from '../../services/purchase.service';
+import { NotificationService } from '../../services/notification.service';
 import { PurchaseFormComponent } from '../purchase-form/purchase-form.component';
 import { GenericDataTableComponent, TableConfig, TableAction } from '../generic-data-table/generic-data-table.component';
+import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
+import { EmptyStateComponent } from '../shared/empty-state.component';
+import { ErrorStateComponent } from '../shared/error-state.component';
 
 @Component({
   selector: 'app-purchase-list',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, PurchaseFormComponent, GenericDataTableComponent],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    PurchaseFormComponent,
+    GenericDataTableComponent,
+    LoadingSpinnerComponent,
+    EmptyStateComponent,
+    ErrorStateComponent
+  ],
   templateUrl: './purchase-list.component.html',
   styleUrl: './purchase-list.component.css'
 })
@@ -43,7 +56,10 @@ export class PurchaseListComponent implements OnInit {
     searchPlaceholder: 'Buscar por número o proveedor...'
   };
 
-  constructor(private purchaseService: PurchaseService) {}
+  constructor(
+    private purchaseService: PurchaseService,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.loadPurchases();
@@ -57,12 +73,16 @@ export class PurchaseListComponent implements OnInit {
       next: (data) => {
         this.purchases = data;
         this.loading = false;
+        if (data.length === 0) {
+          this.notificationService.info('No hay compras registradas');
+        }
       },
       error: (err) => {
         console.error(err);
         this.error = 'Error al cargar compras. Intenta nuevamente.';
         this.purchases = [];
         this.loading = false;
+        this.notificationService.error('Error al cargar compras. Por favor, intenta nuevamente.');
       }
     });
   }
@@ -77,12 +97,8 @@ export class PurchaseListComponent implements OnInit {
 
   onPurchaseCreated(): void {
     this.showForm = false;
-    this.successMessage = '✓ Compra registrada exitosamente';
+    this.notificationService.success('✓ Compra registrada exitosamente');
     this.loadPurchases();
-
-    setTimeout(() => {
-      this.successMessage = null;
-    }, 4000);
   }
 
   onSearch(searchTerm: string): void {
@@ -101,11 +117,15 @@ export class PurchaseListComponent implements OnInit {
           this.purchases = data;
         }
         this.loading = false;
+        if (this.purchases.length === 0 && searchTerm) {
+          this.notificationService.info(`No se encontraron compras para "${searchTerm}"`);
+        }
       },
       error: (err) => {
         console.error(err);
         this.error = 'Error al buscar compras.';
         this.loading = false;
+        this.notificationService.error('Error al buscar compras. Por favor, intenta nuevamente.');
       }
     });
   }

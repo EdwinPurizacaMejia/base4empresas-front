@@ -5,8 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { Product } from '../../models/product.model';
 import { ProductsService } from '../../services/products.service';
+import { NotificationService } from '../../services/notification.service';
 import { ProductFormComponent } from '../product-form/product-form.component';
 import { GenericDataTableComponent, TableConfig, TableAction } from '../generic-data-table/generic-data-table.component';
+import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
+import { EmptyStateComponent } from '../shared/empty-state.component';
+import { ErrorStateComponent } from '../shared/error-state.component';
 
 @Component({
   selector: 'app-products-list',
@@ -16,7 +20,10 @@ import { GenericDataTableComponent, TableConfig, TableAction } from '../generic-
     MatButtonModule,
     MatIconModule,
     ProductFormComponent,
-    GenericDataTableComponent
+    GenericDataTableComponent,
+    LoadingSpinnerComponent,
+    EmptyStateComponent,
+    ErrorStateComponent
   ],
   templateUrl: './products-list.component.html',
   styleUrl: './products-list.component.css'
@@ -62,7 +69,10 @@ export class ProductsListComponent implements OnInit {
     searchPlaceholder: 'Buscar por nombre o SKU...'
   };
 
-  constructor(private productService: ProductsService) {}
+  constructor(
+    private productService: ProductsService,
+    private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.loadProducts();
@@ -76,12 +86,16 @@ export class ProductsListComponent implements OnInit {
       next: (data) => {
         this.products = data;
         this.loading = false;
+        if (data.length === 0) {
+          this.notificationService.info('No hay productos registrados');
+        }
       },
       error: (err) => {
         console.error(err);
         this.error = 'Error al cargar productos. Intenta nuevamente.';
         this.products = [];
         this.loading = false;
+        this.notificationService.error('Error al cargar productos. Por favor, intenta nuevamente.');
       }
     });
   }
@@ -94,11 +108,15 @@ export class ProductsListComponent implements OnInit {
       next: (data) => {
         this.products = data;
         this.loading = false;
+        if (data.length === 0) {
+          this.notificationService.info(`No se encontraron productos para "${searchTerm}"`);
+        }
       },
       error: (err) => {
         console.error(err);
         this.error = 'Error al buscar productos.';
         this.loading = false;
+        this.notificationService.error('Error al buscar productos. Por favor, intenta nuevamente.');
       }
     });
   }
@@ -129,6 +147,7 @@ export class ProductsListComponent implements OnInit {
   onDeleteProduct(product: Product): void {
     if (confirm(`¿Estás seguro de que deseas eliminar el producto "${product.name}"?`)) {
       console.log('Delete product:', product);
+      this.notificationService.warning('Producto marcado para eliminar (función en desarrollo)');
       // TODO: Implementar eliminación
     }
   }
@@ -143,11 +162,7 @@ export class ProductsListComponent implements OnInit {
 
   onProductCreated(): void {
     this.showForm = false;
-    this.successMessage = '✓ Producto creado exitosamente';
+    this.notificationService.success('✓ Producto creado exitosamente');
     this.loadProducts();
-
-    setTimeout(() => {
-      this.successMessage = null;
-    }, 4000);
   }
 }
