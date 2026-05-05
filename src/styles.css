@@ -140,9 +140,11 @@ a:hover {
 }
 
 /* ============ FORMULARIOS ============ */
-input,
-textarea,
-select {
+/* Importante: no sobreescribir los estilos de Angular Material.
+   Usar clases específicas para formularios "propios" fuera de Material. */
+.b4e-form input,
+.b4e-form textarea,
+.b4e-form select {
   font-family: inherit;
   font-size: inherit;
   color: var(--text-primary);
@@ -152,21 +154,22 @@ select {
   transition: all var(--transition-fast);
 }
 
-input:focus,
-textarea:focus,
-select:focus {
+.b4e-form input:focus,
+.b4e-form textarea:focus,
+.b4e-form select:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   background-color: var(--bg-primary);
 }
 
-input::placeholder,
-textarea::placeholder {
+.b4e-form input::placeholder,
+.b4e-form textarea::placeholder {
   color: var(--text-muted);
 }
 
-button {
+/* Botones básicos propios (no Material) */
+.b4e-btn {
   font-family: inherit;
   font-size: inherit;
   cursor: pointer;
@@ -176,12 +179,12 @@ button {
   transition: all var(--transition-fast);
 }
 
-button:hover {
+.b4e-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
-button:active {
+.b4e-btn:active {
   transform: translateY(0);
 }
 

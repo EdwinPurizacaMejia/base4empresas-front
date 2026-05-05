@@ -14,70 +14,16 @@
     {{ successMessage }}
   </div>
 
-  <!-- Error Message -->
-  <div class="error-message" *ngIf="error">
-    <span class="error-icon">⚠</span>
-    {{ error }}
-  </div>
-
-  <!-- Loading State -->
-  <div class="loading-state" *ngIf="loading">
-    <div class="spinner"></div>
-    <p>Cargando ventas...</p>
-  </div>
-
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="!loading && sales.length === 0 && !error">
-    <div class="empty-icon">📦</div>
-    <h3>No hay ventas registradas</h3>
-    <p>Haz clic en "Registrar Venta" para crear tu primera venta</p>
-  </div>
-
   <!-- Sales Table -->
-  <div class="sales-table-wrapper" *ngIf="!loading && sales.length > 0">
-    <table class="sales-table">
-      <thead>
-        <tr>
-          <th>Número</th>
-          <th>Fecha</th>
-          <th>Customer ID</th>
-          <th>Almacén</th>
-          <th>Estado</th>
-          <th>Pago</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let sale of sales" class="sale-row">
-          <td class="sale-number">
-            <strong>{{ sale.number }}</strong>
-          </td>
-          <td class="sale-date">
-            {{ formatDate(sale.created_at) }}
-          </td>
-          <td class="sale-customer">
-            {{ sale.customer_id || '-' }}
-          </td>
-          <td class="sale-warehouse">
-            {{ sale.warehouse_id }}
-          </td>
-          <td class="sale-status">
-            <span class="status-badge" [ngClass]="'status-' + (sale.status || 'completed')">
-              {{ getStatusLabel(sale.status) }}
-            </span>
-          </td>
-          <td class="sale-payment">
-            <span class="payment-badge" [ngClass]="'payment-' + (sale.payment_status || 'pending')">
-              {{ getPaymentStatusLabel(sale.payment_status) }}
-            </span>
-          </td>
-          <td class="sale-total">
-            <strong>S/{{ sale.total.toFixed(2) }}</strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <app-generic-data-table
+    [data]="sales"
+    [config]="tableConfig"
+    [loading]="loading"
+    [error]="error"
+    [totalItems]="sales.length"
+    (actionClick)="onTableAction($event)"
+    (searchChange)="onSearch($event)"
+  ></app-generic-data-table>
 
   <!-- Form Modal -->
   <app-sale-form 
