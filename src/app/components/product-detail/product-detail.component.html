@@ -1,0 +1,139 @@
+<div class="detail-container">
+  <!-- Header con navegación -->
+  <div class="detail-header">
+    <div class="header-content">
+      <button mat-icon-button (click)="onGoBack()" class="back-button" matTooltip="Volver al listado">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-title">
+        <h1>Detalle del Producto</h1>
+        <p class="breadcrumb">Productos / Detalle</p>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="product">
+      <button mat-raised-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <app-loading-spinner
+    *ngIf="loading && !product"
+    message="Cargando detalles del producto..."
+  ></app-loading-spinner>
+
+  <!-- Error State -->
+  <app-error-state
+    *ngIf="error && !loading"
+    icon="error_outline"
+    title="Error al cargar"
+    [message]="error"
+    (onRetry)="onRetry()"
+    (onGoBack)="onGoBack()"
+  ></app-error-state>
+
+  <!-- Product Detail -->
+  <div *ngIf="product && !loading && !error" class="detail-content">
+    <!-- Información Principal -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Información Principal</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>SKU</label>
+            <p class="info-value">{{ product.sku }}</p>
+          </div>
+          <div class="info-item">
+            <label>Nombre</label>
+            <p class="info-value">{{ product.name }}</p>
+          </div>
+          <div class="info-item">
+            <label>Estado</label>
+            <mat-chip-set>
+              <mat-chip
+                [highlighted]="product.is_active"
+                [color]="getStatusColor(product.is_active)"
+              >
+                {{ getStatusLabel(product.is_active) }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+
+        <div class="info-section" *ngIf="product.description">
+          <label>Descripción</label>
+          <p class="info-text">{{ product.description }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Precios -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Información de Precios</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Precio de Compra</label>
+            <p class="info-value currency">
+              {{ product.purchase_price | currency : 'USD' : 'symbol' : '1.2-2' }}
+            </p>
+          </div>
+          <div class="info-item">
+            <label>Precio de Venta</label>
+            <p class="info-value currency">
+              {{ product.sale_price | currency : 'USD' : 'symbol' : '1.2-2' }}
+            </p>
+          </div>
+          <div class="info-item">
+            <label>Margen de Ganancia</label>
+            <p class="info-value currency">
+              {{
+                (
+                  (product.sale_price - product.purchase_price) /
+                    product.purchase_price *
+                    100
+                ).toFixed(2)
+              }}%
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Stock -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Información de Stock</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Stock Mínimo</label>
+            <p class="info-value">{{ product.min_stock }} unidades</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Acciones -->
+    <div class="action-section">
+      <button mat-raised-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar Producto
+      </button>
+      <button mat-stroked-button (click)="onGoBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver al Listado
+      </button>
+    </div>
+  </div>
+</div>

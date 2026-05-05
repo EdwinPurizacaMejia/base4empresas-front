@@ -1,17 +1,24 @@
 BASE4EMPRESAS - SISTEMA DE GESTIÓN DE INVENTARIO
 =================================================
 
-## ✨ RAMA ACTUAL: feature/notificaciones-estados
+## ✨ RAMA ACTUAL: feature/detalle-entidades
 
-Esta es una rama de mejora enfocada en la experiencia de usuario (UX).
-Agrega notificaciones, estados de carga y gestión visual de errores.
+Esta rama implementa la navegación de detalle para entidades del sistema.
+Flujo: lista → ver detalle → editar
+
+Características:
+* Páginas de detalle profesionales para Productos, Compras, Ventas e Inventario
+* Diseño responsivo con Angular Material
+* Navegación clara y estados de carga
+* Integración con rutas actuales
+* Componentes standalone reutilizables
 
 ## 🚀 EJECUCIÓN DEL PROYECTO
 
 ### Para desarrollar:
 1. ng serve
    (Inicia servidor en http://localhost:4200)
-f
+
 ### Para compilar:
 1. ng build
    (Compila el proyecto con SSR)
@@ -19,11 +26,12 @@ f
 ### Para terminar:
    Presionar Ctrl + C (back y front)
 
-## 📦 GIT - Comandos Básicosf
+## 📦 GIT - Comandos Básicos
 
-### Ver ramas:f
+### Ver ramas:
 git branch
-# Output: * feature/notificaciones-estados
+# Output: * feature/detalle-entidades
+#         feature/notificaciones-estados
 #         feature/layout-general
 #         feature/formularios
 #         main
@@ -31,13 +39,13 @@ git branch
 ### Cambiar a main:
 git checkout main
 
-### Volver a feature/notificaciones-estados:
-git checkout feature/notificaciones-estados
+### Volver a feature/detalle-entidades:
+git checkout feature/detalle-entidades
 
 ### Subir cambios a rama remota:
 git add .
 git commit -m "Descripción de los cambios"
-git push -u origin feature/notificaciones-estados
+git push -u origin feature/detalle-entidades
 
 ### Hacer Pull Request (PR):
 1. Ir a GitHub
@@ -47,8 +55,12 @@ git push -u origin feature/notificaciones-estados
 
 ## 📄 DOCUMENTACIÓN
 
+📖 NAVEGACION_DETALLE.md     (Nueva: Implementación de rutas de detalle)
 📖 GUIA_NOTIFICACIONES_ESTADOS.md
+📖 PATRONES_COMUNES.md
+📖 INICIO_RAPIDO.md
    Guía completa de los nuevos componentes de UX.
+
    Incluye: NotificationService, componentes, ejemplos de uso.
 
 📊 PATRONES_COMUNES.md

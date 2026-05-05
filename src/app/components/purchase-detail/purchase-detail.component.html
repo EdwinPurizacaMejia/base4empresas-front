@@ -1,0 +1,110 @@
+<div class="detail-container">
+  <!-- Header con navegación -->
+  <div class="detail-header">
+    <div class="header-content">
+      <button mat-icon-button (click)="onGoBack()" class="back-button" matTooltip="Volver al listado">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-title">
+        <h1>Detalle de Compra</h1>
+        <p class="breadcrumb">Compras / Detalle</p>
+      </div>
+    </div>
+    <div class="header-actions" *ngIf="purchase">
+      <button mat-raised-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <app-loading-spinner
+    *ngIf="loading && !purchase"
+    message="Cargando detalles de la compra..."
+  ></app-loading-spinner>
+
+  <!-- Error State -->
+  <app-error-state
+    *ngIf="error && !loading"
+    icon="error_outline"
+    title="Error al cargar"
+    [message]="error"
+    (onRetry)="onRetry()"
+    (onGoBack)="onGoBack()"
+  ></app-error-state>
+
+  <!-- Purchase Detail -->
+  <div *ngIf="purchase && !loading && !error" class="detail-content">
+    <!-- Información Principal -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Información Principal</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Número de Compra</label>
+            <p class="info-value">{{ purchase.number }}</p>
+          </div>
+          <div class="info-item">
+            <label>Estado</label>
+            <mat-chip-set>
+              <mat-chip
+                [highlighted]="true"
+                [color]="getStatusColor(purchase.status || 'pending')"
+              >
+                {{ getStatusLabel(purchase.status || 'pending') }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          <div class="info-item">
+            <label>Fecha</label>
+            <p class="info-value">{{ purchase.created_at ? (purchase.created_at | date: 'dd/MM/yyyy HH:mm') : 'N/A' }}</p>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <label>ID de Proveedor</label>
+          <p class="info-text">{{ purchase.supplier_id }}</p>
+        </div>
+
+        <div class="info-section">
+          <label>ID de Almacén</label>
+          <p class="info-text">{{ purchase.warehouse_id }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Información de Totales -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Resumen Financiero</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Total</label>
+            <p class="info-value currency">
+              {{ purchase.total | currency : 'USD' : 'symbol' : '1.2-2' }}
+            </p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Acciones -->
+    <div class="action-section">
+      <button mat-raised-button color="primary" (click)="onEdit()">
+        <mat-icon>edit</mat-icon>
+        Editar Compra
+      </button>
+      <button mat-stroked-button (click)="onGoBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Volver al Listado
+      </button>
+    </div>
+  </div>
+</div>
