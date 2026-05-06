@@ -1,6 +1,21 @@
 BASE4EMPRESAS - SISTEMA DE GESTIÓN DE INVENTARIO
 =================================================
 
+## ✨ ACTUALIZAR LA WEB DESPLEGADA EN https://edwinpurizacamejia.github.io/base4empresas-front
+
+🤖 Con GitHub Actions AUTOMÁTICO - Solo necesitas:
+
+git add .
+git commit -m "Actualización de cambios"
+git push origin main
+
+✅ GitHub Actions se encargará automáticamente de:
+   - Compilar el proyecto (npm run build)
+   - Crear 404.html para SPA routing
+   - Desplegar a GitHub Pages
+
+📊 Monitorea el progreso en: https://github.com/EdwinPurizacaMejia/base4empresas-front/actions
+
 ## ✨ RAMA ACTUAL: feature/detalle-entidades
 
 Esta rama implementa la navegación de detalle para entidades del sistema.
