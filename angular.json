@@ -37,6 +37,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/base4empresas-front/",
               "budgets": [
                 {
                   "type": "initial",
