@@ -28,6 +28,14 @@ jobs:
             - name: Build project
               run: npm run build
 
+            - name: Copy 404.html for SPA routing
+              run: |
+                  if [ -f "dist/base4empresas/404.html" ]; then
+                    echo "404.html already exists"
+                  else
+                    cp dist/base4empresas/index.html dist/base4empresas/404.html
+                  fi
+
             - name: Deploy to GitHub Pages
               run: |
                   git config user.name "GitHub Actions"

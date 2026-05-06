@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>Base4Empresas - Gestión de Inventario</title>
+    <base href="/base4empresas-front/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script>
+      // Redirigir a index.html para que Angular maneje el routing
+      // Esto es necesario para que las rutas SPA funcionen en GitHub Pages
+      var pathArray = window.location.pathname.split('/');
+      var projectName = pathArray[1];
+      window.location.href = '/' + projectName + '/index.html?redirect=' + window.location.pathname;
+    </script>
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>
