@@ -19,6 +19,38 @@
   min-width: 250px;
 }
 
+/* Material Form Field Styles */
+::ng-deep .search-field .mdc-notched-outline__leading,
+::ng-deep .search-field .mdc-notched-outline__notch,
+::ng-deep .search-field .mdc-notched-outline__trailing {
+  border-color: #d1d5db;
+}
+
+::ng-deep .search-field:hover .mdc-notched-outline__leading,
+::ng-deep .search-field:hover .mdc-notched-outline__notch,
+::ng-deep .search-field:hover .mdc-notched-outline__trailing {
+  border-color: #9ca3af;
+}
+
+::ng-deep .search-field.mat-focused .mdc-notched-outline__leading,
+::ng-deep .search-field.mat-focused .mdc-notched-outline__notch,
+::ng-deep .search-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #5c6ac4;
+}
+
+::ng-deep .search-field .mat-mdc-form-field-input {
+  height: 48px;
+  padding: 0 12px;
+}
+
+::ng-deep .search-field .mat-mdc-form-field-label {
+  font-size: 14px;
+}
+
+::ng-deep .search-field .mat-mdc-text-field-wrapper {
+  padding-bottom: 0;
+}
+
 /* Loading State */
 .loading-state {
   display: flex;
