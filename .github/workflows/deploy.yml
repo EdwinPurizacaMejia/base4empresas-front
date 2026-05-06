@@ -28,18 +28,18 @@ jobs:
             - name: Build project
               run: npm run build
 
-            - name: Copy 404.html for SPA routing
+            - name: Prepare for GitHub Pages
               run: |
-                  if [ -f "dist/base4empresas/404.html" ]; then
-                    echo "404.html already exists"
-                  else
-                    cp dist/base4empresas/index.html dist/base4empresas/404.html
-                  fi
+                  # Copiar archivos de browser a la raíz de dist/base4empresas
+                  cp dist/base4empresas/browser/* dist/base4empresas/ 2>/dev/null || true
+                  # Crear 404.html para SPA routing
+                  cp dist/base4empresas/index.html dist/base4empresas/404.html 2>/dev/null || true
+                  # Crear .nojekyll
+                  touch dist/base4empresas/.nojekyll
 
             - name: Deploy to GitHub Pages
-              run: |
-                  git config user.name "GitHub Actions"
-                  git config user.email "actions@github.com"
-                  npx angular-cli-ghpages --dir=dist/base4empresas
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./dist/base4empresas
+                  cname: edwinpurizacamejia.github.io
