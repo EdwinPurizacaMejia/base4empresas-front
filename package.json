@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && npm run build:post",
+    "build:post": "cp dist/base4empresas/browser/* dist/base4empresas/ 2>/dev/null; cp dist/base4empresas/browser/index.html dist/base4empresas/404.html 2>/dev/null; true",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:base4empresas": "node dist/base4empresas/server/server.mjs"
