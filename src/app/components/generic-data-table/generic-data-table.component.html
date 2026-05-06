@@ -1,13 +1,25 @@
 <div class="table-container">
   <!-- Search Bar -->
   <div *ngIf="config.showSearch !== false" class="search-section">
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>{{ config.searchPlaceholder || 'Buscar...' }}</mat-label>
-      <input matInput [(ngModel)]="searchValue" (change)="onSearch(searchValue)" />
-      <button mat-icon-button matSuffix *ngIf="searchValue" (click)="onSearch('')" type="button">
+    <div class="search-wrapper">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input 
+        type="text"
+        class="search-input" 
+        [(ngModel)]="searchValue" 
+        (change)="onSearch(searchValue)"
+        [placeholder]="config.searchPlaceholder || 'Buscar...'" 
+      />
+      <button 
+        mat-icon-button 
+        *ngIf="searchValue" 
+        (click)="onSearch('')" 
+        type="button"
+        class="clear-btn"
+      >
         <mat-icon>close</mat-icon>
       </button>
-    </mat-form-field>
+    </div>
   </div>
 
   <!-- Loading State -->
