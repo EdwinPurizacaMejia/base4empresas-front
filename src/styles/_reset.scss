@@ -1,0 +1,374 @@
+// ============================================================================
+// RESET Y ESTILOS BASE - Normalización global
+// ============================================================================
+
+@import 'variables';
+
+// ============================================================================
+// HTML5 Display-role reset
+// ============================================================================
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfd, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+main, menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, main, menu, nav, section {
+  display: block;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+// ============================================================================
+// ELEMENTOS BASE
+// ============================================================================
+
+* {
+  box-sizing: border-box;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-family-primary;
+  font-size: $font-size-base;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+  color: $color-text-medium;
+  background-color: $color-background;
+  margin: 0;
+  padding: 0;
+  -webkit-text-size-adjust: 100%;
+}
+
+// ============================================================================
+// HEADINGS
+// ============================================================================
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  color: $color-text-dark;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+}
+
+h1 {
+  font-size: $font-size-4xl;
+}
+
+h2 {
+  font-size: $font-size-3xl;
+}
+
+h3 {
+  font-size: $font-size-2xl;
+}
+
+h4 {
+  font-size: $font-size-xl;
+}
+
+h5 {
+  font-size: $font-size-lg;
+}
+
+h6 {
+  font-size: $font-size-base;
+}
+
+// ============================================================================
+// PÁRRAFOS Y TEXTO
+// ============================================================================
+
+p {
+  margin: 0;
+  line-height: $line-height-normal;
+}
+
+small {
+  font-size: $font-size-xs;
+}
+
+strong {
+  font-weight: $font-weight-semibold;
+}
+
+em {
+  font-style: italic;
+}
+
+code, pre {
+  font-family: $font-family-monospace;
+  background-color: $color-surface-variant;
+  padding: $space-2 $space-3;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+}
+
+pre {
+  overflow-x: auto;
+  padding: $space-4;
+}
+
+// ============================================================================
+// LINKS
+// ============================================================================
+
+a {
+  color: $color-primary;
+  text-decoration: none;
+  transition: color $transition-fast;
+  
+  &:hover {
+    color: darken($color-primary, 10%);
+    text-decoration: underline;
+  }
+  
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+// ============================================================================
+// IMÁGENES Y MEDIA
+// ============================================================================
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+img {
+  border-radius: $border-radius-md;
+}
+
+svg {
+  color: inherit;
+  fill: currentColor;
+}
+
+// ============================================================================
+// FORMS
+// ============================================================================
+
+input, button, textarea, select {
+  font-family: $font-family-primary;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+input {
+  &[type='text'],
+  &[type='email'],
+  &[type='password'],
+  &[type='number'],
+  &[type='tel'],
+  &[type='url'],
+  &[type='search'],
+  &[type='date'],
+  &[type='time'] {
+    padding: $space-3 $space-4;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-md;
+    background-color: $color-surface-variant;
+    
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px $color-primary-light;
+      background-color: $color-surface;
+    }
+  }
+  
+  &[type='checkbox'],
+  &[type='radio'] {
+    cursor: pointer;
+  }
+}
+
+textarea {
+  resize: vertical;
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  background-color: $color-surface-variant;
+  font-family: $font-family-primary;
+  
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px $color-primary-light;
+    background-color: $color-surface;
+  }
+}
+
+select {
+  padding: $space-3 $space-4;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  background-color: $color-surface-variant;
+  cursor: pointer;
+  
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px $color-primary-light;
+  }
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// ============================================================================
+// LISTAS
+// ============================================================================
+
+ul, ol {
+  list-style-position: inside;
+  
+  li {
+    margin-bottom: $space-2;
+  }
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+dl {
+  dt {
+    font-weight: $font-weight-semibold;
+    color: $color-text-dark;
+  }
+  
+  dd {
+    margin-left: $space-4;
+    margin-bottom: $space-4;
+    color: $color-text-medium;
+  }
+}
+
+// ============================================================================
+// TABLAS
+// ============================================================================
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  thead {
+    background-color: $color-surface-variant;
+    border-bottom: 2px solid $color-border;
+  }
+  
+  th {
+    padding: $space-3 $space-4;
+    text-align: left;
+    font-weight: $font-weight-semibold;
+    color: $color-text-dark;
+    font-size: $font-size-sm;
+  }
+  
+  td {
+    padding: $space-3 $space-4;
+    border-bottom: 1px solid $color-border;
+  }
+  
+  tbody tr:hover {
+    background-color: $color-surface-hover;
+  }
+}
+
+// ============================================================================
+// SCROLLBAR PERSONALIZADA
+// ============================================================================
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $color-surface-variant;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $color-border;
+  border-radius: $border-radius-full;
+  
+  &:hover {
+    background: $color-text-lighter;
+  }
+}
+
+// ============================================================================
+// SELECCIÓN DE TEXTO
+// ============================================================================
+
+::selection {
+  background-color: $color-primary-light;
+  color: $color-primary-dark;
+}
+
+::-moz-selection {
+  background-color: $color-primary-light;
+  color: $color-primary-dark;
+}

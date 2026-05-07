@@ -1,0 +1,421 @@
+// ============================================================================
+// STYLES.SCSS - Archivo principal que integra todo el sistema de diseño
+// SaaS Profesional - Base4Empresas
+// ============================================================================
+
+// 1. ANGULAR MATERIAL THEME (DEBE SER PRIMERO)
+@use '@angular/material' as mat;
+
+// 2. IMPORTAR GOOGLE FONTS
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+// 3. VARIABLES Y CONFIGURACIÓN
+@import 'styles/variables';
+@import 'styles/functions';
+
+// 4. MATERIAL CORE Y TEMA
+@include mat.core();
+
+$custom-primary: mat.define-palette(mat.$blue-palette, 500);
+$custom-accent: mat.define-palette(mat.$green-palette, 500);
+$custom-warn: mat.define-palette(mat.$red-palette, 500);
+
+$custom-theme: mat.define-light-theme((
+  color: (
+    primary: $custom-primary,
+    accent: $custom-accent,
+    warn: $custom-warn,
+  )
+));
+
+@include mat.all-component-colors($custom-theme);
+
+// 5. RESET Y BASE
+@import 'styles/reset';
+
+// 6. COMPONENTES REUTILIZABLES
+@import 'styles/components';
+
+// ============================================================================
+// ESTILOS GLOBALES - PROFESIONALES & SaaS
+// ============================================================================
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #f8fafc;
+  color: $color-text-medium;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ============================================================================
+// ANGULAR MATERIAL OVERRIDES
+// ============================================================================
+
+// Tema global para Material
+.mat-mdc-form-field {
+  .mat-mdc-floating-label {
+    color: $color-text-medium !important;
+    
+    &.mat-form-field-invalid {
+      color: $color-danger !important;
+    }
+  }
+  
+  .mat-mdc-form-field-infix {
+    padding-top: $space-4 !important;
+  }
+  
+  &.mat-focused {
+    .mat-mdc-floating-label {
+      color: $color-primary !important;
+    }
+  }
+}
+
+.mat-mdc-text-field-wrapper {
+  .mat-mdc-text-field-fill {
+    background-color: $color-surface-variant !important;
+    border-radius: $border-radius-md $border-radius-md 0 0;
+  }
+}
+
+.mat-mdc-form-field-underline {
+  background-color: $color-border !important;
+}
+
+.mdc-line-ripple::after {
+  border-bottom-color: $color-primary !important;
+}
+
+.mat-mdc-option {
+  font-size: $font-size-sm;
+  
+  &.mat-selected {
+    background-color: $color-primary-light !important;
+    color: $color-primary !important;
+  }
+  
+  &:hover:not(.mat-option-disabled) {
+    background-color: $color-surface-hover !important;
+  }
+}
+
+.mat-mdc-menu-panel {
+  background-color: $color-surface !important;
+  box-shadow: $shadow-lg !important;
+  border-radius: $border-radius-md !important;
+}
+
+.mat-mdc-menu-item {
+  font-size: $font-size-sm;
+  height: 40px !important;
+  
+  &:hover {
+    background-color: $color-surface-hover !important;
+  }
+}
+
+.mat-mdc-card {
+  border-radius: $border-radius-lg !important;
+  box-shadow: $shadow-sm !important;
+  border: 1px solid $color-border !important;
+  
+  &:hover {
+    box-shadow: $shadow-md !important;
+  }
+}
+
+.mat-mdc-dialog-container {
+  background-color: $color-surface !important;
+  border-radius: $border-radius-lg !important;
+  box-shadow: $shadow-xl !important;
+}
+
+.mat-mdc-dialog-title {
+  font-size: $font-size-lg !important;
+  font-weight: $font-weight-semibold !important;
+  color: $color-text-dark !important;
+  margin-bottom: $space-4 !important;
+}
+
+.mat-mdc-dialog-content {
+  color: $color-text-medium !important;
+  font-size: $font-size-sm !important;
+}
+
+.mat-mdc-table {
+  background-color: $color-surface !important;
+  
+  thead {
+    background-color: $color-surface-variant !important;
+  }
+  
+  th {
+    background-color: $color-surface-variant !important;
+    color: $color-text-dark !important;
+    font-weight: $font-weight-semibold !important;
+    font-size: $font-size-xs !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  td {
+    color: $color-text-medium !important;
+    border-bottom-color: $color-border !important;
+  }
+  
+  tbody tr:hover {
+    background-color: $color-surface-hover !important;
+  }
+}
+
+.mat-mdc-paginator {
+  background-color: $color-surface !important;
+  border-top: 1px solid $color-border !important;
+}
+
+.mdc-chip {
+  background-color: $color-surface-variant !important;
+  color: $color-text-medium !important;
+  
+  &.mat-mdc-chip-selected {
+    background-color: $color-primary !important;
+    color: white !important;
+  }
+}
+
+.mat-toolbar {
+  background-color: $color-surface !important;
+  box-shadow: $shadow-sm !important;
+  border-bottom: 1px solid $color-border !important;
+  color: $color-text-dark !important;
+}
+
+.mat-sidenav {
+  background-color: $color-primary-dark !important;
+  color: white !important;
+}
+
+.mat-sidenav-content {
+  background-color: $color-background !important;
+}
+
+.mat-snack-bar-container {
+  background-color: $color-text-dark !important;
+  color: white !important;
+  border-radius: $border-radius-md !important;
+  box-shadow: $shadow-lg !important;
+  
+  &.success {
+    background-color: $color-success !important;
+  }
+  
+  &.error {
+    background-color: $color-danger !important;
+  }
+  
+  &.warning {
+    background-color: $color-warning !important;
+  }
+  
+  &.info {
+    background-color: $color-info !important;
+  }
+}
+
+// ============================================================================
+// UTILIDADES GLOBALES
+// ============================================================================
+
+// Espaciado
+.p-0 { padding: 0; }
+.p-1 { padding: $space-1; }
+.p-2 { padding: $space-2; }
+.p-3 { padding: $space-3; }
+.p-4 { padding: $space-4; }
+.p-6 { padding: $space-6; }
+.p-8 { padding: $space-8; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: $space-1; }
+.m-2 { margin: $space-2; }
+.m-3 { margin: $space-3; }
+.m-4 { margin: $space-4; }
+.m-6 { margin: $space-6; }
+.m-8 { margin: $space-8; }
+
+.mt-0 { margin-top: 0; }
+.mt-2 { margin-top: $space-2; }
+.mt-4 { margin-top: $space-4; }
+.mt-6 { margin-top: $space-6; }
+.mt-8 { margin-top: $space-8; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-2 { margin-bottom: $space-2; }
+.mb-4 { margin-bottom: $space-4; }
+.mb-6 { margin-bottom: $space-6; }
+.mb-8 { margin-bottom: $space-8; }
+
+// Display
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: $space-2; }
+.gap-4 { gap: $space-4; }
+.gap-6 { gap: $space-6; }
+
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: 1fr; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.block { display: block; }
+.inline-block { display: inline-block; }
+.inline { display: inline; }
+.hidden { display: none; }
+
+// Tipografía
+.text-xs { font-size: $font-size-xs; }
+.text-sm { font-size: $font-size-sm; }
+.text-base { font-size: $font-size-base; }
+.text-lg { font-size: $font-size-lg; }
+.text-xl { font-size: $font-size-xl; }
+
+.font-light { font-weight: $font-weight-light; }
+.font-regular { font-weight: $font-weight-regular; }
+.font-medium { font-weight: $font-weight-medium; }
+.font-semibold { font-weight: $font-weight-semibold; }
+.font-bold { font-weight: $font-weight-bold; }
+
+.text-dark { color: $color-text-dark; }
+.text-medium { color: $color-text-medium; }
+.text-light { color: $color-text-light; }
+
+.text-primary { color: $color-primary; }
+.text-secondary { color: $color-secondary; }
+.text-success { color: $color-success; }
+.text-danger { color: $color-danger; }
+.text-warning { color: $color-warning; }
+.text-info { color: $color-info; }
+
+// Colores de fondo
+.bg-primary { background-color: $color-primary; color: white; }
+.bg-secondary { background-color: $color-secondary; color: white; }
+.bg-surface { background-color: $color-surface; }
+.bg-background { background-color: $color-background; }
+
+// Bordes
+.border { border: 1px solid $color-border; }
+.border-t { border-top: 1px solid $color-border; }
+.border-b { border-bottom: 1px solid $color-border; }
+.border-r { border-right: 1px solid $color-border; }
+.border-l { border-left: 1px solid $color-border; }
+
+// Sombras
+.shadow-none { box-shadow: $shadow-none; }
+.shadow-sm { box-shadow: $shadow-sm; }
+.shadow-md { box-shadow: $shadow-md; }
+.shadow-lg { box-shadow: $shadow-lg; }
+
+// Text alignment
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+// Overflow
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.truncate { @include truncate; }
+
+// Cursor
+.cursor-pointer { cursor: pointer; }
+.cursor-default { cursor: default; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+// Opacidad
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+
+// ============================================================================
+// RESPONSIVE UTILITIES
+// ============================================================================
+
+@include media('md') {
+  .md\:hidden { display: none !important; }
+  .md\:block { display: block !important; }
+  .md\:flex { display: flex !important; }
+  .md\:grid { display: grid !important; }
+  
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
+  .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .md\:grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+@include media('lg') {
+  .lg\:hidden { display: none !important; }
+  .lg\:block { display: block !important; }
+  .lg\:flex { display: flex !important; }
+  .lg\:grid { display: grid !important; }
+  
+  .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+// ============================================================================
+// ANIMACIONES
+// ============================================================================
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 300ms ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 300ms ease-out;
+}
+
+.animate-slide-down {
+  animation: slideDown 300ms ease-out;
+}
