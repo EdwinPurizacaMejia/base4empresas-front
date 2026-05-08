@@ -6,7 +6,7 @@ BASE4EMPRESAS - SISTEMA DE GESTIÓN DE INVENTARIO
 🤖 Con GitHub Actions AUTOMÁTICO - Solo necesitas:
 
 git add .
-git commit -m "✨ Dashboard: rediseño de cabecera compacta, sin barra de color, fecha elegante"
+git commit -m "♻️ Rutas: eliminar prefijo '/nuevo/' de navegación - usar rutas limpias"
 git push -u origin feature/nuevo-front
 
 ✅ GitHub Actions se encargará automáticamente de:
@@ -239,7 +239,7 @@ Revisar:
 ✅ Listo para Pull Request a main
 
 =================================================
-Última actualización: 7 de mayo de 2026
+Última actualización: 8 de mayo de 2026
 Rama: feature/nuevo-front
 Etapa: 5 - Consolidación
 Status: ✅ COMPLETADA Y LISTA PARA PRODUCCIÓN

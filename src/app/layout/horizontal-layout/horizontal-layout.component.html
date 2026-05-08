@@ -9,33 +9,33 @@
     <!-- Menú horizontal -->
     <nav class="main-nav">
       <a mat-button 
-         routerLink="/nuevo/dashboard" 
+         routerLink="/dashboard" 
          routerLinkActive="active"
          [routerLinkActiveOptions]="{ exact: true }">
         Dashboard
       </a>
       <a mat-button 
-         routerLink="/nuevo/productos" 
+         routerLink="/productos" 
          routerLinkActive="active">
         Productos
       </a>
       <a mat-button 
-         routerLink="/nuevo/compras" 
+         routerLink="/compras" 
          routerLinkActive="active">
         Compras
       </a>
       <a mat-button 
-         routerLink="/nuevo/ventas" 
+         routerLink="/ventas" 
          routerLinkActive="active">
         Ventas
       </a>
       <a mat-button 
-         routerLink="/nuevo/inventario" 
+         routerLink="/inventario" 
          routerLinkActive="active">
         Inventario
       </a>
       <a mat-button 
-         routerLink="/nuevo/kardex" 
+         routerLink="/kardex" 
          routerLinkActive="active">
         Kardex
       </a>
@@ -44,9 +44,8 @@
     <!-- Espaciador -->
     <span class="spacer"></span>
 
-    <!-- Buscador activo -->
+    <!-- Buscador global -->
     <mat-form-field class="search-field" appearance="outline">
-      <mat-label>Buscar...</mat-label>
       <mat-icon matPrefix>search</mat-icon>
       <input 
         matInput 
