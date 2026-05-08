@@ -1,0 +1,631 @@
+// Variables
+$primary-color: #667eea;
+$success-color: #28a745;
+$warning-color: #ffc107;
+$danger-color: #dc3545;
+$info-color: #17a2b8;
+$light-bg: #f8f9fa;
+$border-color: #e9ecef;
+$text-dark: #2c3e50;
+$text-light: #6c757d;
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+// Mixins
+@mixin card-shadow {
+  box-shadow: $shadow-md;
+  border: 1px solid $border-color;
+}
+
+@mixin gradient($color1, $color2) {
+  background: linear-gradient(135deg, $color1 0%, $color2 100%);
+}
+
+// Dashboard Date Header - Compacto y elegante
+.dashboard-date-header {
+  padding: 1.5rem 2rem 1rem;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: $text-light;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+
+    .calendar-icon {
+      font-size: 1.1rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      color: #667eea;
+      opacity: 0.8;
+    }
+
+    .date-text {
+      text-transform: capitalize;
+      color: #475569;
+    }
+  }
+}
+
+// Loading and Error States
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: $light-bg;
+  border-radius: 8px;
+  margin: 2rem;
+
+  mat-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  margin: 2rem;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 8px;
+  color: $danger-color;
+
+  mat-icon {
+    font-size: 1.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .retry-btn {
+    margin-left: auto;
+    padding: 0.5rem 1rem;
+    background: $danger-color;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+
+    &:hover {
+      background: darken($danger-color, 10%);
+    }
+  }
+}
+
+// Dashboard Container
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+}
+
+// KPI Section
+.kpi-section {
+  margin-bottom: 3rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi-card {
+  @include card-shadow;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    width: 100%;
+  }
+
+  &.kpi-primary {
+    &::before {
+      background: $primary-color;
+    }
+  }
+
+  &.kpi-success {
+    &::before {
+      background: $success-color;
+    }
+  }
+
+  &.kpi-warning {
+    &::before {
+      background: $warning-color;
+    }
+  }
+
+  &.kpi-danger {
+    &::before {
+      background: $danger-color;
+    }
+  }
+
+  &.kpi-info {
+    &::before {
+      background: $info-color;
+    }
+  }
+
+  .kpi-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+
+    mat-icon {
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .kpi-primary & {
+      background: rgba($primary-color, 0.1);
+      color: $primary-color;
+    }
+
+    .kpi-success & {
+      background: rgba($success-color, 0.1);
+      color: $success-color;
+    }
+
+    .kpi-warning & {
+      background: rgba($warning-color, 0.1);
+      color: $warning-color;
+    }
+
+    .kpi-danger & {
+      background: rgba($danger-color, 0.1);
+      color: $danger-color;
+    }
+
+    .kpi-info & {
+      background: rgba($info-color, 0.1);
+      color: $info-color;
+    }
+  }
+
+  .kpi-content {
+    flex: 1;
+  }
+
+  .kpi-title {
+    font-size: 0.9rem;
+    color: $text-light;
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .kpi-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .kpi-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    width: fit-content;
+
+    &.trend-positive {
+      background: rgba($success-color, 0.1);
+      color: $success-color;
+    }
+
+    &.trend-negative {
+      background: rgba($danger-color, 0.1);
+      color: $danger-color;
+    }
+
+    .trend-icon {
+      font-size: 1rem;
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .trend-text {
+      font-weight: 500;
+    }
+  }
+}
+
+// Chart Section
+.chart-section {
+  margin-bottom: 3rem;
+}
+
+.chart-card {
+  @include card-shadow;
+  border-radius: 12px;
+  padding: 2rem;
+  background: white;
+
+  .chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .chart-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+
+    .simple-chart {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 2rem;
+      padding-left: 80px;
+      border-left: 2px solid $border-color;
+      border-bottom: 2px solid $border-color;
+      position: relative;
+
+      .chart-bars {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        gap: 0.5rem;
+        width: 100%;
+        height: 200px;
+
+        .bar-group {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+
+          .bar-pair {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            height: 200px;
+
+            .bar {
+              border-radius: 4px 4px 0 0;
+              transition: all 0.3s ease;
+              cursor: pointer;
+
+              &:hover {
+                opacity: 0.8;
+                transform: scaleY(1.05);
+              }
+
+              &.sales-bar {
+                background: $primary-color;
+                width: 30px;
+              }
+
+              &.purchases-bar {
+                background: #ff9f1c;
+                width: 30px;
+              }
+            }
+          }
+
+          .month-label {
+            font-size: 0.85rem;
+            color: $text-light;
+            font-weight: 500;
+          }
+        }
+      }
+
+      .chart-axis {
+        position: absolute;
+        left: 12px;
+        top: 0;
+        height: 100%;
+        width: 68px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-right: 1rem;
+        font-size: 0.8rem;
+        color: $text-light;
+
+        .axis-label {
+          font-weight: 500;
+        }
+      }
+    }
+
+    // Legend centered below chart
+    .chart-legend-bottom {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      width: 100%;
+      padding-top: 1rem;
+      border-top: 1px solid $border-color;
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+        color: $text-dark;
+        font-weight: 500;
+
+        .legend-color {
+          width: 16px;
+          height: 16px;
+          border-radius: 3px;
+          display: flex;
+          align-items: center;
+          flex-shrink: 0;
+        }
+
+        &.sales .legend-color {
+          background: $primary-color;
+        }
+
+        &.purchases .legend-color {
+          background: #ff9f1c;
+        }
+
+        .legend-label {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// Lists Section
+.lists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.list-card {
+  @include card-shadow;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: white;
+  display: flex;
+  flex-direction: column;
+
+  .list-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0 0 1.5rem 0;
+
+    mat-icon {
+      color: $primary-color;
+    }
+  }
+
+  .list-content {
+    flex: 1;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    text-align: center;
+    color: $text-light;
+
+    mat-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  }
+
+  .purchase-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .purchase-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 1rem;
+      padding: 1rem;
+      background: $light-bg;
+      border-radius: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+
+      .purchase-number {
+        font-weight: 600;
+        color: $text-dark;
+      }
+
+      .purchase-supplier {
+        color: $text-light;
+      }
+
+      .purchase-date {
+        color: $text-light;
+      }
+
+      .purchase-total {
+        font-weight: 600;
+        color: $success-color;
+      }
+    }
+  }
+
+  .product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: $light-bg;
+      border-left: 3px solid $warning-color;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba($warning-color, 0.05);
+        box-shadow: 0 2px 8px rgba($warning-color, 0.1);
+      }
+
+      .product-info {
+        flex: 1;
+
+        .product-name {
+          font-weight: 600;
+          color: $text-dark;
+          margin-bottom: 0.25rem;
+          font-size: 0.95rem;
+        }
+
+        .product-sku {
+          font-size: 0.85rem;
+          color: $text-light;
+        }
+      }
+
+      .product-stock-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid rgba($warning-color, 0.2);
+
+        .stock-current {
+          font-weight: 700;
+          font-size: 0.95rem;
+          color: $danger-color;
+          min-width: 30px;
+          text-align: center;
+        }
+
+        .stock-separator {
+          color: $text-light;
+          font-weight: 300;
+        }
+
+        .stock-minimum {
+          font-weight: 600;
+          font-size: 0.9rem;
+          color: $text-light;
+          min-width: 30px;
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .dashboard-container {
+    padding: 0 1rem 1.5rem;
+  }
+
+  .chart-container {
+    flex-direction: column !important;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-date-header {
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card {
+    padding: 1rem;
+  }
+
+  .lists-grid {
+    gap: 1.5rem;
+  }
+}

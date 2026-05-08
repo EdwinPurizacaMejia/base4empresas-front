@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 
 import { KardexMovement } from '../../models/kardex.model';
 import { KardexService } from '../../services/kardex.service';
+import { SearchService } from '../../services/search.service';
 
 @Component({
   selector: 'app-kardex',
@@ -12,34 +14,53 @@ import { KardexService } from '../../services/kardex.service';
   templateUrl: './kardex.component.html',
   styleUrl: './kardex.component.css'
 })
-export class KardexComponent implements OnInit {
+export class KardexComponent implements OnInit, OnDestroy {
 
   movements: KardexMovement[] = [];
+  private allMovements: KardexMovement[] = []; // Copia de todos los movimientos sin filtrar
   productId = '';
   warehouseId = '';
   loading = false;
   error: string | null = null;
   initialLoad = true;
+  private destroy$ = new Subject<void>();
 
-  constructor(private kardexService: KardexService) {}
+  constructor(
+    private kardexService: KardexService,
+    private searchService: SearchService
+  ) {}
 
   ngOnInit(): void {
     // Intentar cargar workspace ID por localStorage
     if (typeof localStorage !== 'undefined') {
       this.warehouseId = localStorage.getItem('lastWarehouseId') || '';
     }
+
+    // Suscribirse al buscador global
+    this.searchService.searchTerm$Debounced
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(term => {
+        this.applyFilter(term);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadKardex(): void {
     if (!this.productId.trim()) {
       this.error = 'Por favor ingresa un ID de producto';
       this.movements = [];
+      this.allMovements = [];
       return;
     }
 
     if (!this.warehouseId.trim()) {
       this.error = 'Por favor ingresa un ID de almacén';
       this.movements = [];
+      this.allMovements = [];
       return;
     }
 
@@ -49,6 +70,7 @@ export class KardexComponent implements OnInit {
 
     this.kardexService.getKardex(this.productId, this.warehouseId).subscribe({
       next: (data) => {
+        this.allMovements = data;
         this.movements = data;
         this.loading = false;
       },
@@ -56,9 +78,29 @@ export class KardexComponent implements OnInit {
         console.error(err);
         this.error = 'Error al cargar kardex. Verifica los IDs e intenta nuevamente.';
         this.movements = [];
+        this.allMovements = [];
         this.loading = false;
       }
     });
+  }
+
+  /**
+   * Aplica el filtro de búsqueda global a los movimientos del kardex
+   */
+  private applyFilter(searchTerm: string): void {
+    if (!searchTerm || searchTerm.trim() === '') {
+      this.movements = [...this.allMovements];
+    } else {
+      const term = searchTerm.toLowerCase().trim();
+      this.movements = this.allMovements.filter(movement =>
+        movement.id.toLowerCase().includes(term) ||
+        movement.movement_type.toLowerCase().includes(term) ||
+        movement.reference_id.toLowerCase().includes(term) ||
+        (movement.reason && movement.reason.toLowerCase().includes(term)) ||
+        (movement.note && movement.note.toLowerCase().includes(term))
+      );
+      console.log(`🔍 Movimientos filtrados: ${this.movements.length} de ${this.allMovements.length}`);
+    }
   }
 
   onKeyPress(event: KeyboardEvent): void {

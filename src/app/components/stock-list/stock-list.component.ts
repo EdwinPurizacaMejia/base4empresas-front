@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Subject, takeUntil } from 'rxjs';
 import { Stock } from '../../models/stock.model';
 import { StockService } from '../../services/stock.service';
+import { SearchService } from '../../services/search.service';
 import { GenericDataTableComponent, TableConfig } from '../generic-data-table/generic-data-table.component';
 
 type StockStatus = 'ok' | 'warning' | 'critical';
@@ -22,13 +24,15 @@ interface StockWithStatus extends Stock {
   templateUrl: './stock-list.component.html',
   styleUrl: './stock-list.component.css'
 })
-export class StockListComponent implements OnInit {
+export class StockListComponent implements OnInit, OnDestroy {
 
   stocks: StockWithStatus[] = [];
+  private allStocks: StockWithStatus[] = []; // Copia de todos los stocks sin filtrar
   warehouseId = '';
   loading = false;
   error: string | null = null;
   initialLoad = true;
+  private destroy$ = new Subject<void>();
 
   tableConfig: TableConfig = {
     columns: [
@@ -50,6 +54,7 @@ export class StockListComponent implements OnInit {
 
   constructor(
     private stockService: StockService,
+    private searchService: SearchService,
     private router: Router
   ) {}
 
@@ -61,12 +66,25 @@ export class StockListComponent implements OnInit {
         this.loadStock();
       }
     }
+
+    // Suscribirse al buscador global
+    this.searchService.searchTerm$Debounced
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(term => {
+        this.applyFilter(term);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadStock(): void {
     if (!this.warehouseId.trim()) {
       this.error = 'Por favor ingresa un ID de almacén';
       this.stocks = [];
+      this.allStocks = [];
       return;
     }
 
@@ -81,20 +99,39 @@ export class StockListComponent implements OnInit {
 
     this.stockService.getStock(this.warehouseId).subscribe({
       next: (data) => {
-        this.stocks = data.map(stock => ({
+        const enrichedData = data.map(stock => ({
           ...stock,
           status: this.getStockStatus(stock.stock, stock.min_stock),
           percentage: this.getStockPercentage(stock.stock, stock.min_stock)
         }));
+        this.allStocks = enrichedData;
+        this.stocks = enrichedData;
         this.loading = false;
       },
       error: (err) => {
         console.error(err);
         this.error = `Error al cargar stock del almacén. Verifica el ID e intenta nuevamente.`;
         this.stocks = [];
+        this.allStocks = [];
         this.loading = false;
       }
     });
+  }
+
+  /**
+   * Aplica el filtro de búsqueda global al inventario
+   */
+  private applyFilter(searchTerm: string): void {
+    if (!searchTerm || searchTerm.trim() === '') {
+      this.stocks = [...this.allStocks];
+    } else {
+      const term = searchTerm.toLowerCase().trim();
+      this.stocks = this.allStocks.filter(stock =>
+        stock.sku.toLowerCase().includes(term) ||
+        stock.name.toLowerCase().includes(term)
+      );
+      console.log(`🔍 Stocks filtrados: ${this.stocks.length} de ${this.allStocks.length}`);
+    }
   }
 
   getStockStatus(current: number, minimum?: number): StockStatus {
@@ -132,15 +169,15 @@ export class StockListComponent implements OnInit {
     this.loading = true;
     setTimeout(() => {
       if (!searchTerm) {
-        this.loadStock();
+        this.stocks = [...this.allStocks];
       } else {
-        const filtered = this.stocks.filter(s => 
+        const filtered = this.allStocks.filter(s => 
           s.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
           s.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
         this.stocks = filtered;
-        this.loading = false;
       }
+      this.loading = false;
     }, 300);
   }
 
@@ -173,3 +210,4 @@ export class StockListComponent implements OnInit {
     return labels[status];
   }
 }
+

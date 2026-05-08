@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Subject, takeUntil } from 'rxjs';
 import { SalesService } from '../../services/sales.service';
+import { SearchService } from '../../services/search.service';
 import { SaleFormComponent } from '../sale-form/sale-form.component';
 import { SaleListItem } from '../../models/sale.model';
 import { GenericDataTableComponent, TableConfig } from '../generic-data-table/generic-data-table.component';
@@ -15,12 +17,14 @@ import { GenericDataTableComponent, TableConfig } from '../generic-data-table/ge
   templateUrl: './sale-list.component.html',
   styleUrls: ['./sale-list.component.css']
 })
-export class SaleListComponent implements OnInit {
+export class SaleListComponent implements OnInit, OnDestroy {
   sales: SaleListItem[] = [];
+  private allSales: SaleListItem[] = []; // Copia de todas las ventas sin filtrar
   loading = true;
   error = '';
   showForm = false;
   successMessage = '';
+  private destroy$ = new Subject<void>();
 
   tableConfig: TableConfig = {
     columns: [
@@ -45,11 +49,24 @@ export class SaleListComponent implements OnInit {
 
   constructor(
     private salesService: SalesService,
+    private searchService: SearchService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadSales();
+
+    // Suscribirse al buscador global
+    this.searchService.searchTerm$Debounced
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(term => {
+        this.applyFilter(term);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadSales(): void {
@@ -57,14 +74,32 @@ export class SaleListComponent implements OnInit {
     this.error = '';
     this.salesService.getSales().subscribe({
       next: (data) => {
+        this.allSales = data;
         this.sales = data;
         this.loading = false;
       },
       error: (err) => {
         this.error = 'Error al cargar las ventas';
         this.loading = false;
+        this.allSales = [];
       }
     });
+  }
+
+  /**
+   * Aplica el filtro de búsqueda global a las ventas
+   */
+  private applyFilter(searchTerm: string): void {
+    if (!searchTerm || searchTerm.trim() === '') {
+      this.sales = [...this.allSales];
+    } else {
+      const term = searchTerm.toLowerCase().trim();
+      this.sales = this.allSales.filter(sale =>
+        sale.number.toLowerCase().includes(term) ||
+        (sale.customer_id && sale.customer_id.toLowerCase().includes(term))
+      );
+      console.log(`🔍 Ventas filtradas: ${this.sales.length} de ${this.allSales.length}`);
+    }
   }
 
   onCreateSale(): void {
@@ -99,6 +134,7 @@ export class SaleListComponent implements OnInit {
         } else {
           this.sales = data;
         }
+        this.allSales = data;
         this.loading = false;
       },
       error: (err) => {

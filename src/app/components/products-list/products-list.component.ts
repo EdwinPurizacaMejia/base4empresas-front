@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Subject, takeUntil } from 'rxjs';
 
 import { Product } from '../../models/product.model';
 import { ProductsService } from '../../services/products.service';
+import { SearchService } from '../../services/search.service';
 import { NotificationService } from '../../services/notification.service';
 import { ProductFormComponent } from '../product-form/product-form.component';
 import { GenericDataTableComponent, TableConfig, TableAction } from '../generic-data-table/generic-data-table.component';
@@ -29,13 +31,15 @@ import { ErrorStateComponent } from '../shared/error-state.component';
   templateUrl: './products-list.component.html',
   styleUrl: './products-list.component.css'
 })
-export class ProductsListComponent implements OnInit {
+export class ProductsListComponent implements OnInit, OnDestroy {
 
   products: Product[] = [];
+  private allProducts: Product[] = []; // Copia de todos los productos sin filtrar
   loading = false;
   error: string | null = null;
   showForm = false;
   successMessage: string | null = null;
+  private destroy$ = new Subject<void>();
 
   tableConfig: TableConfig = {
     columns: [
@@ -72,12 +76,25 @@ export class ProductsListComponent implements OnInit {
 
   constructor(
     private productService: ProductsService,
+    private searchService: SearchService,
     private notificationService: NotificationService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadProducts();
+
+    // Suscribirse al buscador global
+    this.searchService.searchTerm$Debounced
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(term => {
+        this.applyFilter(term);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadProducts(): void {
@@ -86,6 +103,7 @@ export class ProductsListComponent implements OnInit {
 
     this.productService.getProducts().subscribe({
       next: (data) => {
+        this.allProducts = data;
         this.products = data;
         this.loading = false;
         if (data.length === 0) {
@@ -96,10 +114,27 @@ export class ProductsListComponent implements OnInit {
         console.error(err);
         this.error = 'Error al cargar productos. Intenta nuevamente.';
         this.products = [];
+        this.allProducts = [];
         this.loading = false;
         this.notificationService.error('Error al cargar productos. Por favor, intenta nuevamente.');
       }
     });
+  }
+
+  /**
+   * Aplica el filtro de búsqueda global a los productos
+   */
+  private applyFilter(searchTerm: string): void {
+    if (!searchTerm || searchTerm.trim() === '') {
+      this.products = [...this.allProducts];
+    } else {
+      const term = searchTerm.toLowerCase().trim();
+      this.products = this.allProducts.filter(product =>
+        product.sku.toLowerCase().includes(term) ||
+        product.name.toLowerCase().includes(term)
+      );
+      console.log(`🔍 Productos filtrados: ${this.products.length} de ${this.allProducts.length}`);
+    }
   }
 
   onSearch(searchTerm: string): void {
@@ -109,6 +144,7 @@ export class ProductsListComponent implements OnInit {
     this.productService.getProducts(searchTerm || undefined).subscribe({
       next: (data) => {
         this.products = data;
+        this.allProducts = data;
         this.loading = false;
         if (data.length === 0) {
           this.notificationService.info(`No se encontraron productos para "${searchTerm}"`);

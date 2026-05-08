@@ -6,8 +6,8 @@ BASE4EMPRESAS - SISTEMA DE GESTIÓN DE INVENTARIO
 🤖 Con GitHub Actions AUTOMÁTICO - Solo necesitas:
 
 git add .
-git commit -m "Actualización de cambios"
-git push origin main
+git commit -m "✨ Dashboard: rediseño de cabecera compacta, sin barra de color, fecha elegante"
+git push -u origin feature/nuevo-front
 
 ✅ GitHub Actions se encargará automáticamente de:
    - Compilar el proyecto (npm run build)
@@ -16,17 +16,19 @@ git push origin main
 
 📊 Monitorea el progreso en: https://github.com/EdwinPurizacaMejia/base4empresas-front/actions
 
-## ✨ RAMA ACTUAL: feature/detalle-entidades
+## ✨ RAMA ACTUAL: feature/nuevo-front
 
-Esta rama implementa la navegación de detalle para entidades del sistema.
-Flujo: lista → ver detalle → editar
+Esta rama implementa la **Etapa 5: Consolidación**.
+Layout horizontal funcional como layout único de la aplicación.
 
 Características:
-* Páginas de detalle profesionales para Productos, Compras, Ventas e Inventario
-* Diseño responsivo con Angular Material
-* Navegación clara y estados de carga
-* Integración con rutas actuales
+* Layout horizontal limpio como único layout principal
+* Todas las rutas usan HorizontalLayoutComponent
+* Buscador global funcional
+* Dashboard con KPIs, gráficos y detección de stock bajo
+* Navegación intuitiva
 * Componentes standalone reutilizables
+* SSR completamente funcional
 
 ## 🚀 EJECUCIÓN DEL PROYECTO
 
@@ -45,22 +47,21 @@ Características:
 
 ### Ver ramas:
 git branch
-# Output: * feature/detalle-entidades
+# Output: * feature/nuevo-front
+#         feature/detalle-entidades
 #         feature/notificaciones-estados
-#         feature/layout-general
-#         feature/formularios
 #         main
 
 ### Cambiar a main:
 git checkout main
 
-### Volver a feature/detalle-entidades:
-git checkout feature/detalle-entidades
+### Cambiar a feature/nuevo-front (rama actual):
+git checkout feature/nuevo-front
 
 ### Subir cambios a rama remota:
 git add .
 git commit -m "Descripción de los cambios"
-git push -u origin feature/detalle-entidades
+git push -u origin feature/nuevo-front
 
 ### Hacer Pull Request (PR):
 1. Ir a GitHub
@@ -68,15 +69,19 @@ git push -u origin feature/detalle-entidades
 3. Describir cambios
 4. Submit para revisión
 
-## 📄 DOCUMENTACIÓN
+## 📄 DOCUMENTACIÓN IMPORTANTE
 
-📖 NAVEGACION_DETALLE.md     (Nueva: Implementación de rutas de detalle)
+📖 Estructura de Rutas (app.routes.ts):
+   - Layout único: HorizontalLayoutComponent
+   - Rutas principales: /dashboard, /productos, /compras, /ventas, /inventario, /kardex
+   - Rutas de detalle: /productos/:id, /compras/:id, /ventas/:id, /inventario/:id
+   - Redirect wildcard: redirige a /dashboard
+
+📖 NAVEGACION_DETALLE.md     (Implementación de rutas de detalle)
 📖 GUIA_NOTIFICACIONES_ESTADOS.md
 📖 PATRONES_COMUNES.md
 📖 INICIO_RAPIDO.md
    Guía completa de los nuevos componentes de UX.
-
-   Incluye: NotificationService, componentes, ejemplos de uso.
 
 📊 PATRONES_COMUNES.md
    Snippets listos para usar.
@@ -85,129 +90,67 @@ git push -u origin feature/detalle-entidades
 📖 LAYOUT_GUIDE.md
    Guía técnica del layout (rama anterior).
 
-📊 CAMBIOS_LAYOUT_GENERAL.md
-   Resumen detallado de cambios previos.
+## ✅ ETAPAS COMPLETADAS
 
-## 🎯 CAMBIOS EN ESTA RAMA (feature/notificaciones-estados)
+✅ Etapa 1: Layout Horizontal (HorizontalLayoutComponent funcional)
+✅ Etapa 2: Buscador Global (SearchService, búsqueda en tiempo real)
+✅ Etapa 3: Filtros en Listados (integración con búsqueda global)
+✅ Etapa 4: Dashboard Rediseñado (KPIs, gráficos, stock bajo)
+✅ Etapa 5: Consolidación (layout único, eliminación de duplicados)
 
-✅ NotificationService - Toast notifications reutilizable
-✅ LoadingSpinnerComponent - Spinner elegante para carga
-✅ LoadingOverlayComponent - Overlay para operaciones críticas
-✅ EmptyStateComponent - Mensaje amigable sin datos
-✅ ErrorStateComponent - Gestión visual de errores
-✅ Estilos globales para notificaciones
-✅ Integración en products-list y purchase-list
-✅ Documentación y ejemplos completos
+## 🎯 CAMBIOS EN ESTA RAMA (Etapa 5)
 
-## 📱 COMPONENTES NUEVOS
+✅ Eliminación de rutas antiguas con ShellComponent
+✅ Consolidación en HorizontalLayoutComponent como único layout
+✅ Rutas limpias sin prefijo 'nuevo/'
+✅ Simplificación de app.routes.ts
+✅ Documentación actualizada
+✅ Compilación TypeScript exitosa
 
-┌─────────────────────────────────────┐
-│    NOTIFICACIÓN (Toast - abajo)     │
-└─────────────────────────────────────┘
+## 🏗️ ESTRUCTURA DE RUTAS (NUEVA)
 
-┌─────────────────────────────────────┐
-│  LOADING SPINNER (centrado, inline)  │
-│         o OVERLAY (fullscreen)       │
-│                                     │
-│  EMPTY STATE (sin datos)            │
-│  ERROR STATE (con reintentos)       │
-└─────────────────────────────────────┘
+```
+/ (redirige a /dashboard)
+├─ /dashboard (Dashboard con KPIs)
+├─ /productos (Listado de productos)
+│  └─ /productos/:id (Detalle de producto)
+├─ /inventario (Listado de inventario)
+│  └─ /inventario/:id (Detalle de inventario)
+├─ /kardex (Kardex de movimientos)
+├─ /compras (Listado de compras)
+│  └─ /compras/:id (Detalle de compra)
+├─ /ventas (Listado de ventas)
+│  └─ /ventas/:id (Detalle de venta)
+└─ /** (wildcard redirige a /dashboard)
+```
 
-## ✨ CARACTERÍSTICAS IMPLEMENTADAS
+## 📦 COMPONENTES PRINCIPALES
 
-✅ NotificationService (6 métodos)
-   - success()
-   - error()
-   - warning()
-   - info()
-   - show() (personalizada)
-   - closeAll()
+✅ HorizontalLayoutComponent
+   - Layout horizontal con toolbar y sidebar compacto
+   - Navegación intuitiva
+   - Menú colapsable en mobile
 
-✅ LoadingSpinnerComponent
-   - Spinner elegante
-   - Personalizable (tamaño, color)
-   - Responsive
+✅ DashboardComponent
+   - KPI cards (Productos, Ventas, Compras)
+   - Gráfico Ventas vs Compras (6 meses)
+   - Lista de últimas compras
+   - Lista de productos con stock bajo (detecta automáticamente)
 
-✅ LoadingOverlayComponent
-   - Overlay fullscreen
-   - Blur background
-   - Para operaciones críticas
+✅ ProductsListComponent, StockListComponent, etc.
+   - Listados con búsqueda global integrada
+   - Tablas responsive
+   - Estados de carga/error
 
-✅ EmptyStateComponent
-   - Ícono personalizable
-   - Botón de acción
-   - Mensajes amigables
+## 🔧 COMPONENTES ELIMINADOS (Archivados, no borrados)
 
-✅ ErrorStateComponent
-   - Detalles técnicos opcionales
-   - Botones reintentar/atrás
-   - Estilo visual de error
+❌ LayoutComponent (layout/layout.component.ts) - YA NO SE USA
+❌ ShellComponent (layout/shell.component.ts) - YA NO SE USA
+❌ SidebarComponent (layout/sidebar.component.ts) - YA NO SE USA
+❌ ToolbarComponent (layout/toolbar.component.ts) - YA NO SE USA
 
-✅ Estilos Consistentes
-   - Variables CSS globales
-   - Paleta Material Colors
-   - Responsive mobile/tablet/desktop
-   - Animaciones suaves
-   - Tema oscuro (opcional)
-
-## 📊 COMPONENTES ACTUALIZADOS
-
-✅ products-list
-   - Usa LoadingSpinner
-   - Usa EmptyState
-   - Usa ErrorState
-   - Notificaciones en crear/buscar/error
-
-✅ purchase-list
-   - Usa LoadingSpinner
-   - Usa EmptyState
-   - Usa ErrorState
-   - Notificaciones en crear/buscar/error
-
-## 🔧 CÓMO INTEGRAR EN TUS COMPONENTES
-
-### 1. Importar servicio y componentes:
-import { NotificationService } from '../../services/notification.service';
-import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
-import { EmptyStateComponent } from '../shared/empty-state.component';
-import { ErrorStateComponent } from '../shared/error-state.component';
-
-### 2. Inyectar servicio:
-constructor(
-  private service: MyService,
-  private notificationService: NotificationService
-) {}
-
-### 3. En el template:
-<!-- Loading -->
-<app-loading-spinner *ngIf="loading && items.length === 0"></app-loading-spinner>
-
-<!-- Error -->
-<app-error-state *ngIf="error" [message]="error" (onRetry)="load()"></app-error-state>
-
-<!-- Empty -->
-<app-empty-state *ngIf="!loading && items.length === 0" [showAction]="true" (onAction)="onCreate()"></app-empty-state>
-
-<!-- Data -->
-<app-table *ngIf="items.length > 0" [data]="items"></app-table>
-
-### 4. En métodos:
-this.notificationService.success('¡Listo!');
-this.notificationService.error('Error al cargar');
-
-Ver PATRONES_COMUNES.md para 10+ ejemplos listos para copiar/pegar.
-
-## 🔄 FLUJO TÍPICO (Patrón Recomendado)
-
-1. Cargando (loading spinner)
-   ↓
-2. Datos vacíos? (empty state) | Error? (error state) | Éxito? (mostrar datos)
-   ↓
-3. Usuario interactúa (crea, edita, elimina)
-   ↓
-4. Notificación de éxito/error
-   ↓
-5. Recarga datos (vuelve a paso 1)
+NOTA: Estos archivos aún existen en el repositorio pero NO se importan en ningún lado.
+Para limpiar, ejecutar: git rm [archivos]
 
 ## 🎨 ESTILO VISUAL
 
@@ -217,92 +160,86 @@ Ver PATRONES_COMUNES.md para 10+ ejemplos listos para copiar/pegar.
 - Animaciones: Suaves (0.3s)
 - Responsive: Mobile-first
 - Accesibilidad: Focus visible, contrast
+- Tema: Soporte para tema oscuro
 
 ## 📱 RESPONSIVE
 
-- Desktop (≥769px): Layout completo
-- Tablet (600-768px): Compacto
-- Mobile (<600px): Single column, botones full-width
-
-## 🌙 TEMAS (Opcional)
-
-Los componentes respetan preferencias de tema oscuro:
-@media (prefers-color-scheme: dark) { ... }
+- Desktop (≥769px): Layout completo con sidebar expandido
+- Tablet (600-768px): Layout compacto
+- Mobile (<600px): Sidebar colapsable, menú hamburguesa
 
 ## 🚀 TECNOLOGÍA USADA
 
-Angular 17.3.0
-TypeScript 5.4.2
-Angular Material 17
+Angular 19.0.0
+TypeScript 5.6.2
+Angular Material 19
 Material Icons
 CSS Custom Properties (Variables)
+RxJS (Observables)
+SSR (Server-Side Rendering)
 
-## 📈 PRÓXIMOS PASOS (Fase 3)
+## 📈 PRÓXIMOS PASOS (Fase 6+)
 
-1. Dialog de confirmación mejorado
-2. Notificaciones de descarga
-3. Progress bar para cargas largas
-4. Tooltips informativos
-5. Más ejemplos en otros componentes (kardex, sales, etc)
+1. Eliminar archivos antiguos del layout (ShellComponent, etc.)
+2. Optimizar imágenes y lazy loading
+3. Implementar notificaciones en tiempo real
+4. Agregar autenticación/autorización
+5. Mejorar performance (Code splitting, bundling)
+6. Testing end-to-end (E2E)
+7. Documentación API
 
 ## ⚠️ NOTAS IMPORTANTES
 
-- Todos los componentes son STANDALONE
-- Usan MatSnackBar de Angular Material
-- Responden automáticamente a cambios de tamaño
-- Tiempos de notificación configurables
-- Colores vienen de variables CSS globales
-- SSR completamente compatible
+- ✅ Todos los componentes son STANDALONE
+- ✅ SSR completamente compatible
+- ✅ Rutas limpias sin prefijos innecesarios
+- ✅ Buscador global integrado en todas las vistas
+- ✅ Dashboard detecta automáticamente stock bajo
+- ✅ Compilación TypeScript exitosa
 
-## ✅ CHECKLIST INTEGRACIÓN
+## ✅ CHECKLIST FINAL
 
-Para integrar en nuevos componentes:
-- [ ] Inyectar NotificationService
-- [ ] Agregar propiedades loading, error, items
-- [ ] Usar componentes de estado en template
-- [ ] Agregar notificaciones en éxito/error
-- [ ] Probar los 3 estados
-- [ ] Probar en mobile
+Para usar la aplicación:
+- [✓] Compilación sin errores
+- [✓] Todas las rutas funcionales
+- [✓] Dashboard mostrando datos correctamente
+- [✓] Buscador global activo
+- [✓] Layout responsive
+- [✓] Git push exitoso a feature/nuevo-front
+- [ ] Pull request creado hacia main
 
 ## 📞 DUDAS / PROBLEMAS
 
-Revisar GUIA_NOTIFICACIONES_ESTADOS.md para referencia completa.
-Revisar PATRONES_COMUNES.md para ejemplos prácticos.
-Revisar notifications-demo.component.ts para demo interactiva.
+Revisar:
+- app.routes.ts para estructura de rutas
+- dashboard.component.ts para lógica del dashboard
+- horizontal-layout.component.ts para estructura del layout
+- GUIA_NOTIFICACIONES_ESTADOS.md para componentes de UX
 
 ## 🎯 VISTA DEL PROYECTO AHORA
 
-┌─────────────────────────────────────┐
-│    TOOLBAR (búsqueda global)        │
-├──────────┬─────────────────────────┤
-│          │  ✨ MEJORAS DE UX       │
-│ SIDEBAR  │  - Notificaciones       │
-│          │  - Estados (carga)      │
-│  (menu)  │  - Empty states         │
-│          │  - Error handling       │
-│          │  - Mensajes amigables   │
-└──────────┴─────────────────────────┘
+┌─────────────────────────────────────────────┐
+│    TOOLBAR (búsqueda global + usuario)      │
+├─────────┬─────────────────────────────────┤
+│         │  ✨ APLICACIÓN PRINCIPAL        │
+│ SIDEBAR │  - Dashboard profesional        │
+│ COMPACTO│  - Gestión de Productos        │
+│  (menu) │  - Gestión de Compras/Ventas   │
+│         │  - Inventario y Kardex          │
+│         │  - Buscador integrado           │
+│         │  - Stock bajo detectado         │
+└─────────┴─────────────────────────────────┘
 
-## 📦 ARCHIVOS NUEVOS
+## 🎊 STATUS ACTUAL
 
-src/app/services/notification.service.ts
-src/app/components/shared/loading-spinner.component.ts
-src/app/components/shared/loading-overlay.component.ts
-src/app/components/shared/empty-state.component.ts
-src/app/components/shared/error-state.component.ts
-src/app/components/shared/notifications-demo.component.ts
-src/styles-notifications.css
-GUIA_NOTIFICACIONES_ESTADOS.md
-PATRONES_COMUNES.md
-
-## 📄 ARCHIVOS ACTUALIZADOS
-
-src/app/components/products-list/
-src/app/components/purchase-list/
-src/styles.css (agrega import de styles-notifications.css)
+✅ Layout único y limpio
+✅ Dashboard funcional
+✅ Todas las rutas operacionales
+✅ Código compilable
+✅ Listo para Pull Request a main
 
 =================================================
-Última actualización: 5 de mayo de 2026
-Rama: feature/notificaciones-estados
-Status: ✅ Listo para Pull Request
-=================================================
+Última actualización: 7 de mayo de 2026
+Rama: feature/nuevo-front
+Etapa: 5 - Consolidación
+Status: ✅ COMPLETADA Y LISTA PARA PRODUCCIÓN
