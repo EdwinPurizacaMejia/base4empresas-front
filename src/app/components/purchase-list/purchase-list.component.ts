@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Subject, takeUntil } from 'rxjs';
 
 import { PurchaseListItem } from '../../models/purchase.model';
 import { PurchaseService } from '../../services/purchase.service';
+import { SearchService } from '../../services/search.service';
 import { NotificationService } from '../../services/notification.service';
 import { PurchaseFormComponent } from '../purchase-form/purchase-form.component';
 import { GenericDataTableComponent, TableConfig, TableAction } from '../generic-data-table/generic-data-table.component';
@@ -29,13 +31,15 @@ import { ErrorStateComponent } from '../shared/error-state.component';
   templateUrl: './purchase-list.component.html',
   styleUrl: './purchase-list.component.css'
 })
-export class PurchaseListComponent implements OnInit {
+export class PurchaseListComponent implements OnInit, OnDestroy {
 
   purchases: PurchaseListItem[] = [];
+  private allPurchases: PurchaseListItem[] = []; // Copia de todas las compras sin filtrar
   loading = false;
   error: string | null = null;
   showForm = false;
   successMessage: string | null = null;
+  private destroy$ = new Subject<void>();
 
   tableConfig: TableConfig = {
     columns: [
@@ -59,12 +63,25 @@ export class PurchaseListComponent implements OnInit {
 
   constructor(
     private purchaseService: PurchaseService,
+    private searchService: SearchService,
     private notificationService: NotificationService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadPurchases();
+
+    // Suscribirse al buscador global
+    this.searchService.searchTerm$Debounced
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(term => {
+        this.applyFilter(term);
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadPurchases(): void {
@@ -73,6 +90,7 @@ export class PurchaseListComponent implements OnInit {
 
     this.purchaseService.getPurchases().subscribe({
       next: (data) => {
+        this.allPurchases = data;
         this.purchases = data;
         this.loading = false;
         if (data.length === 0) {
@@ -83,10 +101,27 @@ export class PurchaseListComponent implements OnInit {
         console.error(err);
         this.error = 'Error al cargar compras. Intenta nuevamente.';
         this.purchases = [];
+        this.allPurchases = [];
         this.loading = false;
         this.notificationService.error('Error al cargar compras. Por favor, intenta nuevamente.');
       }
     });
+  }
+
+  /**
+   * Aplica el filtro de búsqueda global a las compras
+   */
+  private applyFilter(searchTerm: string): void {
+    if (!searchTerm || searchTerm.trim() === '') {
+      this.purchases = [...this.allPurchases];
+    } else {
+      const term = searchTerm.toLowerCase().trim();
+      this.purchases = this.allPurchases.filter(purchase =>
+        purchase.number.toLowerCase().includes(term) ||
+        purchase.supplier_id.toLowerCase().includes(term)
+      );
+      console.log(`🔍 Compras filtradas: ${this.purchases.length} de ${this.allPurchases.length}`);
+    }
   }
 
   onNewPurchase(): void {
@@ -118,6 +153,7 @@ export class PurchaseListComponent implements OnInit {
         } else {
           this.purchases = data;
         }
+        this.allPurchases = data;
         this.loading = false;
         if (this.purchases.length === 0 && searchTerm) {
           this.notificationService.info(`No se encontraron compras para "${searchTerm}"`);

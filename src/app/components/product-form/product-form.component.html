@@ -1,189 +1,87 @@
-<mat-card class="form-card">
-  <!-- Header -->
-  <mat-card-header>
-    <div class="form-header">
-      <h2>Nuevo Producto</h2>
-      <button 
-        mat-icon-button 
-        (click)="onCancel()"
-        [disabled]="loading"
-        class="btn-close"
-        title="Cerrar formulario">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </mat-card-header>
+<h2 mat-dialog-title class="dialog-title">
+  {{ (data?.product ? 'Editar Producto' : 'Nuevo Producto') }}
+  <button mat-icon-button mat-dialog-close class="close-button" aria-label="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
 
-  <!-- Form Content -->
-  <mat-card-content>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+<mat-dialog-content class="dialog-content">
+  <p class="subtitle">Ingresa los datos del producto para agregarlo al inventario</p>
 
-      <!-- Grid de campos -->
-      <div class="form-grid">
-
-        <!-- SKU -->
-        <mat-form-field class="full-width">
-          <mat-label>SKU *</mat-label>
-          <input 
-            matInput 
-            formControlName="sku" 
-            placeholder="Ej: PROD-001"
-            [attr.aria-invalid]="hasError('sku')">
-          <mat-icon matPrefix>tag</mat-icon>
-          <mat-error *ngIf="hasError('sku')">
-            {{ getErrorMessage('sku') }}
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="two-columns">
+      <!-- Columna izquierda -->
+      <div class="column">
+        <mat-form-field appearance="outline" class="full-width" floatLabel="always">
+          <mat-label>SKU</mat-label>
+          <input matInput formControlName="sku" placeholder="Ej: SKU-001">
+          <mat-error *ngIf="productForm.get('sku')?.invalid && (productForm.get('sku')?.dirty || productForm.get('sku')?.touched)">
+            El SKU es requerido
           </mat-error>
         </mat-form-field>
 
-        <!-- Nombre del Producto -->
-        <mat-form-field class="full-width">
-          <mat-label>Nombre del Producto *</mat-label>
-          <input 
-            matInput 
-            formControlName="name" 
-            placeholder="Ej: Laptop Dell Inspiron 15"
-            [attr.aria-invalid]="hasError('name')">
-          <mat-icon matPrefix>inventory_2</mat-icon>
-          <mat-error *ngIf="hasError('name')">
-            {{ getErrorMessage('name') }}
+        <mat-form-field appearance="outline" class="full-width" floatLabel="always">
+          <mat-label>Nombre del producto</mat-label>
+          <input matInput formControlName="name" placeholder="Ej: Coca Cola 1L">
+          <mat-error *ngIf="productForm.get('name')?.invalid && (productForm.get('name')?.dirty || productForm.get('name')?.touched)">
+            El nombre es requerido
           </mat-error>
         </mat-form-field>
 
-        <!-- Código de Barras -->
-        <mat-form-field class="full-width">
-          <mat-label>Código de Barras</mat-label>
-          <input 
-            matInput 
-            formControlName="barcode" 
-            placeholder="Código opcional"
-            [attr.aria-invalid]="hasError('barcode')">
-          <mat-icon matPrefix>barcode</mat-icon>
-        </mat-form-field>
-
-        <!-- Categoría -->
-        <mat-form-field class="half-width">
-          <mat-label>Categoría *</mat-label>
-          <mat-select formControlName="category_id" [attr.aria-invalid]="hasError('category_id')">
-            <mat-option value="">-- Seleccionar --</mat-option>
-            <mat-option value="1">Electrónica</mat-option>
-            <mat-option value="2">Muebles</mat-option>
-            <mat-option value="3">Software</mat-option>
+        <mat-form-field appearance="outline" class="full-width" floatLabel="always">
+          <mat-label>Categoría</mat-label>
+          <mat-select formControlName="category_id">
+            <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
           </mat-select>
-          <mat-icon matPrefix>category</mat-icon>
-          <mat-error *ngIf="hasError('category_id')">
-            {{ getErrorMessage('category_id') }}
-          </mat-error>
         </mat-form-field>
 
-        <!-- Unidad -->
-        <mat-form-field class="half-width">
-          <mat-label>Unidad *</mat-label>
-          <mat-select formControlName="unit_id" [attr.aria-invalid]="hasError('unit_id')">
-            <mat-option value="">-- Seleccionar --</mat-option>
-            <mat-option value="1">Unidad</mat-option>
-            <mat-option value="2">Caja</mat-option>
-            <mat-option value="3">Paquete</mat-option>
+        <mat-form-field appearance="outline" class="full-width" floatLabel="always">
+          <mat-label>Unidad de medida</mat-label>
+          <mat-select formControlName="unit_id">
+            <mat-option *ngFor="let unit of units" [value]="unit.id">{{ unit.name }}</mat-option>
           </mat-select>
-          <mat-icon matPrefix>straighten</mat-icon>
-          <mat-error *ngIf="hasError('unit_id')">
-            {{ getErrorMessage('unit_id') }}
-          </mat-error>
         </mat-form-field>
-
-        <!-- Precio Compra -->
-        <mat-form-field class="half-width">
-          <mat-label>Precio Compra *</mat-label>
-          <input 
-            matInput 
-            formControlName="purchase_price" 
-            type="number" 
-            step="0.01"
-            placeholder="0.00"
-            [attr.aria-invalid]="hasError('purchase_price')">
-          <mat-icon matPrefix>attach_money</mat-icon>
-          <mat-error *ngIf="hasError('purchase_price')">
-            {{ getErrorMessage('purchase_price') }}
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Precio Venta -->
-        <mat-form-field class="half-width">
-          <mat-label>Precio Venta *</mat-label>
-          <input 
-            matInput 
-            formControlName="sale_price" 
-            type="number" 
-            step="0.01"
-            placeholder="0.00"
-            [attr.aria-invalid]="hasError('sale_price')">
-          <mat-icon matPrefix>sell</mat-icon>
-          <mat-error *ngIf="hasError('sale_price')">
-            {{ getErrorMessage('sale_price') }}
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Stock Mínimo -->
-        <mat-form-field class="full-width">
-          <mat-label>Stock Mínimo *</mat-label>
-          <input 
-            matInput 
-            formControlName="min_stock" 
-            type="number"
-            placeholder="0"
-            [attr.aria-invalid]="hasError('min_stock')">
-          <mat-icon matPrefix>warehouse</mat-icon>
-          <mat-error *ngIf="hasError('min_stock')">
-            {{ getErrorMessage('min_stock') }}
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Descripción -->
-        <mat-form-field class="full-width">
-          <mat-label>Descripción</mat-label>
-          <textarea 
-            matInput 
-            formControlName="description" 
-            rows="4"
-            placeholder="Descripción opcional del producto"
-            [attr.aria-invalid]="hasError('description')">
-          </textarea>
-          <mat-icon matPrefix>description</mat-icon>
-          <mat-hint *ngIf="!hasError('description')">
-            {{ form.get('description')?.value?.length || 0 }}/500 caracteres
-          </mat-hint>
-          <mat-error *ngIf="hasError('description')">
-            {{ getErrorMessage('description') }}
-          </mat-error>
-        </mat-form-field>
-
       </div>
 
-    </form>
-  </mat-card-content>
+      <!-- Columna derecha -->
+      <div class="column">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Precio venta (S/)</mat-label>
+          <span matPrefix>S/&nbsp;</span>
+          <input matInput type="number" formControlName="sale_price" step="0.01" placeholder="0.00">
+        </mat-form-field>
 
-  <!-- Actions -->
-  <mat-card-footer>
-    <div class="form-actions">
-      <button 
-        mat-stroked-button 
-        (click)="onCancel()"
-        [disabled]="loading"
-        class="btn-secondary">
-        Cancelar
-      </button>
-      <button 
-        mat-raised-button 
-        color="primary" 
-        (click)="onSubmit()"
-        [disabled]="loading || form.invalid"
-        class="btn-primary">
-        <mat-icon *ngIf="!loading">save</mat-icon>
-        <span *ngIf="loading" class="spinner-text">
-          <mat-icon class="spinner">hourglass_empty</mat-icon>
-        </span>
-        {{ loading ? 'Guardando...' : 'Guardar Producto' }}
-      </button>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Precio compra (S/)</mat-label>
+          <span matPrefix>S/&nbsp;</span>
+          <input matInput type="number" formControlName="purchase_price" step="0.01" placeholder="0.00">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Stock mínimo</mat-label>
+          <input matInput type="number" formControlName="min_stock" placeholder="0">
+        </mat-form-field>
+
+        <div class="status-toggle">
+          <mat-slide-toggle formControlName="is_active" color="primary">
+            Producto activo
+          </mat-slide-toggle>
+        </div>
+      </div>
     </div>
-  </mat-card-footer>
 
-</mat-card>
+    <mat-form-field appearance="outline" class="full-width description-field" floatLabel="always">
+      <mat-label>Descripción (opcional)</mat-label>
+      <textarea matInput formControlName="description" rows="4" maxlength="500" placeholder="Describe el producto..."></textarea>
+      <mat-hint align="end">{{ (productForm.get('description')?.value?.length || 0) }}/500</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="productForm.invalid">
+    <mat-icon>save</mat-icon>
+    Guardar Producto
+  </button>
+</mat-dialog-actions>

@@ -42,7 +42,7 @@ src/app/components/
 └── products-list/
     ├── products-list.component.ts         (REFACTORIZADO - 180 líneas)
     ├── products-list.component.html       (REFACTORIZADO - 40 líneas)
-    └── products-list.component.css        (SIMPLIFICADO - 130 líneas)
+    └── products-list.component.css                                                                     (SIMPLIFICADO - 130 líneas)
 
 TABLA_MATERIAL_GUIDE.md                    # 📖 GUÍA COMPLETA
 src/app/components/sale-list/

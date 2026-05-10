@@ -1,236 +1,135 @@
-<div class="dashboard-container">
-  <!-- Page Header -->
-  <div class="page-header">
-    <div class="header-content">
-      <h1>Dashboard Administrativo</h1>
-      <p class="subtitle">Resumen completo de tu negocio</p>
-    </div>
-    <div class="header-date">
-      {{ currentDate }}
-    </div>
+<!-- Date Display - Elegante y discreto -->
+<div class="dashboard-date-header">
+  <div class="date-display">
+    <mat-icon class="calendar-icon">calendar_today</mat-icon>
+    <span class="date-text">{{ currentDate }}</span>
   </div>
+</div>
 
-  <!-- Loading State -->
-  <div class="loading-state" *ngIf="loading">
-    <div class="spinner"></div>
-    <p>Cargando datos del dashboard...</p>
-  </div>
+<!-- Loading Spinner -->
+<div class="loading-overlay" *ngIf="loading">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
 
-  <!-- Error State -->
-  <div class="error-state" *ngIf="error && !loading">
-    <span class="error-icon">⚠️</span>
-    <p>{{ error }}</p>
-    <button class="error-btn" (click)="ngOnInit()">Reintentar</button>
-  </div>
+<!-- Error Message -->
+<div class="error-message" *ngIf="error && !loading">
+  <mat-icon>error</mat-icon>
+  <span>{{ error }}</span>
+  <button class="retry-btn" (click)="retry()">Reintentar</button>
+</div>
 
-  <!-- Dashboard Content -->
-  <div class="dashboard-content" *ngIf="!loading && !error">
-    <!-- KPI Cards Section -->
-    <section class="kpi-section">
-      <div class="section-title">
-        <h2>Indicadores Clave (KPIs)</h2>
-        <p>Métricas principales de tu negocio</p>
+<!-- Dashboard Content -->
+<div class="dashboard-container" *ngIf="!loading">
+  <!-- KPI Cards Grid -->
+  <section class="kpi-section">
+    <div class="kpi-grid">
+      <div class="kpi-card" *ngFor="let card of kpiCards" [ngClass]="'kpi-' + card.color">
+        <div class="kpi-icon">
+          <mat-icon>{{ card.icon }}</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <h3 class="kpi-title">{{ card.title }}</h3>
+          <p class="kpi-value">{{ card.value }}</p>
+          <div class="kpi-trend" *ngIf="card.trend !== undefined" [ngClass]="getTrendClass(card.trend)">
+            <mat-icon class="trend-icon">{{ getTrendIcon(card.trend) }}</mat-icon>
+            <span class="trend-text">{{ card.trend > 0 ? '+' : '' }}{{ card.trend }}% vs mes anterior</span>
+          </div>
+        </div>
       </div>
-      
-      <div class="kpi-grid">
-        <div *ngFor="let card of cards" class="kpi-card" [ngClass]="getCardClass(card)">
-          <div class="kpi-header">
-            <div class="kpi-icon-wrapper">
-              <span class="kpi-icon">{{ card.icon }}</span>
-            </div>
-            <div class="kpi-title-section">
-              <h3 class="kpi-title">{{ card.title }}</h3>
-              <p class="kpi-subtitle">{{ card.subtitle }}</p>
+    </div>
+  </section>
+
+  <!-- Chart Section -->
+  <section class="chart-section">
+    <div class="chart-card">
+      <h2 class="chart-title">Ventas vs Compras (Últimos 6 meses)</h2>
+      <div class="chart-container">
+        <div class="simple-chart">
+          <div class="chart-bars">
+            <div class="bar-group" *ngFor="let label of monthlyChartLabels; let i = index">
+              <div class="bar-pair">
+                <div class="bar sales-bar" 
+                     [style.height.%]="getChartBarHeight(monthlySalesData[i])"
+                     [title]="'Ventas: S/ ' + monthlySalesData[i].toLocaleString('es-PE')">
+                </div>
+                <div class="bar purchases-bar" 
+                     [style.height.%]="getChartBarHeight(monthlyPurchasesData[i])"
+                     [title]="'Compras: S/ ' + monthlyPurchasesData[i].toLocaleString('es-PE')">
+                </div>
+              </div>
+              <span class="month-label">{{ label }}</span>
             </div>
           </div>
-
-          <div class="kpi-body">
-            <div class="kpi-value">{{ card.value }}</div>
-            <div class="kpi-trend" *ngIf="card.trend" [ngClass]="getTrendClass(card.trend)">
-              <span class="trend-icon">{{ getTrendIcon(card.trend) }}</span>
-              <span class="trend-text">{{ card.trend }}% vs mes anterior</span>
-            </div>
+          <div class="chart-axis">
+            <div class="axis-label">S/ 0</div>
+            <div class="axis-label">S/ 35K</div>
+            <div class="axis-label">S/ 70K</div>
           </div>
+        </div>
+        <!-- Legend centered below chart -->
+        <div class="chart-legend-bottom">
+          <div class="legend-item sales">
+            <span class="legend-color"></span>
+            <span class="legend-label">Ventas</span>
+          </div>
+          <div class="legend-item purchases">
+            <span class="legend-color"></span>
+            <span class="legend-label">Compras</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-          <div class="kpi-footer">
-            <div class="kpi-bar">
-              <div class="kpi-progress" [style.width.%]="80"></div>
-            </div>
+  <!-- Lists Section -->
+  <div class="lists-grid">
+    <!-- Recent Purchases -->
+    <section class="list-card">
+      <h2 class="list-title">
+        <mat-icon>history</mat-icon>
+        Últimas Compras
+      </h2>
+      <div class="list-content">
+        <div *ngIf="recentPurchases.length === 0" class="empty-state">
+          <mat-icon>shopping_cart</mat-icon>
+          <p>No hay compras recientes</p>
+        </div>
+        <div *ngIf="recentPurchases.length > 0" class="purchase-list">
+          <div class="purchase-item" *ngFor="let purchase of recentPurchases">
+            <div class="purchase-number">{{ purchase.number }}</div>
+            <div class="purchase-supplier">{{ purchase.supplier_id }}</div>
+            <div class="purchase-date">{{ formatDate(purchase.created_at) }}</div>
+            <div class="purchase-total">S/ {{ purchase.total.toFixed(2) }}</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Charts Section -->
-    <section class="charts-section">
-      <div class="section-title">
-        <h2>Análisis y Tendencias</h2>
-        <p>Visualización de datos importantes</p>
-      </div>
-
-      <div class="charts-grid">
-        <!-- Sales Trend Chart -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>Ventas vs Compras (6 Meses)</h3>
-            <p class="chart-subtitle">Análisis de tendencias</p>
-          </div>
-          <div class="chart-body">
-            <div class="chart-container">
-              <div class="simple-chart">
-                <div class="chart-bars">
-                  <div class="chart-bar" *ngFor="let month of salesLineChartConfig.data.labels">
-                    <div class="bar-group">
-                      <div class="bar" [style.height]="'20px'" style="background: #667eea;"></div>
-                      <div class="bar" [style.height]="'12px'" style="background: #764ba2;"></div>
-                    </div>
-                    <div class="bar-label">{{ month }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <!-- Low Stock Products -->
+    <section class="list-card">
+      <h2 class="list-title">
+        <mat-icon>warning</mat-icon>
+        Stock Bajo
+      </h2>
+      <div class="list-content">
+        <div *ngIf="lowStockProducts.length === 0" class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <p>Sin problemas de stock</p>
         </div>
-
-        <!-- Product Category Chart -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>Productos por Categoría</h3>
-            <p class="chart-subtitle">Distribución de inventario</p>
-          </div>
-          <div class="chart-body">
-            <div class="chart-container">
-              <div class="simple-chart">
-                <div class="horizontal-bars">
-                  <div class="h-bar-item" *ngFor="let label of productCategoryChartConfig.data.labels; let i = index">
-                    <div class="h-bar-label">{{ label }}</div>
-                    <div class="h-bar-track">
-                      <div class="h-bar-fill" [style.width.%]="getBarWidth(productCategoryChartConfig.data.datasets[0].data[i])"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <div *ngIf="lowStockProducts.length > 0" class="product-list">
+          <div class="product-item" *ngFor="let product of lowStockProducts">
+            <div class="product-info">
+              <div class="product-name">{{ product.name }}</div>
+              <div class="product-sku">{{ product.sku }}</div>
             </div>
-          </div>
-        </div>
-
-        <!-- Revenue Distribution Chart -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3>Distribución de Ingresos</h3>
-            <p class="chart-subtitle">Proporción de ventas, compras y otros</p>
-          </div>
-          <div class="chart-body">
-            <div class="chart-container chart-container-doughnut">
-              <div class="simple-chart">
-                <div class="donut-chart">
-                  <div class="donut-legend">
-                    <div class="legend-item">
-                      <div class="legend-color" style="background: #667eea;"></div>
-                      <span>Ventas</span>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color" style="background: #764ba2;"></div>
-                      <span>Compras</span>
-                    </div>
-                    <div class="legend-item">
-                      <div class="legend-color" style="background: #17a2b8;"></div>
-                      <span>Otros</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div class="product-stock-info">
+              <div class="stock-current">{{ product.current_stock }}</div>
+              <span class="stock-separator">/</span>
+              <div class="stock-minimum">{{ product.min_stock }}</div>
             </div>
           </div>
         </div>
       </div>
     </section>
-
-    <!-- Quick Actions Section -->
-    <section class="actions-section" *ngIf="cards.length > 0">
-      <div class="section-title">
-        <h2>Acciones Rápidas</h2>
-        <p>Accede rápidamente a las funciones principales</p>
-      </div>
-
-      <div class="actions-grid">
-        <a href="/products" class="action-card products-card">
-          <div class="action-icon-wrapper">
-            <span class="action-icon">📦</span>
-          </div>
-          <div class="action-content">
-            <h4>Productos</h4>
-            <p>Gestionar inventario</p>
-          </div>
-          <div class="action-arrow">→</div>
-        </a>
-
-        <a href="/sales" class="action-card sales-card">
-          <div class="action-icon-wrapper">
-            <span class="action-icon">💰</span>
-          </div>
-          <div class="action-content">
-            <h4>Ventas</h4>
-            <p>Registrar nuevas ventas</p>
-          </div>
-          <div class="action-arrow">→</div>
-        </a>
-
-        <a href="/purchases" class="action-card purchases-card">
-          <div class="action-icon-wrapper">
-            <span class="action-icon">🛒</span>
-          </div>
-          <div class="action-content">
-            <h4>Compras</h4>
-            <p>Gestionar órdenes</p>
-          </div>
-          <div class="action-arrow">→</div>
-        </a>
-
-        <a href="/stock" class="action-card stock-card">
-          <div class="action-icon-wrapper">
-            <span class="action-icon">📊</span>
-          </div>
-          <div class="action-content">
-            <h4>Inventario</h4>
-            <p>Ver stock disponible</p>
-          </div>
-          <div class="action-arrow">→</div>
-        </a>
-
-        <a href="/kardex" class="action-card kardex-card">
-          <div class="action-icon-wrapper">
-            <span class="action-icon">📋</span>
-          </div>
-          <div class="action-content">
-            <h4>Kardex</h4>
-            <p>Historial de movimientos</p>
-          </div>
-          <div class="action-arrow">→</div>
-        </a>
-
-        <a href="#" class="action-card reports-card">
-          <div class="action-icon-wrapper">
-            <span class="action-icon">📈</span>
-          </div>
-          <div class="action-content">
-            <h4>Reportes</h4>
-            <p>Generar reportes</p>
-          </div>
-          <div class="action-arrow">→</div>
-        </a>
-      </div>
-    </section>
-  </div>
-
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="!loading && cards.length === 0 && !error">
-    <div class="empty-icon">📊</div>
-    <h2>No hay datos disponibles</h2>
-    <p>Comienza a crear productos, realizando ventas o compras para ver el dashboard</p>
-    <div class="empty-actions">
-      <a href="/products" class="empty-btn">Crear Producto</a>
-      <a href="/sales" class="empty-btn secondary">Registrar Venta</a>
-    </div>
   </div>
 </div>
