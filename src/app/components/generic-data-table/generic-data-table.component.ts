@@ -41,6 +41,7 @@ export interface TableAction {
 export interface TableConfig {
   columns: TableColumn[];
   actions?: TableAction[];
+  actionsDisplay?: 'menu' | 'buttons';
   pageSize?: number;
   pageSizeOptions?: number[];
   showSearch?: boolean;
@@ -173,16 +174,16 @@ export class GenericDataTableComponent implements OnInit, AfterViewInit, OnChang
 
   private formatCurrency(value: any): string {
     if (value == null) return '-';
-    return new Intl.NumberFormat('es-CO', {
+    return new Intl.NumberFormat('es-PE', {
       style: 'currency',
-      currency: 'COP'
+      currency: 'PEN'
     }).format(Number(value));
   }
 
   private formatDate(value: any): string {
     if (!value) return '-';
     const date = new Date(value);
-    return date.toLocaleDateString('es-CO', {
+    return date.toLocaleDateString('es-PE', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -191,7 +192,7 @@ export class GenericDataTableComponent implements OnInit, AfterViewInit, OnChang
 
   private formatNumber(value: any): string {
     if (value == null) return '-';
-    return new Intl.NumberFormat('es-CO').format(Number(value));
+    return new Intl.NumberFormat('es-PE').format(Number(value));
   }
 
   isActionVisible(action: TableAction, row: any): boolean {

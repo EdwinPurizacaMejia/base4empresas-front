@@ -9,11 +9,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { PurchaseService } from '../../services/purchase.service';
-import { PurchaseCreate, PurchaseItemCreate } from '../../models/purchase.model';
+import { PurchaseCreate } from '../../models/purchase.model';
 import { ConfirmationService } from '../../services/confirmation.service';
 
 @Component({
@@ -29,7 +30,8 @@ import { ConfirmationService } from '../../services/confirmation.service';
     MatCardModule,
     MatSnackBarModule,
     MatSelectModule,
-    MatTableModule
+    MatTableModule,
+    MatDialogModule
   ],
   templateUrl: './purchase-form.component.html',
   styleUrl: './purchase-form.component.css'
@@ -50,7 +52,8 @@ export class PurchaseFormComponent implements OnDestroy {
     private fb: FormBuilder,
     private purchaseService: PurchaseService,
     private snackBar: MatSnackBar,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private dialogRef: MatDialogRef<PurchaseFormComponent>
   ) {
     this.form = this.createForm();
   }
@@ -277,11 +280,13 @@ export class PurchaseFormComponent implements OnDestroy {
 
           setTimeout(() => {
             this.purchaseCreated.emit();
+            this.dialogRef.close(true);
           }, 300);
         },
         error: (err) => {
           this.loading = false;
-          const errorMsg = err.error?.detail || 'Error al registrar la compra';
+          const errorMsg =
+            err.userMessage || err.error?.detail || 'Error al registrar la compra';
 
           this.snackBar.open(errorMsg, 'Cerrar', {
             duration: 5000,
@@ -309,10 +314,12 @@ export class PurchaseFormComponent implements OnDestroy {
             this.items.clear();
             this.items.push(this.createItemGroup());
             this.formClosed.emit();
+            this.dialogRef.close(false);
           }
         });
     } else {
       this.formClosed.emit();
+      this.dialogRef.close(false);
     }
   }
 

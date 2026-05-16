@@ -1,7 +1,7 @@
 .table-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
   width: 100%;
 }
 
@@ -117,7 +117,8 @@
   background: white;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e9ecef;
 }
 
 /* Data Table */
@@ -132,11 +133,11 @@
 }
 
 .data-table th {
-  padding: 16px;
+  padding: 18px 16px;
   text-align: left;
-  font-weight: 600;
-  color: #374151;
-  font-size: 13px;
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   user-select: none;
@@ -157,32 +158,90 @@
 }
 
 .data-table td {
-  padding: 14px 16px;
-  font-size: 14px;
-  color: #111827;
+  padding: 16px;
+  font-size: 13px;
+  color: #495057;
+  vertical-align: middle;
+}
+
+.data-table .column-number {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.data-table .column-status,
+.data-table .column-payment_status,
+.data-table .column-total,
+.data-table .column-actions {
+  text-align: center;
+}
+
+.data-table .column-total {
+  color: #667eea;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.data-table .column-customer_id,
+.data-table .column-warehouse_id {
+  color: #6c757d;
+  font-family: monospace;
+  font-size: 12px;
 }
 
 /* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.3px;
 }
 
-.badge-active {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
+.badge-completed,
+.badge-confirmed,
+.badge-paid {
+  background: rgba(40, 167, 69, 0.12);
+  color: #28a745;
+}
+
+.dot-completed,
+.dot-confirmed,
+.dot-paid {
+  background: #28a745;
+}
+
+.badge-pending,
+.badge-partial {
+  background: rgba(255, 193, 7, 0.16);
+  color: #b7791f;
+}
+
+.dot-pending,
+.dot-partial {
+  background: #ffc107;
+}
+
+.badge-cancelled,
 .badge-inactive {
-  background: rgba(107, 114, 128, 0.1);
-  color: #6b7280;
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+}
+
+.dot-cancelled,
+.dot-inactive {
+  background: #dc3545;
 }
 
 /* Empty State */
@@ -207,9 +266,8 @@
 
 /* Paginator Section */
 .paginator-section {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px 16px;
+  display: block;
+  padding: 0;
   background: #f9fafb;
   border-top: 1px solid #e5e7eb;
 }
@@ -217,6 +275,20 @@
 ::ng-deep .paginator-section .mat-mdc-paginator {
   background: transparent;
   padding: 0;
+  width: 100%;
+}
+
+::ng-deep .paginator-section .mat-mdc-paginator-container {
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+::ng-deep .paginator-section .mat-mdc-paginator-page-size {
+  margin-right: auto;
+}
+
+::ng-deep .paginator-section .mat-mdc-paginator-range-actions {
+  margin-left: auto;
 }
 
 ::ng-deep .mat-mdc-paginator-page-size,
@@ -226,6 +298,51 @@
 }
 
 /* Action Menu */
+.inline-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 4px;
+  border-radius: 4px;
+  color: #94a3b8;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  opacity: 1;
+}
+
+.action-btn.view:hover {
+  color: #0369a1;
+  background: rgba(3, 105, 161, 0.08);
+}
+
+.action-btn.edit:hover {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.action-btn.delete:hover,
+.action-btn.danger:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.action-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
 ::ng-deep .mat-mdc-menu-content {
   padding: 4px 0 !important;
 }

@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +13,7 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 
 import { PurchaseListItem } from '../../models/purchase.model';
@@ -34,19 +40,25 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     PurchaseFormComponent,
     LoadingSpinnerComponent,
     EmptyStateComponent,
-    ErrorStateComponent
+    ErrorStateComponent,
   ],
   templateUrl: './purchase-list.component.html',
-  styleUrl: './purchase-list.component.scss'
+  styleUrl: './purchase-list.component.scss',
 })
 export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   purchases: PurchaseListItem[] = [];
   private allPurchases: PurchaseListItem[] = [];
   dataSource = new MatTableDataSource<PurchaseListItem>([]);
-  displayedColumns = ['number', 'created_at', 'supplier_id', 'status', 'total', 'actions'];
+  displayedColumns = [
+    'number',
+    'created_at',
+    'supplier_id',
+    'status',
+    'total',
+    'actions',
+  ];
   loading = false;
   error: string | null = null;
   showForm = false;
@@ -57,7 +69,8 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
     private purchaseService: PurchaseService,
     private searchService: SearchService,
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -66,7 +79,7 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
     // Suscribirse al buscador global
     this.searchService.searchTerm$Debounced
       .pipe(takeUntil(this.destroy$))
-      .subscribe(term => {
+      .subscribe((term) => {
         this.applyFilter(term);
       });
   }
@@ -96,13 +109,15 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         console.error(err);
-        this.error = 'Error al cargar compras. Intenta nuevamente.';
+        const errorMsg =
+          err.userMessage || 'Error al cargar compras. Intenta nuevamente.';
+        this.error = errorMsg;
         this.purchases = [];
         this.allPurchases = [];
         this.dataSource.data = [];
         this.loading = false;
-        this.notificationService.error('Error al cargar compras. Por favor, intenta nuevamente.');
-      }
+        this.notificationService.error(errorMsg);
+      },
     });
   }
 
@@ -115,37 +130,63 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.purchases = [...this.allPurchases];
     } else {
       const term = searchTerm.toLowerCase().trim();
-      const filtered = this.allPurchases.filter(purchase =>
-        purchase.number.toLowerCase().includes(term) ||
-        purchase.supplier_id.toLowerCase().includes(term)
+      const filtered = this.allPurchases.filter(
+        (purchase) =>
+          purchase.number.toLowerCase().includes(term) ||
+          purchase.supplier_id.toLowerCase().includes(term),
       );
       this.dataSource.data = filtered;
       this.purchases = filtered;
-      console.log(`🔍 Compras filtradas: ${filtered.length} de ${this.allPurchases.length}`);
+      console.log(
+        `🔍 Compras filtradas: ${filtered.length} de ${this.allPurchases.length}`,
+      );
     }
   }
 
   getStatusColor(status?: string): string {
     switch (status) {
-      case 'pending': return 'warn';
-      case 'completed': return 'primary';
-      case 'cancelled': return 'danger';
-      default: return 'primary';
+      case 'pending':
+        return 'warn';
+      case 'completed':
+        return 'primary';
+      case 'cancelled':
+        return 'danger';
+      default:
+        return 'primary';
     }
   }
 
   getStatusLabel(status?: string): string {
     if (!status) return 'Completada';
     const labels: { [key: string]: string } = {
-      'pending': 'Pendiente',
-      'completed': 'Completada',
-      'cancelled': 'Cancelada'
+      pending: 'Pendiente',
+      completed: 'Completada',
+      cancelled: 'Cancelada',
     };
     return labels[status] || status;
   }
 
   onNewPurchase(): void {
-    this.showForm = true;
+    const dialogRef = this.dialog.open(PurchaseFormComponent, {
+      width: '760px',
+      minWidth: '300px',
+      maxWidth: '95vw',
+      height: 'auto',
+      minHeight: '400px',
+      maxHeight: '95vh',
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      panelClass: 'crm-dialog-panel',
+      backdropClass: 'crm-dialog-backdrop',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.notificationService.success('Compra registrada exitosamente');
+        this.loadPurchases();
+      }
+    });
   }
 
   onFormClosed(): void {
@@ -168,9 +209,15 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onDeletePurchase(purchase: PurchaseListItem): void {
-    if (confirm(`¿Estás seguro de que deseas eliminar la compra "${purchase.number}"?`)) {
+    if (
+      confirm(
+        `¿Estás seguro de que deseas eliminar la compra "${purchase.number}"?`,
+      )
+    ) {
       console.log('Eliminar compra:', purchase);
-      this.notificationService.warning('Compra marcada para eliminar (función en desarrollo)');
+      this.notificationService.warning(
+        'Compra marcada para eliminar (función en desarrollo)',
+      );
       // TODO: Implementar eliminación en servicio
     }
   }

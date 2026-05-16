@@ -1,13 +1,16 @@
 import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { SalesService } from '../../services/sales.service';
 import { SaleCreate } from '../../models/sale.model';
 
 @Component({
   selector: 'app-sale-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatDialogModule, MatIconModule],
   templateUrl: './sale-form.component.html',
   styleUrls: ['./sale-form.component.css']
 })
@@ -23,7 +26,8 @@ export class SaleFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private salesService: SalesService
+    private salesService: SalesService,
+    private dialogRef: MatDialogRef<SaleFormComponent>
   ) {
     this.initForm();
   }
@@ -116,6 +120,7 @@ export class SaleFormComponent implements OnInit {
         this.items.clear();
         this.items.push(this.createItemControl());
         this.saleCreated.emit();
+        this.dialogRef.close(true);
 
         // Auto-hide success message
         setTimeout(() => {
@@ -165,5 +170,6 @@ export class SaleFormComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
     this.formClosed.emit();
+    this.dialogRef.close(false);
   }
 }

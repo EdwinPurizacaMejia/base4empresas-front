@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 import { SalesService } from '../../services/sales.service';
 import { SearchService } from '../../services/search.service';
@@ -13,7 +14,7 @@ import { GenericDataTableComponent, TableConfig } from '../generic-data-table/ge
 @Component({
   selector: 'app-sale-list',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, SaleFormComponent, GenericDataTableComponent],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, GenericDataTableComponent],
   templateUrl: './sale-list.component.html',
   styleUrls: ['./sale-list.component.css']
 })
@@ -32,8 +33,7 @@ export class SaleListComponent implements OnInit, OnDestroy {
       { key: 'created_at', label: 'Fecha', type: 'date', sortable: true, width: '160px' },
       { key: 'customer_id', label: 'Cliente', sortable: true, formatter: (val) => val || '-' },
       { key: 'warehouse_id', label: 'Almacén', sortable: true },
-      { key: 'status', label: 'Estado', type: 'badge', sortable: true, width: '100px', formatter: (val) => this.getStatusLabel(val) },
-      { key: 'payment_status', label: 'Pago', type: 'badge', sortable: true, width: '100px', formatter: (val) => this.getPaymentStatusLabel(val) },
+      { key: 'status', label: 'Estado', sortable: true, width: '100px', formatter: (val) => this.getStatusLabel(val) },
       { key: 'total', label: 'Total', type: 'currency', sortable: true, width: '130px' }
     ],
     actions: [
@@ -41,16 +41,18 @@ export class SaleListComponent implements OnInit, OnDestroy {
       { id: 'edit', label: 'Editar', icon: 'edit' },
       { id: 'delete', label: 'Eliminar', icon: 'delete', color: 'danger' }
     ],
+    actionsDisplay: 'buttons',
     pageSize: 10,
     pageSizeOptions: [5, 10, 25, 50],
-    showSearch: true,
+    showSearch: false,
     searchPlaceholder: 'Buscar por número o cliente...'
   };
 
   constructor(
     private salesService: SalesService,
     private searchService: SearchService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -103,7 +105,30 @@ export class SaleListComponent implements OnInit, OnDestroy {
   }
 
   onCreateSale(): void {
-    this.showForm = true;
+    const dialogRef = this.dialog.open(SaleFormComponent, {
+      width: '760px',
+      minWidth: '300px',
+      maxWidth: '95vw',
+      height: 'auto',
+      minHeight: '400px',
+      maxHeight: '95vh',
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      panelClass: 'crm-dialog-panel',
+      backdropClass: 'crm-dialog-backdrop',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.successMessage = 'Venta registrada exitosamente';
+        this.loadSales();
+
+        setTimeout(() => {
+          this.successMessage = '';
+        }, 4000);
+      }
+    });
   }
 
   onSaleCreated(): void {

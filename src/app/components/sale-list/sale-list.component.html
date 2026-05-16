@@ -5,7 +5,10 @@
       <h1>Ventas</h1>
       <p class="subtitle">Registro de ventas y salidas de stock</p>
     </div>
-    <button class="btn-create-sale" (click)="onCreateSale()">+ Registrar Venta</button>
+    <button class="btn-create-sale" (click)="onCreateSale()">
+      <mat-icon>add</mat-icon>
+      Registrar Venta
+    </button>
   </div>
 
   <!-- Success Message -->
@@ -25,10 +28,4 @@
     (searchChange)="onSearch($event)"
   ></app-generic-data-table>
 
-  <!-- Form Modal -->
-  <app-sale-form 
-    *ngIf="showForm"
-    (saleCreated)="onSaleCreated()"
-    (formClosed)="onFormClosed()"
-  ></app-sale-form>
 </div>
