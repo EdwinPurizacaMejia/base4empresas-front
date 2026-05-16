@@ -1,8 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  AfterViewInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 
 import { PurchaseListItem } from '../../models/purchase.model';
@@ -10,7 +21,6 @@ import { PurchaseService } from '../../services/purchase.service';
 import { SearchService } from '../../services/search.service';
 import { NotificationService } from '../../services/notification.service';
 import { PurchaseFormComponent } from '../purchase-form/purchase-form.component';
-import { GenericDataTableComponent, TableConfig, TableAction } from '../generic-data-table/generic-data-table.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { EmptyStateComponent } from '../shared/empty-state.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
@@ -22,50 +32,45 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     CommonModule,
     MatButtonModule,
     MatIconModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
+    MatDialogModule,
     PurchaseFormComponent,
-    GenericDataTableComponent,
     LoadingSpinnerComponent,
     EmptyStateComponent,
-    ErrorStateComponent
+    ErrorStateComponent,
   ],
   templateUrl: './purchase-list.component.html',
-  styleUrl: './purchase-list.component.css'
+  styleUrl: './purchase-list.component.scss',
 })
-export class PurchaseListComponent implements OnInit, OnDestroy {
+export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   purchases: PurchaseListItem[] = [];
-  private allPurchases: PurchaseListItem[] = []; // Copia de todas las compras sin filtrar
+  private allPurchases: PurchaseListItem[] = [];
+  dataSource = new MatTableDataSource<PurchaseListItem>([]);
+  displayedColumns = [
+    'number',
+    'created_at',
+    'supplier_id',
+    'status',
+    'total',
+    'actions',
+  ];
   loading = false;
   error: string | null = null;
   showForm = false;
-  successMessage: string | null = null;
   private destroy$ = new Subject<void>();
-
-  tableConfig: TableConfig = {
-    columns: [
-      { key: 'number', label: 'Número', sortable: true, width: '120px' },
-      { key: 'created_at', label: 'Fecha', type: 'date', sortable: true, width: '160px' },
-      { key: 'supplier_id', label: 'Proveedor', sortable: true, formatter: (val) => val?.substring(0, 8) + '...' },
-      { key: 'warehouse_id', label: 'Almacén', sortable: true, formatter: (val) => val?.substring(0, 8) + '...' },
-      { key: 'status', label: 'Estado', type: 'badge', sortable: true, width: '100px', formatter: (val) => this.getStatusLabel(val) },
-      { key: 'total', label: 'Total', type: 'currency', sortable: true, width: '130px' }
-    ],
-    actions: [
-      { id: 'view', label: 'Ver detalle', icon: 'visibility' },
-      { id: 'edit', label: 'Editar', icon: 'edit' },
-      { id: 'delete', label: 'Eliminar', icon: 'delete', color: 'danger' }
-    ],
-    pageSize: 10,
-    pageSizeOptions: [5, 10, 25, 50],
-    showSearch: true,
-    searchPlaceholder: 'Buscar por número o proveedor...'
-  };
+  pageSizeOptions = [5, 10, 25, 50];
 
   constructor(
     private purchaseService: PurchaseService,
     private searchService: SearchService,
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -74,9 +79,13 @@ export class PurchaseListComponent implements OnInit, OnDestroy {
     // Suscribirse al buscador global
     this.searchService.searchTerm$Debounced
       .pipe(takeUntil(this.destroy$))
-      .subscribe(term => {
+      .subscribe((term) => {
         this.applyFilter(term);
       });
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
   }
 
   ngOnDestroy(): void {
@@ -92,6 +101,7 @@ export class PurchaseListComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.allPurchases = data;
         this.purchases = data;
+        this.dataSource.data = data;
         this.loading = false;
         if (data.length === 0) {
           this.notificationService.info('No hay compras registradas');
@@ -99,12 +109,15 @@ export class PurchaseListComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error(err);
-        this.error = 'Error al cargar compras. Intenta nuevamente.';
+        const errorMsg =
+          err.userMessage || 'Error al cargar compras. Intenta nuevamente.';
+        this.error = errorMsg;
         this.purchases = [];
         this.allPurchases = [];
+        this.dataSource.data = [];
         this.loading = false;
-        this.notificationService.error('Error al cargar compras. Por favor, intenta nuevamente.');
-      }
+        this.notificationService.error(errorMsg);
+      },
     });
   }
 
@@ -113,19 +126,67 @@ export class PurchaseListComponent implements OnInit, OnDestroy {
    */
   private applyFilter(searchTerm: string): void {
     if (!searchTerm || searchTerm.trim() === '') {
+      this.dataSource.data = [...this.allPurchases];
       this.purchases = [...this.allPurchases];
     } else {
       const term = searchTerm.toLowerCase().trim();
-      this.purchases = this.allPurchases.filter(purchase =>
-        purchase.number.toLowerCase().includes(term) ||
-        purchase.supplier_id.toLowerCase().includes(term)
+      const filtered = this.allPurchases.filter(
+        (purchase) =>
+          purchase.number.toLowerCase().includes(term) ||
+          purchase.supplier_id.toLowerCase().includes(term),
       );
-      console.log(`🔍 Compras filtradas: ${this.purchases.length} de ${this.allPurchases.length}`);
+      this.dataSource.data = filtered;
+      this.purchases = filtered;
+      console.log(
+        `🔍 Compras filtradas: ${filtered.length} de ${this.allPurchases.length}`,
+      );
     }
   }
 
+  getStatusColor(status?: string): string {
+    switch (status) {
+      case 'pending':
+        return 'warn';
+      case 'completed':
+        return 'primary';
+      case 'cancelled':
+        return 'danger';
+      default:
+        return 'primary';
+    }
+  }
+
+  getStatusLabel(status?: string): string {
+    if (!status) return 'Completada';
+    const labels: { [key: string]: string } = {
+      pending: 'Pendiente',
+      completed: 'Completada',
+      cancelled: 'Cancelada',
+    };
+    return labels[status] || status;
+  }
+
   onNewPurchase(): void {
-    this.showForm = true;
+    const dialogRef = this.dialog.open(PurchaseFormComponent, {
+      width: '760px',
+      minWidth: '300px',
+      maxWidth: '95vw',
+      height: 'auto',
+      minHeight: '400px',
+      maxHeight: '95vh',
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      panelClass: 'crm-dialog-panel',
+      backdropClass: 'crm-dialog-backdrop',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.notificationService.success('Compra registrada exitosamente');
+        this.loadPurchases();
+      }
+    });
   }
 
   onFormClosed(): void {
@@ -134,52 +195,8 @@ export class PurchaseListComponent implements OnInit, OnDestroy {
 
   onPurchaseCreated(): void {
     this.showForm = false;
-    this.notificationService.success('✓ Compra registrada exitosamente');
+    this.notificationService.success('Compra registrada exitosamente');
     this.loadPurchases();
-  }
-
-  onSearch(searchTerm: string): void {
-    this.loading = true;
-    this.error = null;
-
-    this.purchaseService.getPurchases().subscribe({
-      next: (data) => {
-        // Filtrar localmente si hay término de búsqueda
-        if (searchTerm) {
-          this.purchases = data.filter(p =>
-            p.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.supplier_id.toLowerCase().includes(searchTerm.toLowerCase())
-          );
-        } else {
-          this.purchases = data;
-        }
-        this.allPurchases = data;
-        this.loading = false;
-        if (this.purchases.length === 0 && searchTerm) {
-          this.notificationService.info(`No se encontraron compras para "${searchTerm}"`);
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        this.error = 'Error al buscar compras.';
-        this.loading = false;
-        this.notificationService.error('Error al buscar compras. Por favor, intenta nuevamente.');
-      }
-    });
-  }
-
-  onTableAction(event: { action: string; row: PurchaseListItem }): void {
-    switch (event.action) {
-      case 'view':
-        this.onViewPurchase(event.row);
-        break;
-      case 'edit':
-        this.onEditPurchase(event.row);
-        break;
-      case 'delete':
-        this.onDeletePurchase(event.row);
-        break;
-    }
   }
 
   onViewPurchase(purchase: PurchaseListItem): void {
@@ -188,21 +205,20 @@ export class PurchaseListComponent implements OnInit, OnDestroy {
 
   onEditPurchase(purchase: PurchaseListItem): void {
     console.log('Editar compra:', purchase);
+    // TODO: Implementar edición en modal
   }
 
   onDeletePurchase(purchase: PurchaseListItem): void {
-    if (confirm(`¿Estás seguro de eliminar la compra N°${purchase.number}?`)) {
+    if (
+      confirm(
+        `¿Estás seguro de que deseas eliminar la compra "${purchase.number}"?`,
+      )
+    ) {
       console.log('Eliminar compra:', purchase);
+      this.notificationService.warning(
+        'Compra marcada para eliminar (función en desarrollo)',
+      );
+      // TODO: Implementar eliminación en servicio
     }
-  }
-
-  getStatusLabel(status?: string): string {
-    if (!status) return 'Completada';
-    const labels: { [key: string]: string } = {
-      'pending': 'Pendiente',
-      'completed': 'Completada',
-      'cancelled': 'Cancelada'
-    };
-    return labels[status] || status;
   }
 }

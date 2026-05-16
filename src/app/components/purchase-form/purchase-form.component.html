@@ -1,191 +1,219 @@
-<mat-card class="form-card">
-  <!-- Header -->
-  <mat-card-header>
-    <div class="form-header">
-      <h2>Nueva Compra</h2>
-      <button 
-        mat-icon-button 
-        (click)="onCancel()"
-        [disabled]="loading"
-        class="btn-close"
-        title="Cerrar formulario">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </mat-card-header>
+<h2 mat-dialog-title class="dialog-title">
+  Nueva Compra
+  <button
+    mat-icon-button
+    (click)="onCancel()"
+    [disabled]="loading"
+    class="close-button"
+    aria-label="Cerrar"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</h2>
 
-  <!-- Form Content -->
-  <mat-card-content>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+<mat-dialog-content class="dialog-content">
+  <p class="subtitle">
+    Ingresa los datos de la compra para registrar el ingreso al inventario
+  </p>
 
-      <div class="form-grid">
-
-        <!-- Proveedor -->
-        <mat-form-field class="half-width">
-          <mat-label>Proveedor *</mat-label>
-          <mat-select formControlName="supplier_id" [attr.aria-invalid]="hasError('supplier_id')">
-            <mat-option value="">-- Seleccionar --</mat-option>
-            <mat-option value="1">Proveedor A</mat-option>
-            <mat-option value="2">Proveedor B</mat-option>
-            <mat-option value="3">Proveedor C</mat-option>
-          </mat-select>
-          <mat-icon matPrefix>business</mat-icon>
-          <mat-error *ngIf="hasError('supplier_id')">
-            {{ getErrorMessage('supplier_id') }}
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Almacén -->
-        <mat-form-field class="half-width">
-          <mat-label>Almacén *</mat-label>
-          <mat-select formControlName="warehouse_id" [attr.aria-invalid]="hasError('warehouse_id')">
-            <mat-option value="">-- Seleccionar --</mat-option>
-            <mat-option value="1">Almacén Central</mat-option>
-            <mat-option value="2">Almacén Secundario</mat-option>
-          </mat-select>
-          <mat-icon matPrefix>warehouse</mat-icon>
-          <mat-error *ngIf="hasError('warehouse_id')">
-            {{ getErrorMessage('warehouse_id') }}
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Notas -->
-        <mat-form-field class="full-width">
-          <mat-label>Notas</mat-label>
-          <textarea 
-            matInput 
-            formControlName="notes" 
-            rows="2"
-            placeholder="Notas adicionales sobre esta compra"
-            [attr.aria-invalid]="hasError('notes')">
-          </textarea>
-          <mat-icon matPrefix>note</mat-icon>
-          <mat-hint *ngIf="!hasError('notes')">
-            {{ form.get('notes')?.value?.length || 0 }}/500 caracteres
-          </mat-hint>
-          <mat-error *ngIf="hasError('notes')">
-            {{ getErrorMessage('notes') }}
-          </mat-error>
-        </mat-form-field>
-
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+    <div class="purchase-main-grid">
+      <div class="purchase-field native-select-field">
+        <label class="native-select-label" for="purchase-supplier">
+          Proveedor *
+        </label>
+        <div class="native-select-control">
+          <mat-icon>business</mat-icon>
+          <select
+            id="purchase-supplier"
+            formControlName="supplier_id"
+            [attr.aria-invalid]="hasError('supplier_id')"
+          >
+            <option value="">-- Seleccionar --</option>
+            <option value="1">Proveedor A</option>
+            <option value="2">Proveedor B</option>
+            <option value="3">Proveedor C</option>
+          </select>
+        </div>
+        <div class="native-select-error" *ngIf="hasError('supplier_id')">
+          {{ getErrorMessage("supplier_id") }}
+        </div>
       </div>
 
-      <!-- Items Section -->
-      <div class="items-section">
-        <div class="section-header">
-          <h3>Items de Compra</h3>
-          <button 
-            type="button" 
-            mat-mini-fab 
-            color="primary" 
-            (click)="addItem()"
-            [disabled]="loading"
-            title="Agregar nuevo item">
-            <mat-icon>add</mat-icon>
-          </button>
+      <div class="purchase-field native-select-field">
+        <label class="native-select-label" for="purchase-warehouse">
+          Almacén *
+        </label>
+        <div class="native-select-control">
+          <mat-icon>warehouse</mat-icon>
+          <select
+            id="purchase-warehouse"
+            formControlName="warehouse_id"
+            [attr.aria-invalid]="hasError('warehouse_id')"
+          >
+            <option value="">-- Seleccionar --</option>
+            <option value="1">Almacén Central</option>
+            <option value="2">Almacén Secundario</option>
+          </select>
         </div>
-
-        <div *ngIf="items.length === 0" class="empty-state">
-          <mat-icon>shopping_cart</mat-icon>
-          <p>No hay items. Haz clic en "+" para agregar.</p>
+        <div class="native-select-error" *ngIf="hasError('warehouse_id')">
+          {{ getErrorMessage("warehouse_id") }}
         </div>
+      </div>
 
-        <div *ngFor="let item of items.controls; let i = index" class="item-card">
-          <div [formGroupName]="i" class="item-form">
-            <mat-form-field class="item-field">
-              <mat-label>Producto *</mat-label>
-              <mat-select formControlName="product_id" [attr.aria-invalid]="hasItemError(i, 'product_id')">
-                <mat-option value="">-- Seleccionar --</mat-option>
-                <mat-option value="1">Producto 1</mat-option>
-                <mat-option value="2">Producto 2</mat-option>
-                <mat-option value="3">Producto 3</mat-option>
-              </mat-select>
-              <mat-error *ngIf="hasItemError(i, 'product_id')">
-                {{ getItemError(i, 'product_id') }}
-              </mat-error>
-            </mat-form-field>
+      <div class="description-field native-notes-field">
+        <label class="native-notes-label" for="purchase-notes">Notas</label>
+        <div class="native-notes-control">
+          <mat-icon>note</mat-icon>
+          <textarea
+            id="purchase-notes"
+            formControlName="notes"
+            rows="3"
+            placeholder="Notas adicionales sobre esta compra"
+            [attr.aria-invalid]="hasError('notes')"
+          ></textarea>
+        </div>
+        <div class="native-notes-hint" *ngIf="!hasError('notes')">
+          {{ form.get("notes")?.value?.length || 0 }}/500 caracteres
+        </div>
+        <div class="native-select-error" *ngIf="hasError('notes')">
+          {{ getErrorMessage("notes") }}
+        </div>
+      </div>
+    </div>
 
-            <mat-form-field class="item-field">
-              <mat-label>Cantidad *</mat-label>
-              <input 
-                matInput 
-                formControlName="quantity" 
-                type="number" 
+    <!-- Items Section -->
+    <div class="items-section">
+      <div class="section-header">
+        <h3>Items de Compra</h3>
+        <button
+          type="button"
+          mat-mini-fab
+          color="primary"
+          (click)="addItem()"
+          [disabled]="loading"
+          title="Agregar nuevo item"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+
+      <div *ngIf="items.length === 0" class="empty-state">
+        <mat-icon>shopping_cart</mat-icon>
+        <p>No hay items. Haz clic en "+" para agregar.</p>
+      </div>
+
+      <div *ngFor="let item of items.controls; let i = index" class="item-card">
+        <div [formGroupName]="i" class="item-form">
+          <div class="item-field product-field native-select-field item-native-select-field">
+            <label class="native-select-label" [attr.for]="'purchase-product-' + i">
+              Producto *
+            </label>
+            <div class="native-select-control">
+              <select
+                [id]="'purchase-product-' + i"
+                formControlName="product_id"
+                [attr.aria-invalid]="hasItemError(i, 'product_id')"
+              >
+                <option value="">-- Seleccionar --</option>
+                <option value="1">Producto 1</option>
+                <option value="2">Producto 2</option>
+                <option value="3">Producto 3</option>
+              </select>
+            </div>
+            <div class="native-select-error" *ngIf="hasItemError(i, 'product_id')">
+              {{ getItemError(i, "product_id") }}
+            </div>
+          </div>
+
+          <div class="item-field quantity-field native-input-field">
+            <label class="native-input-label" [attr.for]="'purchase-quantity-' + i">
+              Cantidad *
+            </label>
+            <div class="native-input-control">
+              <mat-icon>numbers</mat-icon>
+              <input
+                [id]="'purchase-quantity-' + i"
+                formControlName="quantity"
+                type="number"
                 min="1"
-                [attr.aria-invalid]="hasItemError(i, 'quantity')">
-              <mat-icon matPrefix>numbers</mat-icon>
-              <mat-error *ngIf="hasItemError(i, 'quantity')">
-                {{ getItemError(i, 'quantity') }}
-              </mat-error>
-            </mat-form-field>
+                [attr.aria-invalid]="hasItemError(i, 'quantity')"
+              />
+            </div>
+            <div class="native-select-error" *ngIf="hasItemError(i, 'quantity')">
+              {{ getItemError(i, "quantity") }}
+            </div>
+          </div>
 
-            <mat-form-field class="item-field">
-              <mat-label>Costo Unitario *</mat-label>
-              <input 
-                matInput 
-                formControlName="unit_cost" 
-                type="number" 
+          <div class="item-field cost-field native-input-field">
+            <label class="native-input-label" [attr.for]="'purchase-unit-cost-' + i">
+              Costo Unitario *
+            </label>
+            <div class="native-input-control">
+              <span class="native-input-prefix">S/</span>
+              <input
+                [id]="'purchase-unit-cost-' + i"
+                formControlName="unit_cost"
+                type="number"
                 step="0.01"
                 min="0"
-                [attr.aria-invalid]="hasItemError(i, 'unit_cost')">
-              <mat-icon matPrefix>attach_money</mat-icon>
-              <mat-error *ngIf="hasItemError(i, 'unit_cost')">
-                {{ getItemError(i, 'unit_cost') }}
-              </mat-error>
-            </mat-form-field>
+                [attr.aria-invalid]="hasItemError(i, 'unit_cost')"
+              />
+            </div>
+            <div class="native-select-error" *ngIf="hasItemError(i, 'unit_cost')">
+              {{ getItemError(i, "unit_cost") }}
+            </div>
+          </div>
 
+          <div class="item-actions-cell">
             <div class="item-subtotal">
               <span class="subtotal-label">Subtotal:</span>
               <span class="subtotal-value">
-                {{ ((item.get('quantity')?.value || 0) * (item.get('unit_cost')?.value || 0)) | number: '1.2-2' }}
+                {{
+                  (item.get("quantity")?.value || 0) *
+                    (item.get("unit_cost")?.value || 0) | number: "1.2-2"
+                }}
               </span>
             </div>
 
-            <button 
-              type="button" 
-              mat-icon-button 
-              color="warn" 
+            <button
+              type="button"
+              mat-icon-button
+              color="warn"
+              class="remove-item-button"
               (click)="removeItem(i)"
               [disabled]="loading || items.length === 1"
-              title="Eliminar este item">
+              title="Eliminar este item"
+            >
               <mat-icon>delete</mat-icon>
             </button>
           </div>
         </div>
       </div>
-
-      <!-- Total -->
-      <div class="total-section">
-        <span class="total-label">Total de Compra:</span>
-        <span class="total-value">S/{{ calculateTotal() | number: '1.2-2' }}</span>
-      </div>
-
-    </form>
-  </mat-card-content>
-
-  <!-- Actions -->
-  <mat-card-footer>
-    <div class="form-actions">
-      <button 
-        mat-stroked-button 
-        (click)="onCancel()"
-        [disabled]="loading"
-        class="btn-secondary">
-        Cancelar
-      </button>
-      <button 
-        mat-raised-button 
-        color="primary" 
-        (click)="onSubmit()"
-        [disabled]="loading || form.invalid"
-        class="btn-primary">
-        <mat-icon *ngIf="!loading">save</mat-icon>
-        <span *ngIf="loading" class="spinner-text">
-          <mat-icon class="spinner">hourglass_empty</mat-icon>
-        </span>
-        {{ loading ? 'Guardando...' : 'Registrar Compra' }}
-      </button>
     </div>
-  </mat-card-footer>
 
-</mat-card>
+    <!-- Total -->
+    <div class="total-section">
+      <span class="total-label">Total de Compra:</span>
+      <span class="total-value"
+        >S/{{ calculateTotal() | number: "1.2-2" }}</span
+      >
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()" [disabled]="loading">Cancelar</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="loading || form.invalid"
+  >
+    <mat-icon *ngIf="!loading">save</mat-icon>
+    <span *ngIf="loading" class="spinner-text">
+      <mat-icon class="spinner">hourglass_empty</mat-icon>
+    </span>
+    {{ loading ? "Guardando..." : "Guardar Compra" }}
+  </button>
+</mat-dialog-actions>

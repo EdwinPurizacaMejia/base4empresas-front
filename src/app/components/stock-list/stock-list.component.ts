@@ -1,14 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
 import { Stock } from '../../models/stock.model';
 import { StockService } from '../../services/stock.service';
 import { SearchService } from '../../services/search.service';
-import { GenericDataTableComponent, TableConfig } from '../generic-data-table/generic-data-table.component';
+import { NotificationService } from '../../services/notification.service';
 
 type StockStatus = 'ok' | 'warning' | 'critical';
 
@@ -20,42 +24,38 @@ interface StockWithStatus extends Stock {
 @Component({
   selector: 'app-stock-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, GenericDataTableComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './stock-list.component.html',
-  styleUrl: './stock-list.component.css'
+  styleUrl: './stock-list.component.scss'
 })
-export class StockListComponent implements OnInit, OnDestroy {
+export class StockListComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   stocks: StockWithStatus[] = [];
   private allStocks: StockWithStatus[] = []; // Copia de todos los stocks sin filtrar
+  dataSource = new MatTableDataSource<StockWithStatus>([]);
+  displayedColumns = ['sku', 'name', 'stock', 'min_stock', 'status', 'actions'];
   warehouseId = '';
   loading = false;
   error: string | null = null;
   initialLoad = true;
   private destroy$ = new Subject<void>();
-
-  tableConfig: TableConfig = {
-    columns: [
-      { key: 'sku', label: 'SKU', sortable: true, width: '120px' },
-      { key: 'name', label: 'Producto', sortable: true },
-      { key: 'stock', label: 'Stock Actual', type: 'number', sortable: true, width: '130px' },
-      { key: 'min_stock', label: 'Stock Mínimo', type: 'number', sortable: true, width: '130px', formatter: (val) => val ? val.toString() : '—' },
-      { key: 'status', label: 'Estado', type: 'badge', sortable: true, width: '120px', formatter: (val) => this.getStatusLabel(val) }
-    ],
-    actions: [
-      { id: 'view', label: 'Ver detalle', icon: 'visibility' },
-      { id: 'kardex', label: 'Ver Kardex', icon: 'description' }
-    ],
-    pageSize: 10,
-    pageSizeOptions: [5, 10, 25, 50],
-    showSearch: true,
-    searchPlaceholder: 'Buscar por SKU o producto...'
-  };
+  pageSizeOptions = [5, 10, 25, 50];
 
   constructor(
     private stockService: StockService,
     private searchService: SearchService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +75,10 @@ export class StockListComponent implements OnInit, OnDestroy {
       });
   }
 
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -85,6 +89,7 @@ export class StockListComponent implements OnInit, OnDestroy {
       this.error = 'Por favor ingresa un ID de almacén';
       this.stocks = [];
       this.allStocks = [];
+      this.dataSource.data = [];
       return;
     }
 
@@ -106,14 +111,20 @@ export class StockListComponent implements OnInit, OnDestroy {
         }));
         this.allStocks = enrichedData;
         this.stocks = enrichedData;
+        this.dataSource.data = enrichedData;
         this.loading = false;
+        if (enrichedData.length === 0) {
+          this.notificationService.info('No hay stock registrado para este almacén');
+        }
       },
       error: (err) => {
         console.error(err);
         this.error = `Error al cargar stock del almacén. Verifica el ID e intenta nuevamente.`;
         this.stocks = [];
         this.allStocks = [];
+        this.dataSource.data = [];
         this.loading = false;
+        this.notificationService.error(this.error);
       }
     });
   }
@@ -124,12 +135,14 @@ export class StockListComponent implements OnInit, OnDestroy {
   private applyFilter(searchTerm: string): void {
     if (!searchTerm || searchTerm.trim() === '') {
       this.stocks = [...this.allStocks];
+      this.dataSource.data = [...this.allStocks];
     } else {
       const term = searchTerm.toLowerCase().trim();
       this.stocks = this.allStocks.filter(stock =>
         stock.sku.toLowerCase().includes(term) ||
         stock.name.toLowerCase().includes(term)
       );
+      this.dataSource.data = this.stocks;
       console.log(`🔍 Stocks filtrados: ${this.stocks.length} de ${this.allStocks.length}`);
     }
   }
@@ -164,41 +177,14 @@ export class StockListComponent implements OnInit, OnDestroy {
     }
   }
 
-  onSearch(searchTerm: string): void {
-    // Filtrar stocks localmente basado en búsqueda
-    this.loading = true;
-    setTimeout(() => {
-      if (!searchTerm) {
-        this.stocks = [...this.allStocks];
-      } else {
-        const filtered = this.allStocks.filter(s => 
-          s.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          s.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        this.stocks = filtered;
-      }
-      this.loading = false;
-    }, 300);
-  }
-
-  onTableAction(event: { action: string; row: StockWithStatus }): void {
-    switch (event.action) {
-      case 'view':
-        this.onViewStock(event.row);
-        break;
-      case 'kardex':
-        this.onViewKardex(event.row);
-        break;
-    }
-  }
-
   onViewStock(product: Stock): void {
-    this.router.navigate(['/stock', product.product_id]);
+    this.router.navigate(['/inventario', product.product_id]);
   }
 
   onViewKardex(product: Stock): void {
-    // TODO: Implementar navegación a kardex
-    console.log('Ver kardex del producto:', product.product_id, product.sku);
+    this.router.navigate(['/kardex'], {
+      queryParams: { product_id: product.product_id, sku: product.sku }
+    });
   }
 
   getStatusLabel(status: StockStatus): string {

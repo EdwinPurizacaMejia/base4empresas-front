@@ -50,50 +50,8 @@ body {
    (solo placeholders). Esto suele pasar por overrides globales
    a la tipografía/line-height/padding o por estilos del wrapper.
    ========================================================= */
-.mat-mdc-form-field {
-  /* asegura que el label exista y tenga espacio para renderizar */
-  .mat-mdc-floating-label {
-    display: inline-flex !important;
-    align-items: center;
-    opacity: 1 !important;
-    visibility: visible !important;
-    color: $color-text-medium !important;
-  }
-
-  /* NO forzar paddings/alturas del infix globalmente.
-     Esto estaba afectando el layout interno del MDC y podía
-     dejar el label fuera de su posición (en especial en MatDialog). */
-  .mat-mdc-form-field-infix {
-    min-height: unset !important;
-    padding-top: unset !important;
-    padding-bottom: unset !important;
-  }
-
-  /* Notch: no tocar globalmente */
-  .mdc-notched-outline__notch {
-    padding-top: unset !important;
-  }
-
-  &.mat-focused {
-    .mat-mdc-floating-label {
-      color: $color-primary !important;
-    }
-  }
-}
-
-.mat-mdc-text-field-wrapper {
-  .mat-mdc-text-field-fill {
-    background-color: $color-surface-variant !important;
-    border-radius: $border-radius-md $border-radius-md 0 0;
-  }
-}
-
-.mat-mdc-form-field-underline {
-  background-color: $color-border !important;
-}
-
-.mdc-line-ripple::after {
-  border-bottom-color: $color-primary !important;
+.mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: $color-primary !important;
 }
 
 .mat-mdc-option {

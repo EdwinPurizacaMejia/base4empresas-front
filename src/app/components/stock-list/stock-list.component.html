@@ -1,59 +1,112 @@
-<div class="container">
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <h1 class="title">Inventario de Stock</h1>
-      <p class="subtitle">Monitorea el stock de productos por almacén</p>
+<div class="inventory-container">
+  <div class="inventory-header">
+    <div class="header-left">
+      <h1 class="page-title">Inventario</h1>
+      <p class="page-subtitle">Gestiona y monitorea el stock de productos por almacén</p>
     </div>
+
+    <button mat-raised-button color="primary" (click)="loadStock()" [disabled]="loading" class="btn-load-stock">
+      <mat-icon>{{ loading ? 'hourglass_empty' : 'sync' }}</mat-icon>
+      {{ loading ? 'Cargando...' : 'Cargar inventario' }}
+    </button>
   </div>
 
-  <!-- Warehouse Selector -->
-  <div class="warehouse-selector">
-    <div class="selector-group">
-      <label for="warehouse-id">Almacén ID:</label>
+  <div class="warehouse-card">
+    <label for="warehouse-id">Almacén ID</label>
+    <div class="warehouse-control">
+      <mat-icon>warehouse</mat-icon>
       <input
         id="warehouse-id"
         type="text"
         [(ngModel)]="warehouseId"
         placeholder="Ej: warehouse-001, 550e8400..."
-        class="warehouse-input"
         (keypress)="onKeyPress($event)"
       />
-      <button class="btn-load" (click)="loadStock()" [disabled]="loading">
-        {{ loading ? 'Cargando...' : 'Cargar Stock' }}
-      </button>
     </div>
   </div>
 
-  <!-- Error Message -->
-  <div *ngIf="error" class="alert alert-error">
-    {{ error }}
+  <div *ngIf="loading && stocks.length === 0" class="loading-state">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando inventario...</p>
   </div>
 
-  <!-- Data Table with Loading State -->
-  <app-generic-data-table
-    [data]="stocks"
-    [config]="tableConfig"
-    [loading]="loading"
-    [error]="error"
-    [totalItems]="stocks.length"
-    (actionClick)="onTableAction($event)"
-    (searchChange)="onSearch($event)"
-  ></app-generic-data-table>
-
-  <!-- Empty State -->
-  <div *ngIf="!loading && stocks.length === 0 && !initialLoad" class="empty-state">
-    <p class="empty-icon">📊</p>
-    <p class="empty-title">No hay datos de stock</p>
-    <p class="empty-text">
-      {{ error ? 'Verifica el ID del almacén' : 'No se encontraron productos en este almacén' }}
-    </p>
+  <div *ngIf="error && !loading" class="error-state">
+    <mat-icon>error</mat-icon>
+    <h3>Error al cargar</h3>
+    <p>{{ error }}</p>
+    <button mat-raised-button (click)="loadStock()">Reintentar</button>
   </div>
 
-  <!-- Initial State -->
-  <div *ngIf="initialLoad && !loading" class="initial-state">
-    <p class="initial-icon">🏭</p>
-    <p class="initial-title">Selecciona un almacén</p>
-    <p class="initial-text">Ingresa un ID de almacén y carga los datos de stock</p>
+  <div *ngIf="initialLoad && !loading && !error" class="empty-state">
+    <mat-icon>warehouse</mat-icon>
+    <h3>Selecciona un almacén</h3>
+    <p>Ingresa un ID de almacén y carga los datos de inventario.</p>
+    <button mat-raised-button color="primary" (click)="loadStock()">Cargar inventario</button>
+  </div>
+
+  <div *ngIf="!loading && !error && stocks.length === 0 && !initialLoad" class="empty-state">
+    <mat-icon>inventory_2</mat-icon>
+    <h3>Sin inventario</h3>
+    <p>No se encontraron productos con stock para este almacén.</p>
+    <button mat-raised-button color="primary" (click)="loadStock()">Volver a cargar</button>
+  </div>
+
+  <div *ngIf="!error && stocks.length > 0" class="table-wrapper">
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" class="inventory-table">
+        <ng-container matColumnDef="sku">
+          <th mat-header-cell *matHeaderCellDef class="column-sku">SKU</th>
+          <td mat-cell *matCellDef="let element" class="column-sku">{{ element.sku }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef class="column-name">Producto</th>
+          <td mat-cell *matCellDef="let element" class="column-name">{{ element.name }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="stock">
+          <th mat-header-cell *matHeaderCellDef class="column-stock">Stock Actual</th>
+          <td mat-cell *matCellDef="let element" class="column-stock">{{ element.stock }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="min_stock">
+          <th mat-header-cell *matHeaderCellDef class="column-stock">Stock Mín.</th>
+          <td mat-cell *matCellDef="let element" class="column-stock">{{ element.min_stock || '—' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="column-status">Estado</th>
+          <td mat-cell *matCellDef="let element" class="column-status">
+            <span class="status-badge" [ngClass]="'status-' + element.status">
+              <span class="status-dot" [ngClass]="'dot-' + element.status"></span>
+              {{ getStatusLabel(element.status) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="column-actions">Acciones</th>
+          <td mat-cell *matCellDef="let element" class="column-actions">
+            <button mat-icon-button (click)="onViewStock(element)" matTooltip="Ver detalle" class="action-btn view">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onViewKardex(element)" matTooltip="Ver kardex" class="action-btn edit">
+              <mat-icon>description</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="data-row"></tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      [pageSizeOptions]="pageSizeOptions"
+      showFirstLastButtons
+      [pageSize]="10"
+      [length]="dataSource.data.length"
+      class="paginator">
+    </mat-paginator>
   </div>
 </div>
