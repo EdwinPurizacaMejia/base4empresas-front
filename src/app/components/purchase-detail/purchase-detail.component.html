@@ -61,18 +61,28 @@
           </div>
           <div class="info-item">
             <label>Fecha</label>
-            <p class="info-value">{{ purchase.created_at ? (purchase.created_at | date: 'dd/MM/yyyy HH:mm') : 'N/A' }}</p>
+            <p class="info-value">
+              {{
+                purchase.purchase_date
+                  ? (purchase.purchase_date | date: 'dd/MM/yyyy HH:mm')
+                  : (purchase.created_at ? (purchase.created_at | date: 'dd/MM/yyyy HH:mm') : 'N/A')
+              }}
+            </p>
           </div>
         </div>
 
         <div class="info-section">
-          <label>ID de Proveedor</label>
-          <p class="info-text">{{ purchase.supplier_id }}</p>
+          <label>Proveedor</label>
+          <p class="info-text">
+            {{ purchase.supplier?.business_name || purchase.supplier_id }}
+          </p>
         </div>
 
         <div class="info-section">
-          <label>ID de Almacén</label>
-          <p class="info-text">{{ purchase.warehouse_id }}</p>
+          <label>Almacén</label>
+          <p class="info-text">
+            {{ purchase.warehouse?.name || purchase.warehouse_id }}
+          </p>
         </div>
       </mat-card-content>
     </mat-card>
@@ -88,10 +98,59 @@
           <div class="info-item">
             <label>Total</label>
             <p class="info-value currency">
-              {{ purchase.total | currency : 'USD' : 'symbol' : '1.2-2' }}
+              {{ purchase.total | currency : 'PEN' : 'symbol' : '1.2-2' }}
             </p>
           </div>
         </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Items -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Items de la Compra</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="section-content">
+        <div *ngIf="itemsDataSource.length === 0" class="empty-items">
+          No hay items para esta compra.
+        </div>
+
+        <table
+          *ngIf="itemsDataSource.length > 0"
+          mat-table
+          [dataSource]="itemsDataSource"
+          class="items-table"
+        >
+          <ng-container matColumnDef="product_id">
+            <th mat-header-cell *matHeaderCellDef>Producto</th>
+            <td mat-cell *matCellDef="let item">
+              {{ getProductName(item.product_id) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+            <td mat-cell *matCellDef="let item">{{ item.quantity }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="unit_cost">
+            <th mat-header-cell *matHeaderCellDef>Costo Unit.</th>
+            <td mat-cell *matCellDef="let item">
+              {{ item.unit_cost | currency : 'PEN' : 'symbol' : '1.2-2' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="subtotal">
+            <th mat-header-cell *matHeaderCellDef>Subtotal</th>
+            <td mat-cell *matCellDef="let item">
+              {{ (item.subtotal ?? (item.quantity * item.unit_cost)) | currency : 'PEN' : 'symbol' : '1.2-2' }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
       </mat-card-content>
     </mat-card>
 

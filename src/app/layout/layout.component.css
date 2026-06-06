@@ -1,119 +1,77 @@
 /**
- * Layout Component Styles
+ * Layout Component Styles (with Angular Material)
  * 
- * Estructura shell profesional con:
- * - Toolbar superior
- * - Sidebar responsive
- * - Contenido principal flexible
- * - Diseño mobile-first
+ * Material maneja la mayoría de maquetación automáticamente
+ * Estilos aquí son customizaciones específicas de la app
  */
 
-.layout-container {
+:host {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #f5f6fa;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   overflow: hidden;
 }
 
-/* ============ MAIN LAYOUT ============ */
-.layout-main {
-  display: flex;
+mat-sidenav-container {
   flex: 1;
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  flex-direction: row;
 }
 
-/* ============ CONTENT AREA ============ */
-.layout-content {
+.app-sidenav {
+  width: 260px !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-sidenav ::ng-deep {
+  color: white !important;
+}
+
+/* Personalizar estilos de Material dentro del sidebar */
+.app-sidenav ::ng-deep mat-expansion-panel {
+  background-color: transparent !important;
+}
+
+.app-sidenav ::ng-deep .mat-mdc-expansion-panel-header {
+  color: white !important;
+}
+
+.app-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  overflow-x: hidden;
   padding: 24px;
   background-color: #f5f6fa;
-  position: relative;
-  z-index: 1;
 }
 
-/* ============ OVERLAY (Mobile) ============ */
-.layout-overlay {
-  display: none;
-  position: fixed;
-  top: 64px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 50;
-  animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* ============ SCROLLBAR ============ */
-.layout-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.layout-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.layout-content::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.layout-content::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
-
-/* ============ RESPONSIVE: TABLET ============ */
+/* Responsive: Tablet */
 @media (max-width: 1024px) {
-  .layout-content {
+  .app-content {
     padding: 20px;
   }
 }
 
+/* Responsive: Mobile */
 @media (max-width: 768px) {
-  .layout-content {
+  .app-content {
     padding: 16px;
   }
 
-  .layout-overlay {
-    display: block;
+  .app-sidenav {
+    width: 240px !important;
   }
 }
 
+/* Responsive: Small Phone */
 @media (max-width: 480px) {
-  .layout-container {
-    height: 100dvh;
-  }
-
-  .layout-content {
+  .app-content {
     padding: 12px;
   }
-}
 
-/* ============ UTILITY CLASSES ============ */
-.layout-container {
-  --primary-color: #667eea;
-  --primary-dark: #764ba2;
-  --secondary-color: #f5f6fa;
-  --text-primary: #333;
-  --text-secondary: #666;
-  --border-color: #e0e0e0;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  .app-sidenav {
+    width: 200px !important;
+  }
 }

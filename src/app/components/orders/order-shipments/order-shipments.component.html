@@ -1,0 +1,285 @@
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h2>Envíos</h2>
+  </div>
+
+  <app-loading-spinner *ngIf="loading" message="Cargando envíos..."></app-loading-spinner>
+
+  <div *ngIf="!loading" class="content">
+    <!-- Tabla de Envíos -->
+    <mat-card class="shipments-card">
+      <mat-card-header>
+        <mat-card-title>Histórico de Envíos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="shipments" class="shipments-table" *ngIf="shipments.length > 0">
+            <!-- Método de Envío -->
+            <ng-container matColumnDef="shipping_method">
+              <th mat-header-cell *matHeaderCellDef>Método</th>
+              <td mat-cell *matCellDef="let shipment">
+                {{ getShippingMethodLabel(shipment.shipping_method) }}
+              </td>
+            </ng-container>
+
+            <!-- Transportista -->
+            <ng-container matColumnDef="carrier_name">
+              <th mat-header-cell *matHeaderCellDef>Transportista</th>
+              <td mat-cell *matCellDef="let shipment">
+                <span *ngIf="shipment.carrier_name">{{ shipment.carrier_name }}</span>
+                <span *ngIf="!shipment.carrier_name" class="empty">-</span>
+              </td>
+            </ng-container>
+
+            <!-- N° Seguimiento -->
+            <ng-container matColumnDef="tracking_number">
+              <th mat-header-cell *matHeaderCellDef>N° Seguimiento</th>
+              <td mat-cell *matCellDef="let shipment">
+                <code *ngIf="shipment.tracking_number">{{ shipment.tracking_number }}</code>
+                <span *ngIf="!shipment.tracking_number" class="empty">-</span>
+              </td>
+            </ng-container>
+
+            <!-- Destinatario -->
+            <ng-container matColumnDef="recipient_name">
+              <th mat-header-cell *matHeaderCellDef>Destinatario</th>
+              <td mat-cell *matCellDef="let shipment">
+                {{ shipment.recipient_name }}
+              </td>
+            </ng-container>
+
+            <!-- Teléfono Destinatario -->
+            <ng-container matColumnDef="recipient_phone">
+              <th mat-header-cell *matHeaderCellDef>Teléfono</th>
+              <td mat-cell *matCellDef="let shipment">
+                <code>{{ shipment.recipient_phone }}</code>
+              </td>
+            </ng-container>
+
+            <!-- Dirección Destino -->
+            <ng-container matColumnDef="destination_address">
+              <th mat-header-cell *matHeaderCellDef>Dirección Destino</th>
+              <td mat-cell *matCellDef="let shipment">
+                <span *ngIf="shipment.destination_address" class="address">
+                  {{ shipment.destination_address }}
+                </span>
+                <span *ngIf="!shipment.destination_address" class="empty">-</span>
+              </td>
+            </ng-container>
+
+            <!-- Estado -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let shipment">
+                <mat-chip [color]="getShipmentStatusColor(shipment.status)" selected>
+                  {{ getShipmentStatusLabel(shipment.status) }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Fecha Programada -->
+            <ng-container matColumnDef="scheduled_date">
+              <th mat-header-cell *matHeaderCellDef>Fecha Programada</th>
+              <td mat-cell *matCellDef="let shipment">
+                <span *ngIf="shipment.scheduled_date">{{ shipment.scheduled_date | date: 'short' }}</span>
+                <span *ngIf="!shipment.scheduled_date" class="empty">-</span>
+              </td>
+            </ng-container>
+
+            <!-- Fecha Enviado -->
+            <ng-container matColumnDef="shipped_at">
+              <th mat-header-cell *matHeaderCellDef>Enviado</th>
+              <td mat-cell *matCellDef="let shipment">
+                <span *ngIf="shipment.shipped_at">{{ shipment.shipped_at | date: 'short' }}</span>
+                <span *ngIf="!shipment.shipped_at" class="empty">-</span>
+              </td>
+            </ng-container>
+
+            <!-- Fecha Entregado -->
+            <ng-container matColumnDef="delivered_at">
+              <th mat-header-cell *matHeaderCellDef>Entregado</th>
+              <td mat-cell *matCellDef="let shipment">
+                <span *ngIf="shipment.delivered_at" class="delivered">
+                  {{ shipment.delivered_at | date: 'short' }}
+                </span>
+                <span *ngIf="!shipment.delivered_at" class="empty">-</span>
+              </td>
+            </ng-container>
+
+            <!-- Acciones -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let shipment">
+                <div class="actions" *ngIf="getAvailableTransitions(shipment.status).length > 0">
+                  <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="statusMenu"
+                    [disabled]="updatingShipment"
+                    matTooltip="Cambiar estado"
+                  >
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #statusMenu="matMenu">
+                    <button
+                      mat-menu-item
+                      *ngFor="let status of getAvailableTransitions(shipment.status)"
+                      (click)="updateStatus(shipment, status)"
+                      [disabled]="updatingShipment"
+                    >
+                      <mat-icon
+                        *ngIf="status === 'IN_TRANSIT'"
+                        color="accent"
+                      >
+                        local_shipping
+                      </mat-icon>
+                      <mat-icon *ngIf="status === 'DELIVERED'" color="primary">
+                        check_circle
+                      </mat-icon>
+                      <mat-icon *ngIf="status === 'CANCELLED'" color="warn">
+                        cancel
+                      </mat-icon>
+                      {{ getShipmentStatusLabel(status) }}
+                    </button>
+                  </mat-menu>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <div class="empty-state" *ngIf="shipments.length === 0">
+            <mat-icon>local_shipping</mat-icon>
+            <p>No hay envíos registrados</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Formulario Crear Envío -->
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>Registrar Nuevo Envío</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="shipmentForm" (ngSubmit)="onSubmitShipment()" class="shipment-form">
+          <!-- Row 1: Method -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Método de Envío</mat-label>
+              <mat-select formControlName="shipping_method">
+                <mat-option value="">-- Seleccionar --</mat-option>
+                <mat-option *ngFor="let method of getAvailableShippingMethods()" [value]="method">
+                  {{ getShippingMethodLabel(method) }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="shipmentForm.get('shipping_method')?.hasError('required')">
+                Método es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Row 2: Carrier, Tracking (conditional) -->
+          <div class="form-row">
+            <mat-form-field
+              appearance="outline"
+              class="form-field"
+              *ngIf="shipmentForm.get('shipping_method')?.value && requiresCarrierName(shipmentForm.get('shipping_method')?.value)"
+            >
+              <mat-label>Transportista *</mat-label>
+              <input matInput formControlName="carrier_name" placeholder="Ej: Olva, Shalom" />
+              <mat-error *ngIf="shipmentForm.get('carrier_name')?.hasError('required')">
+                Transportista es requerido para este método
+              </mat-error>
+              <mat-error *ngIf="shipmentForm.get('carrier_name')?.hasError('minlength')">
+                Mínimo 2 caracteres
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>N° Seguimiento</mat-label>
+              <input matInput formControlName="tracking_number" placeholder="Ej: OLV-123456" />
+              <mat-error *ngIf="shipmentForm.get('tracking_number')?.hasError('minlength')">
+                Mínimo 5 caracteres
+              </mat-error>
+              <mat-error *ngIf="shipmentForm.get('tracking_number')?.hasError('maxlength')">
+                Máximo 50 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Row 3: Destination Address (conditional) -->
+          <div class="form-row">
+            <mat-form-field
+              appearance="outline"
+              class="form-field"
+              *ngIf="shipmentForm.get('shipping_method')?.value && requiresDestinationAddress(shipmentForm.get('shipping_method')?.value)"
+            >
+              <mat-label>Dirección Destino *</mat-label>
+              <textarea
+                matInput
+                formControlName="destination_address"
+                placeholder="Ej: Av. Principal 123, Lima, Perú"
+                rows="3"
+              ></textarea>
+              <mat-error *ngIf="shipmentForm.get('destination_address')?.hasError('required')">
+                Dirección es requerida para este método
+              </mat-error>
+              <mat-error *ngIf="shipmentForm.get('destination_address')?.hasError('minlength')">
+                Mínimo 5 caracteres
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Row 4: Recipient Info -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Nombre Destinatario</mat-label>
+              <input matInput formControlName="recipient_name" placeholder="Ej: Juan Pérez" />
+              <mat-error *ngIf="shipmentForm.get('recipient_name')?.hasError('required')">
+                Nombre es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Teléfono Destinatario</mat-label>
+              <input
+                matInput
+                formControlName="recipient_phone"
+                placeholder="Ej: 987654321"
+                type="tel"
+              />
+              <mat-error *ngIf="shipmentForm.get('recipient_phone')?.hasError('required')">
+                Teléfono es requerido
+              </mat-error>
+              <mat-error *ngIf="shipmentForm.get('recipient_phone')?.hasError('minlength')">
+                Mínimo 7 dígitos
+              </mat-error>
+              <mat-error *ngIf="shipmentForm.get('recipient_phone')?.hasError('pattern')">
+                Solo dígitos permitidos
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Row 5: Scheduled Date -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Fecha Programada</mat-label>
+              <input matInput type="date" formControlName="scheduled_date" />
+            </mat-form-field>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="creatingShipment">
+              <mat-icon>local_shipping</mat-icon>
+              Registrar Envío
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

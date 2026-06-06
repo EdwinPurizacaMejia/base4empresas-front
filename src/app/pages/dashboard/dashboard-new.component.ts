@@ -29,7 +29,7 @@ interface LowStockProduct {
 }
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-dashboard-new',
   standalone: true,
   imports: [
     CommonModule,
@@ -37,10 +37,10 @@ interface LowStockProduct {
     MatButtonModule,
     MatProgressSpinnerModule
   ],
-  templateUrl: './dashboard.component.html',
+  templateUrl: './dashboard-new.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardNewComponent implements OnInit, OnDestroy {
   // State
   loading = true;
   error = '';

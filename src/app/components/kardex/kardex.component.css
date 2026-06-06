@@ -61,6 +61,31 @@
   transition: all 0.2s ease;
 }
 
+/* Select */
+.form-select {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.helper-text {
+  margin-top: 8px;
+  color: #718096;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 .form-input:focus {
   outline: none;
   border-color: #3182ce;

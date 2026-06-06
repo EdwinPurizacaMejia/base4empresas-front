@@ -1,135 +1,392 @@
-<!-- Date Display - Elegante y discreto -->
-<div class="dashboard-date-header">
-  <div class="date-display">
-    <mat-icon class="calendar-icon">calendar_today</mat-icon>
-    <span class="date-text">{{ currentDate }}</span>
+<!-- Header sticky (moderno ERP) -->
+<header class="dash-header">
+  <div class="dash-header__left">
+    <div class="dash-title">
+      <div class="dash-title__text">Dashboard Comercial</div>
+      <div class="dash-title__meta">
+        <mat-icon class="dash-title__icon">calendar_today</mat-icon>
+        <span class="dash-title__date">{{ currentDate }}</span>
+      </div>
+    </div>
+
+    <!-- Rango -->
+    <div class="dash-range">
+      <mat-chip-listbox
+        aria-label="Rango de fechas"
+        [(ngModel)]="rangePreset"
+        (ngModelChange)="onPresetChange($event)"
+      >
+        <mat-chip-option value="today">Hoy</mat-chip-option>
+        <mat-chip-option value="7d">7 días</mat-chip-option>
+        <mat-chip-option value="30d">30 días</mat-chip-option>
+        <mat-chip-option value="month">Este mes</mat-chip-option>
+        <mat-chip-option value="custom">Personalizado</mat-chip-option>
+      </mat-chip-listbox>
+    </div>
   </div>
+
+  <div class="dash-header__right">
+    <!-- Search -->
+    <mat-form-field class="dash-search" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
+      <input
+        matInput
+        placeholder="Buscar en el sistema..."
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+      />
+      <button mat-icon-button matSuffix *ngIf="searchQuery" (click)="clearSearch()" aria-label="Limpiar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- Notificaciones -->
+    <button
+      mat-icon-button
+      class="dash-icon-btn"
+      matTooltip="Notificaciones"
+    >
+      <mat-icon [matBadge]="3" matBadgeColor="warn">notifications</mat-icon>
+    </button>
+
+    <!-- Usuario -->
+    <button mat-button [matMenuTriggerFor]="userMenu" class="dash-user">
+      <span class="dash-user__avatar">EP</span>
+      <span class="dash-user__name">Edwin</span>
+      <mat-icon class="dash-user__chev">expand_more</mat-icon>
+    </button>
+
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>person</mat-icon>
+        <span>Perfil</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>settings</mat-icon>
+        <span>Configuración</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item>
+        <mat-icon>logout</mat-icon>
+        <span>Salir</span>
+      </button>
+    </mat-menu>
+  </div>
+</header>
+
+<!-- Loading -->
+<div class="dash-loading" *ngIf="loading">
+  <mat-spinner diameter="42"></mat-spinner>
 </div>
 
-<!-- Loading Spinner -->
-<div class="loading-overlay" *ngIf="loading">
-  <mat-spinner diameter="50"></mat-spinner>
-</div>
-
-<!-- Error Message -->
-<div class="error-message" *ngIf="error && !loading">
+<!-- Error -->
+<div class="dash-error" *ngIf="error && !loading">
   <mat-icon>error</mat-icon>
-  <span>{{ error }}</span>
-  <button class="retry-btn" (click)="retry()">Reintentar</button>
+  <div class="dash-error__text">{{ error }}</div>
+  <button mat-stroked-button color="primary" (click)="retry()">Reintentar</button>
 </div>
 
-<!-- Dashboard Content -->
-<div class="dashboard-container" *ngIf="!loading">
-  <!-- KPI Cards Grid -->
-  <section class="kpi-section">
+<!-- Content -->
+<main class="dash" *ngIf="!loading">
+  <!-- KPIs -->
+  <section class="dash-section">
+    <div class="dash-section__title">Resumen</div>
+
     <div class="kpi-grid">
-      <div class="kpi-card" *ngFor="let card of kpiCards" [ngClass]="'kpi-' + card.color">
-        <div class="kpi-icon">
-          <mat-icon>{{ card.icon }}</mat-icon>
-        </div>
-        <div class="kpi-content">
-          <h3 class="kpi-title">{{ card.title }}</h3>
-          <p class="kpi-value">{{ card.value }}</p>
+      <article class="kpi-card" *ngFor="let card of kpiCards" [ngClass]="'kpi-' + card.color">
+        <div class="kpi-top">
+          <div class="kpi-icon">
+            <mat-icon>{{ card.icon }}</mat-icon>
+          </div>
+
           <div class="kpi-trend" *ngIf="card.trend !== undefined" [ngClass]="getTrendClass(card.trend)">
             <mat-icon class="trend-icon">{{ getTrendIcon(card.trend) }}</mat-icon>
-            <span class="trend-text">{{ card.trend > 0 ? '+' : '' }}{{ card.trend }}% vs mes anterior</span>
+            <span class="trend-text">{{ card.trend > 0 ? '+' : '' }}{{ card.trend }}%</span>
           </div>
         </div>
-      </div>
+
+        <div class="kpi-content">
+          <div class="kpi-title">{{ card.title }}</div>
+          <div class="kpi-value">{{ card.value }}</div>
+        </div>
+
+        <!-- Sparkline -->
+        <div class="kpi-spark" aria-label="Tendencia">
+          <div class="kpi-spark__canvas" *ngIf="card.sparkline?.length; else kpiSparkSkeleton">
+            <canvas
+              baseChart
+              [type]="'line'"
+              [data]="getKpiSparkData(card)"
+              [options]="kpiSparkOptions"
+            ></canvas>
+          </div>
+
+          <ng-template #kpiSparkSkeleton>
+            <div class="sparkline" aria-hidden="true"></div>
+          </ng-template>
+        </div>
+      </article>
     </div>
   </section>
 
-  <!-- Chart Section -->
-  <section class="chart-section">
-    <div class="chart-card">
-      <h2 class="chart-title">Ventas vs Compras (Últimos 6 meses)</h2>
-      <div class="chart-container">
-        <div class="simple-chart">
-          <div class="chart-bars">
-            <div class="bar-group" *ngFor="let label of monthlyChartLabels; let i = index">
-              <div class="bar-pair">
-                <div class="bar sales-bar" 
-                     [style.height.%]="getChartBarHeight(monthlySalesData[i])"
-                     [title]="'Ventas: S/ ' + monthlySalesData[i].toLocaleString('es-PE')">
-                </div>
-                <div class="bar purchases-bar" 
-                     [style.height.%]="getChartBarHeight(monthlyPurchasesData[i])"
-                     [title]="'Compras: S/ ' + monthlyPurchasesData[i].toLocaleString('es-PE')">
-                </div>
-              </div>
-              <span class="month-label">{{ label }}</span>
+  <!-- Fila 3: Charts principales -->
+  <section class="dash-grid-2">
+    <article class="card">
+      <div class="card-head">
+        <div class="card-title">Ventas vs Compras vs Utilidad</div>
+        <div class="card-sub">Últimos 6 meses</div>
+      </div>
+
+      <!-- IMPORTANTE: en SSR/Angular Universal el canvas no existe. -->
+      <div class="chart-wrap" *ngIf="isBrowser && mainComboChartData && mainComboChartOptions; else chartLoading">
+        <canvas baseChart [data]="mainComboChartData" [options]="mainComboChartOptions"></canvas>
+      </div>
+
+      <ng-template #chartLoading>
+        <div class="chart-skeleton"></div>
+      </ng-template>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <div class="card-title">Ventas por categoría</div>
+        <div class="card-sub">Participación</div>
+      </div>
+
+      <div class="chart-wrap" *ngIf="isBrowser && salesByCategoryData && salesByCategoryOptions; else donutLoading">
+        <canvas baseChart [type]="'doughnut'" [data]="salesByCategoryData" [options]="salesByCategoryOptions"></canvas>
+      </div>
+
+      <ng-template #donutLoading>
+        <div class="chart-skeleton"></div>
+      </ng-template>
+    </article>
+  </section>
+
+  <!-- Fila 4: Analíticas -->
+  <section class="dash-grid-2">
+    <article class="card">
+      <div class="card-head">
+        <div class="card-title">Top 10 productos más vendidos</div>
+        <div class="card-sub">Unidades vendidas</div>
+      </div>
+
+      <div class="chart-wrap chart-wrap--tall" *ngIf="isBrowser && topProductsData && topProductsOptions; else topLoading">
+        <canvas baseChart [type]="'bar'" [data]="topProductsData" [options]="topProductsOptions"></canvas>
+      </div>
+
+      <ng-template #topLoading>
+        <div class="chart-skeleton chart-skeleton--tall"></div>
+      </ng-template>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <div class="card-title">Stock bajo</div>
+        <div class="card-sub">Críticos por almacén</div>
+      </div>
+
+      <div class="low-stock" *ngIf="lowStockProducts.length; else lowStockEmpty">
+        <div class="low-stock__item" *ngFor="let p of lowStockProducts">
+          <div class="low-stock__left">
+            <div class="low-stock__name">{{ p.name }}</div>
+            <div class="low-stock__sku">{{ p.sku }}</div>
+          </div>
+
+          <div class="low-stock__right">
+            <div class="low-stock__qty">{{ p.current_stock }} / {{ p.min_stock }}</div>
+            <div class="low-stock__bar">
+              <div
+                class="low-stock__barFill"
+                [style.width.%]="Math.min(100, (p.current_stock / (p.min_stock || 1)) * 100)"
+                [ngClass]="{
+                  'bar-ok': p.current_stock > p.min_stock,
+                  'bar-warn': p.current_stock <= p.min_stock && p.current_stock > p.min_stock * 0.5,
+                  'bar-danger': p.current_stock <= p.min_stock * 0.5
+                }"
+              ></div>
             </div>
           </div>
-          <div class="chart-axis">
-            <div class="axis-label">S/ 0</div>
-            <div class="axis-label">S/ 35K</div>
-            <div class="axis-label">S/ 70K</div>
-          </div>
-        </div>
-        <!-- Legend centered below chart -->
-        <div class="chart-legend-bottom">
-          <div class="legend-item sales">
-            <span class="legend-color"></span>
-            <span class="legend-label">Ventas</span>
-          </div>
-          <div class="legend-item purchases">
-            <span class="legend-color"></span>
-            <span class="legend-label">Compras</span>
-          </div>
         </div>
       </div>
-    </div>
+
+      <ng-template #lowStockEmpty>
+        <div class="empty">
+          <mat-icon>inventory</mat-icon>
+          <div class="empty__title">Sin alertas de stock</div>
+          <div class="empty__sub">No se encontraron productos críticos.</div>
+        </div>
+      </ng-template>
+    </article>
   </section>
 
-  <!-- Lists Section -->
-  <div class="lists-grid">
-    <!-- Recent Purchases -->
-    <section class="list-card">
-      <h2 class="list-title">
-        <mat-icon>history</mat-icon>
-        Últimas Compras
-      </h2>
-      <div class="list-content">
-        <div *ngIf="recentPurchases.length === 0" class="empty-state">
+  <!-- Fila 5: Operaciones -->
+  <section class="dash-grid-2">
+    <article class="card">
+      <div class="card-head">
+        <div class="card-title">Últimas compras</div>
+        <div class="card-sub">Actividad reciente</div>
+      </div>
+
+      <div class="table" *ngIf="recentPurchases.length; else purchasesEmpty">
+        <div class="table__row table__head">
+          <div>Nro</div>
+          <div>Proveedor</div>
+          <div>Fecha</div>
+          <div class="text-right">Total</div>
+        </div>
+
+        <div class="table__row" *ngFor="let r of recentPurchases">
+          <div class="mono">{{ r.number }}</div>
+          <div class="muted">{{ r.supplier_id }}</div>
+          <div class="muted">{{ formatDate(r.created_at) }}</div>
+          <div class="text-right strong text-success">S/ {{ r.total.toFixed(2) }}</div>
+        </div>
+      </div>
+
+      <ng-template #purchasesEmpty>
+        <div class="empty">
           <mat-icon>shopping_cart</mat-icon>
-          <p>No hay compras recientes</p>
+          <div class="empty__title">Sin compras recientes</div>
+          <div class="empty__sub">Aún no hay registros para mostrar.</div>
         </div>
-        <div *ngIf="recentPurchases.length > 0" class="purchase-list">
-          <div class="purchase-item" *ngFor="let purchase of recentPurchases">
-            <div class="purchase-number">{{ purchase.number }}</div>
-            <div class="purchase-supplier">{{ purchase.supplier_id }}</div>
-            <div class="purchase-date">{{ formatDate(purchase.created_at) }}</div>
-            <div class="purchase-total">S/ {{ purchase.total.toFixed(2) }}</div>
-          </div>
-        </div>
-      </div>
-    </section>
+      </ng-template>
+    </article>
 
-    <!-- Low Stock Products -->
-    <section class="list-card">
-      <h2 class="list-title">
-        <mat-icon>warning</mat-icon>
-        Stock Bajo
-      </h2>
-      <div class="list-content">
-        <div *ngIf="lowStockProducts.length === 0" class="empty-state">
-          <mat-icon>check_circle</mat-icon>
-          <p>Sin problemas de stock</p>
+    <article class="card">
+      <div class="card-head">
+        <div class="card-title">Últimas ventas</div>
+        <div class="card-sub">Clientes y estado</div>
+      </div>
+
+      <div class="table" *ngIf="recentSales.length; else salesEmpty">
+        <div class="table__row table__head">
+          <div>Nro</div>
+          <div>Cliente</div>
+          <div>Fecha</div>
+          <div class="text-right">Total</div>
+          <div class="text-right">Estado</div>
         </div>
-        <div *ngIf="lowStockProducts.length > 0" class="product-list">
-          <div class="product-item" *ngFor="let product of lowStockProducts">
-            <div class="product-info">
-              <div class="product-name">{{ product.name }}</div>
-              <div class="product-sku">{{ product.sku }}</div>
-            </div>
-            <div class="product-stock-info">
-              <div class="stock-current">{{ product.current_stock }}</div>
-              <span class="stock-separator">/</span>
-              <div class="stock-minimum">{{ product.min_stock }}</div>
-            </div>
+
+        <div class="table__row" *ngFor="let r of recentSales">
+          <div class="mono">{{ r.number }}</div>
+          <div>{{ r.customer }}</div>
+          <div class="muted">{{ formatDate(r.created_at) }}</div>
+          <div class="text-right strong">S/ {{ r.total.toFixed(2) }}</div>
+          <div class="text-right">
+            <span class="badge" [ngClass]="{ 'badge-ok': r.status === 'Pagado', 'badge-warn': r.status === 'Pendiente', 'badge-danger': r.status === 'Cancelado' }">
+              {{ r.status }}
+            </span>
           </div>
         </div>
       </div>
-    </section>
-  </div>
-</div>
+
+      <ng-template #salesEmpty>
+        <div class="empty">
+          <mat-icon>receipt_long</mat-icon>
+          <div class="empty__title">Sin ventas recientes</div>
+          <div class="empty__sub">Aún no hay registros para mostrar.</div>
+        </div>
+      </ng-template>
+    </article>
+  </section>
+
+  <!-- Fila 6: Inventario y finanzas -->
+  <section class="dash-grid-2">
+    <article class="card">
+      <div class="card-head">
+        <div class="card-title">Rotación de inventario</div>
+        <div class="card-sub">Clasificación</div>
+      </div>
+
+      <div class="rotation">
+        <div class="rotation__item">
+          <div class="dot dot-success"></div>
+          <div class="rotation__label">Alta</div>
+          <div class="rotation__value">42%</div>
+        </div>
+        <div class="rotation__item">
+          <div class="dot dot-warning"></div>
+          <div class="rotation__label">Media</div>
+          <div class="rotation__value">38%</div>
+        </div>
+        <div class="rotation__item">
+          <div class="dot dot-danger"></div>
+          <div class="rotation__label">Baja</div>
+          <div class="rotation__value">20%</div>
+        </div>
+
+        <div class="rotation__hint">
+          Próximo paso: reemplazar por heatmap/radial chart según data real.
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-head">
+        <div class="card-title">Margen bruto por producto</div>
+        <div class="card-sub">%</div>
+      </div>
+
+      <div class="chart-wrap chart-wrap--tall" *ngIf="isBrowser && grossMarginByProductData && grossMarginByProductOptions; else marginLoading">
+        <canvas baseChart [type]="'bar'" [data]="grossMarginByProductData" [options]="grossMarginByProductOptions"></canvas>
+      </div>
+
+      <ng-template #marginLoading>
+        <div class="chart-skeleton chart-skeleton--tall"></div>
+      </ng-template>
+    </article>
+  </section>
+
+  <!-- Fila 7: Alertas inteligentes -->
+  <section class="dash-section">
+    <div class="dash-section__title">Alertas inteligentes</div>
+
+    <div class="alerts-grid">
+      <article class="alert-card alert-danger">
+        <div class="alert-card__icon"><mat-icon>inventory_2</mat-icon></div>
+        <div class="alert-card__body">
+          <div class="alert-card__title">Próximos a agotarse</div>
+          <div class="alert-card__sub">5 productos requieren reposición</div>
+        </div>
+        <div class="alert-card__meta">Alta</div>
+      </article>
+
+      <article class="alert-card alert-warning">
+        <div class="alert-card__icon"><mat-icon>hourglass_bottom</mat-icon></div>
+        <div class="alert-card__body">
+          <div class="alert-card__title">Sin movimiento</div>
+          <div class="alert-card__sub">12 productos sin rotación (30d)</div>
+        </div>
+        <div class="alert-card__meta">Media</div>
+      </article>
+
+      <article class="alert-card alert-success">
+        <div class="alert-card__icon"><mat-icon>emoji_events</mat-icon></div>
+        <div class="alert-card__body">
+          <div class="alert-card__title">Más rentables</div>
+          <div class="alert-card__sub">Top 3 con mayor margen</div>
+        </div>
+        <div class="alert-card__meta">Info</div>
+      </article>
+
+      <article class="alert-card alert-info">
+        <div class="alert-card__icon"><mat-icon>stacked_bar_chart</mat-icon></div>
+        <div class="alert-card__body">
+          <div class="alert-card__title">Exceso de stock</div>
+          <div class="alert-card__sub">8 productos sobre stock objetivo</div>
+        </div>
+        <div class="alert-card__meta">Media</div>
+      </article>
+
+      <article class="alert-card alert-primary">
+        <div class="alert-card__icon"><mat-icon>autorenew</mat-icon></div>
+        <div class="alert-card__body">
+          <div class="alert-card__title">Reposición sugerida</div>
+          <div class="alert-card__sub">Recomendación para 7 SKUs</div>
+        </div>
+        <div class="alert-card__meta">Info</div>
+      </article>
+    </div>
+  </section>
+</main>

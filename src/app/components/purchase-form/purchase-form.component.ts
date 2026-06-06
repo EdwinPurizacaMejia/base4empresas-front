@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Output, OnDestroy, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,13 +9,23 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { PurchaseService } from '../../services/purchase.service';
 import { PurchaseCreate } from '../../models/purchase.model';
 import { ConfirmationService } from '../../services/confirmation.service';
+import { SuppliersService } from '../../services/suppliers.service';
+import { Supplier } from '../../models/supplier.model';
+import { WarehouseService } from '../../services/warehouse.service';
+import { Warehouse } from '../../models/warehouse.model';
+import { ProductsService } from '../../services/products.service';
+import { Product } from '../../models/product.model';
+
+interface DialogData {
+  purchase?: any;
+}
 
 @Component({
   selector: 'app-purchase-form',
@@ -36,12 +46,18 @@ import { ConfirmationService } from '../../services/confirmation.service';
   templateUrl: './purchase-form.component.html',
   styleUrl: './purchase-form.component.css'
 })
-export class PurchaseFormComponent implements OnDestroy {
+export class PurchaseFormComponent implements OnInit, OnDestroy {
   @Output() purchaseCreated = new EventEmitter<void>();
   @Output() formClosed = new EventEmitter<void>();
 
   form: FormGroup;
   loading = false;
+  private editingPurchaseId: string | null = null;
+
+  suppliers: Supplier[] = [];
+  warehouses: Warehouse[] = [];
+  products: Product[] = [];
+
   private destroy$ = new Subject<void>();
 
   get items(): FormArray {
@@ -51,11 +67,24 @@ export class PurchaseFormComponent implements OnDestroy {
   constructor(
     private fb: FormBuilder,
     private purchaseService: PurchaseService,
+    private suppliersService: SuppliersService,
+    private warehouseService: WarehouseService,
+    private productsService: ProductsService,
     private snackBar: MatSnackBar,
     private confirmationService: ConfirmationService,
-    private dialogRef: MatDialogRef<PurchaseFormComponent>
+    private dialogRef: MatDialogRef<PurchaseFormComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData | null
   ) {
     this.form = this.createForm();
+  }
+
+  ngOnInit(): void {
+    this.loadCatalogs();
+
+    if (this.data?.purchase) {
+      this.editingPurchaseId = this.data.purchase?.id ?? null;
+      this.patchFormForEdit(this.data.purchase);
+    }
   }
 
   private createForm(): FormGroup {
@@ -63,10 +92,7 @@ export class PurchaseFormComponent implements OnDestroy {
       supplier_id: ['', [Validators.required]],
       warehouse_id: ['', [Validators.required]],
       notes: ['', [Validators.maxLength(500)]],
-      items: this.fb.array(
-        [this.createItemGroup()],
-        [Validators.required, Validators.minLength(1)]
-      )
+      items: this.fb.array([this.createItemGroup()])
     });
   }
 
@@ -241,6 +267,64 @@ export class PurchaseFormComponent implements OnDestroy {
       });
   }
 
+  private loadCatalogs(): void {
+    this.suppliersService
+      .getSuppliers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => (this.suppliers = data ?? []),
+        error: (err) => console.error('Error cargando proveedores', err),
+      });
+
+    this.warehouseService
+      .getWarehouses({ isActive: true })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => (this.warehouses = data ?? []),
+        error: (err) => console.error('Error cargando almacenes', err),
+      });
+
+    this.productsService
+      .getProducts({ isActive: true })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => (this.products = data ?? []),
+        error: (err) => console.error('Error cargando productos', err),
+      });
+  }
+
+  private patchFormForEdit(purchase: any): void {
+    const items = purchase?.items ?? [];
+
+    // reset items (y quitar el item inicial que se crea por defecto)
+    this.items.clear();
+    if (items.length > 0) {
+      items.forEach((it: any) => {
+        this.items.push(
+          this.fb.group({
+            product_id: [it?.product_id ?? it?.product?.id ?? '', [Validators.required]],
+            quantity: [
+              it?.quantity ?? 1,
+              [Validators.required, Validators.min(1)],
+            ],
+            unit_cost: [
+              it?.unit_cost ?? it?.unit_price ?? it?.price ?? 0,
+              [Validators.required, Validators.min(0.01)],
+            ],
+          }),
+        );
+      });
+    } else {
+      this.items.push(this.createItemGroup());
+    }
+
+    this.form.patchValue({
+      supplier_id: purchase?.supplier?.id ?? purchase?.supplier_id ?? '',
+      warehouse_id: purchase?.warehouse?.id ?? purchase?.warehouse_id ?? '',
+      notes: purchase?.notes ?? '',
+    });
+  }
+
   /**
    * Envía el formulario (API call)
    */
@@ -253,22 +337,26 @@ export class PurchaseFormComponent implements OnDestroy {
       notes: this.form.get('notes')?.value || null,
       items: this.items.value.map((item: any) => ({
         product_id: item.product_id,
-        quantity: parseInt(item.quantity) || 0,
-        unit_cost: parseFloat(item.unit_cost) || 0
-      }))
+        // Mantener precisión (y evitar issues con coma decimal en el input)
+        quantity: Number(item.quantity) || 0,
+        unit_cost: Number(item.unit_cost) || 0,
+      })),
     };
 
-    this.purchaseService.createPurchase(payload)
+    const request$ = this.editingPurchaseId
+      ? this.purchaseService.updatePurchase(this.editingPurchaseId, payload)
+      : this.purchaseService.createPurchase(payload);
+
+    request$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: any) => {
           this.loading = false;
-          this.form.reset();
-          this.items.clear();
-          this.items.push(this.createItemGroup());
 
           this.snackBar.open(
-            `✓ Compra registrada exitosamente. Total: $${response.total}`,
+            this.editingPurchaseId
+              ? `✓ Compra actualizada exitosamente. Total: $${response.total}`
+              : `✓ Compra registrada exitosamente. Total: $${response.total}`,
             'Cerrar',
             {
               duration: 4000,
@@ -286,7 +374,9 @@ export class PurchaseFormComponent implements OnDestroy {
         error: (err) => {
           this.loading = false;
           const errorMsg =
-            err.userMessage || err.error?.detail || 'Error al registrar la compra';
+            err.userMessage ||
+            err.error?.detail ||
+            (this.editingPurchaseId ? 'Error al actualizar la compra' : 'Error al registrar la compra');
 
           this.snackBar.open(errorMsg, 'Cerrar', {
             duration: 5000,

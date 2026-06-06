@@ -1,0 +1,116 @@
+<div class="container">
+  <div class="header">
+    <h1>Gestión de Clientes</h1>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="openCreateForm()"
+      [disabled]="loading"
+    >
+      <mat-icon>add</mat-icon>
+      Nuevo Cliente
+    </button>
+  </div>
+
+  <!-- Estado de carga -->
+  <app-loading-spinner *ngIf="loading" message="Cargando clientes..."></app-loading-spinner>
+
+  <!-- Estado de error -->
+  <app-error-state
+    *ngIf="error && !loading"
+    [message]="error"
+    (retry)="loadCustomers()"
+  ></app-error-state>
+
+  <!-- Estado vacío -->
+  <app-empty-state
+    *ngIf="!loading && !error && customers.length === 0"
+    title="Sin clientes registrados"
+    message="No hay clientes. Crea uno nuevo para comenzar."
+    icon="people"
+  ></app-empty-state>
+
+  <!-- Tabla de clientes -->
+  <div class="table-container" *ngIf="!loading && !error && customers.length > 0">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+      <!-- Columna: Tipo de Documento -->
+      <ng-container matColumnDef="document_type">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let element">
+          <span class="document-type">{{ getDocumentLabel(element.document_type) }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Columna: Número de Documento -->
+      <ng-container matColumnDef="document_number">
+        <th mat-header-cell *matHeaderCellDef>Documento</th>
+        <td mat-cell *matCellDef="let element">
+          <strong>{{ element.document_number }}</strong>
+        </td>
+      </ng-container>
+
+      <!-- Columna: Nombre -->
+      <ng-container matColumnDef="full_name">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.full_name || element.business_name || '-' }}
+        </td>
+      </ng-container>
+
+      <!-- Columna: Email -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.email || '-' }}
+        </td>
+      </ng-container>
+
+      <!-- Columna: Validación -->
+      <ng-container matColumnDef="validated">
+        <th mat-header-cell *matHeaderCellDef>Validación</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-chip
+            [ngClass]="getValidationColor(element.validated)"
+            [matTooltip]="'Validado por: ' + (element.validation_source || 'N/A')"
+          >
+            <mat-icon *ngIf="element.validated">check_circle</mat-icon>
+            <mat-icon *ngIf="!element.validated">cancel</mat-icon>
+            {{ getValidationLabel(element.validated) }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <!-- Columna: Creado -->
+      <ng-container matColumnDef="created_at">
+        <th mat-header-cell *matHeaderCellDef>Creado</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.created_at | date: 'short' }}
+        </td>
+      </ng-container>
+
+      <!-- Columna: Acciones -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            mat-icon-button
+            color="primary"
+            (click)="openEditForm(element)"
+            matTooltip="Editar cliente"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- Paginación -->
+    <mat-paginator
+      [pageSizeOptions]="pageSizeOptions"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+</div>

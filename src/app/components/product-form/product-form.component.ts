@@ -14,16 +14,9 @@ import { takeUntil } from 'rxjs/operators';
 
 import { ProductsService } from '../../services/products.service';
 import { ConfirmationService } from '../../services/confirmation.service';
+import { CategoriesService, CategoryDto } from '../../services/categories.service';
+import { UnitsService, UnitDto } from '../../services/units.service';
 
-interface Category {
-  id: number | string;
-  name: string;
-}
-
-interface Unit {
-  id: number | string;
-  name: string;
-}
 
 interface DialogData {
   product?: any;
@@ -50,14 +43,17 @@ interface DialogData {
 export class ProductFormComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;
   loading = false;
-  categories: Category[] = [];
-  units: Unit[] = [];
+  categories: CategoryDto[] = [];
+  units: UnitDto[] = [];
+  private editingProductId: string | null = null;
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private productsService: ProductsService,
+    private categoriesService: CategoriesService,
+    private unitsService: UnitsService,
     private confirmationService: ConfirmationService,
     private snackBar: MatSnackBar,
     private dialogRef: MatDialogRef<ProductFormComponent>,
@@ -68,6 +64,11 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCategoriesAndUnits();
+
+    if (this.data?.product) {
+      this.editingProductId = this.data.product?.id ?? null;
+      this.patchFormForEdit(this.data.product);
+    }
   }
 
   ngOnDestroy(): void {
@@ -96,20 +97,55 @@ export class ProductFormComponent implements OnInit, OnDestroy {
    * Carga categorías y unidades desde los servicios
    */
   private loadCategoriesAndUnits(): void {
-    this.categories = [
-      { id: 1, name: 'Electrónica' },
-      { id: 2, name: 'Muebles' },
-      { id: 3, name: 'Software' },
-      { id: 4, name: 'Otros' }
-    ];
+    this.categoriesService
+      .listCategories()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (categories) => {
+          this.categories = categories ?? [];
+        },
+        error: () => {
+          this.snackBar.open('No se pudieron cargar las categorías', 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
+        }
+      });
 
-    this.units = [
-      { id: 1, name: 'Unidad (pcs)' },
-      { id: 2, name: 'Caja' },
-      { id: 3, name: 'Paquete' },
-      { id: 4, name: 'Kilogramo (kg)' },
-      { id: 5, name: 'Litro (L)' }
-    ];
+    this.unitsService
+      .listUnits()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (units) => {
+          this.units = units ?? [];
+        },
+        error: () => {
+          this.snackBar.open('No se pudieron cargar las unidades', 'Cerrar', {
+            duration: 4000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+            panelClass: ['snackbar-error']
+          });
+        }
+      });
+  }
+
+  private patchFormForEdit(product: any): void {
+    // El API del listado devuelve category y unit como objetos
+    // pero el formulario trabaja con category_id y unit_id.
+    this.productForm.patchValue({
+      sku: product?.sku ?? '',
+      name: product?.name ?? '',
+      category_id: product?.category?.id ?? product?.category_id ?? '',
+      unit_id: product?.unit?.id ?? product?.unit_id ?? '',
+      sale_price: product?.sale_price ?? 0,
+      purchase_price: product?.purchase_price ?? 0,
+      min_stock: product?.min_stock ?? 0,
+      is_active: product?.is_active ?? true,
+      description: product?.description ?? ''
+    });
   }
 
   /**
@@ -129,22 +165,30 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     this.loading = true;
     const formData = this.productForm.value;
 
-    this.productsService.createProduct(formData)
+    const request$ = this.editingProductId
+      ? this.productsService.updateProduct(this.editingProductId, formData)
+      : this.productsService.createProduct(formData);
+
+    request$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.snackBar.open('✓ Producto creado exitosamente', 'Cerrar', {
-            duration: 3000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top',
-            panelClass: ['snackbar-success']
-          });
+          this.snackBar.open(
+            this.editingProductId ? '✓ Producto actualizado exitosamente' : '✓ Producto creado exitosamente',
+            'Cerrar',
+            {
+              duration: 3000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top',
+              panelClass: ['snackbar-success']
+            }
+          );
           this.loading = false;
           this.dialogRef.close(true);
         },
         error: (err: any) => {
           this.loading = false;
-          const errorMsg = err.error?.detail || 'Error al crear el producto';
+          const errorMsg = err.error?.detail || (this.editingProductId ? 'Error al actualizar el producto' : 'Error al crear el producto');
           this.snackBar.open(errorMsg, 'Cerrar', {
             duration: 4000,
             horizontalPosition: 'end',

@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="dialog-title">
-  Nueva Compra
+  {{ data?.purchase ? 'Editar Compra' : 'Nueva Compra' }}
   <button
     mat-icon-button
     (click)="onCancel()"
@@ -30,9 +30,9 @@
             [attr.aria-invalid]="hasError('supplier_id')"
           >
             <option value="">-- Seleccionar --</option>
-            <option value="1">Proveedor A</option>
-            <option value="2">Proveedor B</option>
-            <option value="3">Proveedor C</option>
+            <option *ngFor="let s of suppliers" [value]="s.id">
+              {{ s.business_name || s.full_name || s.id }}
+            </option>
           </select>
         </div>
         <div class="native-select-error" *ngIf="hasError('supplier_id')">
@@ -52,8 +52,9 @@
             [attr.aria-invalid]="hasError('warehouse_id')"
           >
             <option value="">-- Seleccionar --</option>
-            <option value="1">Almacén Central</option>
-            <option value="2">Almacén Secundario</option>
+            <option *ngFor="let w of warehouses" [value]="w.id">
+              {{ w.name }}
+            </option>
           </select>
         </div>
         <div class="native-select-error" *ngIf="hasError('warehouse_id')">
@@ -83,7 +84,7 @@
     </div>
 
     <!-- Items Section -->
-    <div class="items-section">
+    <div class="items-section" formArrayName="items">
       <div class="section-header">
         <h3>Items de Compra</h3>
         <button
@@ -116,9 +117,9 @@
                 [attr.aria-invalid]="hasItemError(i, 'product_id')"
               >
                 <option value="">-- Seleccionar --</option>
-                <option value="1">Producto 1</option>
-                <option value="2">Producto 2</option>
-                <option value="3">Producto 3</option>
+                <option *ngFor="let p of products" [value]="p.id">
+                  {{ p.name || p.description || p.sku || p.id }}
+                </option>
               </select>
             </div>
             <div class="native-select-error" *ngIf="hasItemError(i, 'product_id')">

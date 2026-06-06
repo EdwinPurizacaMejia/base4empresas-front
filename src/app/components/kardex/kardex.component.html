@@ -10,33 +10,86 @@
   <!-- Search Section -->
   <div class="search-section">
     <div class="search-form">
+      <!-- Producto (búsqueda + select) -->
       <div class="form-group">
-        <label for="product-id">ID del Producto:</label>
+        <label for="product-search">Producto:</label>
         <input
-          id="product-id"
+          id="product-search"
           type="text"
-          [(ngModel)]="productId"
-          placeholder="Ej: 550e8400-e29b-41d4-a716-446655440000"
+          [(ngModel)]="productSearch"
+          (ngModelChange)="onProductSearchChange($event)"
+          placeholder="Busca por nombre o SKU..."
           class="form-input"
-          (keypress)="onKeyPress($event)"
+          [disabled]="loadingProducts"
         />
+
+        <select
+          class="form-select"
+          [ngModel]="selectedProductId"
+          (ngModelChange)="onSelectProduct($event)"
+          [disabled]="loadingProducts || filteredProducts.length === 0"
+        >
+          <option value="" disabled>Selecciona un producto</option>
+          <option *ngFor="let p of filteredProducts" [value]="p.id">
+            {{ p.name }} <span *ngIf="p.sku">({{ p.sku }})</span>
+          </option>
+        </select>
+        <small class="helper-text" *ngIf="loadingProducts">Cargando productos...</small>
       </div>
 
+      <!-- Almacén (select sin búsqueda) -->
       <div class="form-group">
-        <label for="warehouse-id">ID del Almacén:</label>
-        <input
-          id="warehouse-id"
-          type="text"
-          [(ngModel)]="warehouseId"
-          placeholder="Ej: warehouse-001"
-          class="form-input"
-          (keypress)="onKeyPress($event)"
-        />
+        <label for="warehouse-select">Almacén:</label>
+        <select
+          id="warehouse-select"
+          class="form-select"
+          [ngModel]="selectedWarehouseId"
+          (ngModelChange)="onSelectWarehouse($event)"
+          [disabled]="loadingWarehouses || warehouses.length === 0"
+        >
+          <option value="" disabled>Selecciona un almacén</option>
+          <option *ngFor="let w of warehouses" [value]="w.id">
+            {{ w.name }} <span *ngIf="w.code">({{ w.code }})</span>
+          </option>
+        </select>
+
+        <small class="helper-text" *ngIf="loadingWarehouses">Cargando almacenes...</small>
+        <small class="helper-text" *ngIf="!loadingWarehouses && warehouses.length === 0">
+          No se encontraron almacenes.
+        </small>
       </div>
 
       <button class="btn-search" (click)="loadKardex()" [disabled]="loading">
         {{ loading ? 'Cargando...' : '🔍 Consultar Kardex' }}
       </button>
+    </div>
+
+    <!-- Valorización a fecha -->
+    <div class="search-form" style="margin-top: 12px;">
+      <div class="form-group">
+        <label for="valuation-at">Valorización a fecha:</label>
+        <input
+          id="valuation-at"
+          type="datetime-local"
+          [(ngModel)]="valuationAt"
+          class="form-input"
+          [disabled]="valuationLoading"
+        />
+        <small class="helper-text">
+          Selecciona fecha y hora (se enviará en ISO al backend).
+        </small>
+      </div>
+
+      <button class="btn-search" (click)="onValuationAtDate()" [disabled]="valuationLoading || loading">
+        {{ valuationLoading ? 'Valorizando...' : '💰 Valorar' }}
+      </button>
+
+      <div *ngIf="valuationResult" class="alert" style="margin-top: 10px; border-color: #c8e6c9; background: #e8f5e9;">
+        <strong>Resultado:</strong>
+        Qty: {{ valuationResult.quantity_on_hand }} |
+        Valor: {{ valuationResult.stock_value }} |
+        Costo Prom.: {{ valuationResult.avg_unit_cost }}
+      </div>
     </div>
   </div>
 
@@ -85,48 +138,65 @@
       <thead>
         <tr>
           <th>Fecha</th>
-          <th>Tipo</th>
+          <th>Producto</th>
           <th>Motivo</th>
-          <th>Referencia</th>
+          <th>Ref</th>
+          <th>Tipo</th>
           <th>Cantidad</th>
-          <th>Costo Unitario</th>
-          <th>Total</th>
-          <th>Nota</th>
+          <th>Costo Unit.</th>
+          <th>Valor Línea</th>
+          <th>Saldo Qty</th>
+          <th>Saldo Valor</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let movement of movements" class="table-row" [ngClass]="'type-' + movement.movement_type">
+        <tr *ngFor="let movement of movements" class="table-row">
           <td class="cell-date">
             {{ formatDate(movement.created_at) }}
           </td>
-          <td class="cell-type">
-            <span class="badge" [ngClass]="'badge-' + movement.movement_type">
-              {{ getMovementTypeLabel(movement.movement_type) }}
-            </span>
+
+          <td class="cell-product">
+            <div *ngIf="movement.product_name">
+              <strong>{{ movement.product_name }}</strong>
+              <small *ngIf="movement.product_sku" style="display: block; color: #666;">
+                SKU: {{ movement.product_sku }}
+              </small>
+            </div>
+            <code *ngIf="!movement.product_name" style="font-size: 0.75rem;">
+              {{ movement.product_id.substring(0, 8) }}...
+            </code>
           </td>
+
           <td class="cell-reason">
             {{ getReasonLabel(movement.reason) }}
           </td>
+
           <td class="cell-reference">
-            <code>{{ movement.reference_id.substring(0, 8) }}...</code>
+            <code *ngIf="movement.reference_id">{{ movement.reference_id.substring(0, 8) }}...</code>
+            <span *ngIf="!movement.reference_id">-</span>
           </td>
+
           <td class="cell-quantity">
-            <span class="quantity" [ngClass]="'qty-' + movement.movement_type">
-              {{ movement.movement_type === 'IN' ? '+' : '-' }}{{ movement.quantity }}
-            </span>
+            {{ getMovementTypeLabel(movement.movement_type) }}
           </td>
+
+          <td class="cell-quantity">
+            {{ movement.quantity }}
+          </td>
+
           <td class="cell-unit-cost">
             {{ movement.unit_cost | number: '1.2-2' }}
           </td>
+
           <td class="cell-total">
-            <span class="total-value" [ngClass]="'total-' + movement.movement_type">
-              {{ (movement.quantity * movement.unit_cost) | number: '1.2-2' }}
-            </span>
+            {{ movement.line_value | number: '1.2-2' }}
           </td>
-          <td class="cell-note">
-            <span class="note-text" [title]="movement.note">
-              {{ movement.note }}
-            </span>
+
+          <td class="cell-quantity">
+            {{ movement.running_qty }}
+          </td>
+          <td class="cell-total">
+            {{ movement.running_value | number: '1.2-2' }}
           </td>
         </tr>
       </tbody>

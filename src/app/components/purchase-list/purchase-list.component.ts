@@ -21,6 +21,8 @@ import { PurchaseService } from '../../services/purchase.service';
 import { SearchService } from '../../services/search.service';
 import { NotificationService } from '../../services/notification.service';
 import { PurchaseFormComponent } from '../purchase-form/purchase-form.component';
+import { SuppliersService } from '../../services/suppliers.service';
+import { Supplier } from '../../models/supplier.model';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { EmptyStateComponent } from '../shared/empty-state.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
@@ -51,6 +53,7 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
   purchases: PurchaseListItem[] = [];
   private allPurchases: PurchaseListItem[] = [];
   dataSource = new MatTableDataSource<PurchaseListItem>([]);
+  private suppliersById = new Map<string, Supplier>();
   displayedColumns = [
     'number',
     'created_at',
@@ -67,6 +70,7 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private purchaseService: PurchaseService,
+    private suppliersService: SuppliersService,
     private searchService: SearchService,
     private notificationService: NotificationService,
     private router: Router,
@@ -74,6 +78,7 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.loadSuppliers();
     this.loadPurchases();
 
     // Suscribirse al buscador global
@@ -91,6 +96,30 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private loadSuppliers(): void {
+    this.suppliersService.getSuppliers().subscribe({
+      next: (suppliers) => {
+        this.suppliersById = new Map((suppliers ?? []).map((s) => [s.id, s]));
+      },
+      error: (err) => {
+        console.error(err);
+        // No bloquea la pantalla si proveedores falla; solo caerá a mostrar el ID.
+      },
+    });
+  }
+
+  getSupplierName(purchase: PurchaseListItem): string {
+    return (
+      purchase.supplier?.business_name ??
+      this.suppliersById.get(purchase.supplier_id)?.business_name ??
+      purchase.supplier_id
+    );
+  }
+
+  getPurchaseDate(purchase: PurchaseListItem): string | null {
+    return purchase.purchase_date ?? purchase.created_at ?? null;
   }
 
   loadPurchases(): void {
@@ -200,12 +229,42 @@ export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onViewPurchase(purchase: PurchaseListItem): void {
-    this.router.navigate(['/purchases', purchase.id]);
+    this.router.navigate(['/compras', purchase.id]);
   }
 
   onEditPurchase(purchase: PurchaseListItem): void {
-    console.log('Editar compra:', purchase);
-    // TODO: Implementar edición en modal
+    // Importante: el listado no trae items. Para editar necesitamos el detalle.
+    this.purchaseService.getPurchaseById(purchase.id).subscribe({
+      next: (detail) => {
+        const dialogRef = this.dialog.open(PurchaseFormComponent, {
+          width: '760px',
+          minWidth: '300px',
+          maxWidth: '95vw',
+          height: 'auto',
+          minHeight: '400px',
+          maxHeight: '95vh',
+          disableClose: true,
+          autoFocus: false,
+          restoreFocus: false,
+          panelClass: 'crm-dialog-panel',
+          backdropClass: 'crm-dialog-backdrop',
+          data: { purchase: detail },
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result === true) {
+            this.notificationService.success('Compra actualizada exitosamente');
+            this.loadPurchases();
+          }
+        });
+      },
+      error: (err) => {
+        console.error(err);
+        this.notificationService.error(
+          err.userMessage || 'No se pudo cargar el detalle de la compra para editar.',
+        );
+      },
+    });
   }
 
   onDeletePurchase(purchase: PurchaseListItem): void {

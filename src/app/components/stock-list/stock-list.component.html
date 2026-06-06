@@ -12,16 +12,26 @@
   </div>
 
   <div class="warehouse-card">
-    <label for="warehouse-id">Almacén ID</label>
+    <label for="warehouse-select">Almacén</label>
     <div class="warehouse-control">
       <mat-icon>warehouse</mat-icon>
-      <input
-        id="warehouse-id"
-        type="text"
-        [(ngModel)]="warehouseId"
-        placeholder="Ej: warehouse-001, 550e8400..."
-        (keypress)="onKeyPress($event)"
-      />
+      <select
+        id="warehouse-select"
+        class="warehouse-select"
+        [ngModel]="warehouseId"
+        (ngModelChange)="onSelectWarehouse($event)"
+        [disabled]="loadingWarehouses || warehouses.length === 0"
+      >
+        <option value="" disabled>Selecciona un almacén</option>
+        <option *ngFor="let w of warehouses" [value]="w.id">
+          {{ w.name }} <span *ngIf="w.code">({{ w.code }})</span>
+        </option>
+      </select>
+    </div>
+
+    <div class="warehouse-helper">
+      <small *ngIf="loadingWarehouses">Cargando almacenes...</small>
+      <small *ngIf="!loadingWarehouses && warehouses.length === 0">No se encontraron almacenes.</small>
     </div>
   </div>
 
@@ -40,8 +50,8 @@
   <div *ngIf="initialLoad && !loading && !error" class="empty-state">
     <mat-icon>warehouse</mat-icon>
     <h3>Selecciona un almacén</h3>
-    <p>Ingresa un ID de almacén y carga los datos de inventario.</p>
-    <button mat-raised-button color="primary" (click)="loadStock()">Cargar inventario</button>
+    <p>Selecciona un almacén para cargar los datos de inventario.</p>
+    <button mat-raised-button color="primary" (click)="loadStock()" [disabled]="!warehouseId">Cargar inventario</button>
   </div>
 
   <div *ngIf="!loading && !error && stocks.length === 0 && !initialLoad" class="empty-state">

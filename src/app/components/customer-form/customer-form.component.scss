@@ -1,0 +1,64 @@
+.form-section {
+  margin-bottom: 24px;
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #666;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.document-input {
+  flex: 1;
+}
+
+.validate-btn {
+  white-space: nowrap;
+  height: 56px;
+}
+
+mat-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.validation-status {
+  margin-bottom: 16px;
+
+  .validation-chip {
+    background-color: #4caf50 !important;
+    color: white;
+  }
+}
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.accent {
+  background-color: #3f51b5;
+  color: white;
+}

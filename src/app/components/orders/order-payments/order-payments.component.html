@@ -1,0 +1,206 @@
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h2>Pagos</h2>
+    <div class="summary">
+      <span class="summary-item">
+        <strong>Total Orden:</strong> {{ orderTotalAmount | currency }}
+      </span>
+      <span class="summary-item">
+        <strong>Pagado:</strong>
+        <span class="paid">{{ getTotalPaid() | currency }}</span>
+      </span>
+      <span class="summary-item" [class.pending]="getBalancePending() > 0">
+        <strong>Pendiente:</strong>
+        <span class="balance">{{ getBalancePending() | currency }}</span>
+      </span>
+    </div>
+  </div>
+
+  <app-loading-spinner *ngIf="loading" message="Cargando pagos..."></app-loading-spinner>
+
+  <div *ngIf="!loading" class="content">
+    <!-- Tabla de Pagos -->
+    <mat-card class="payments-card">
+      <mat-card-header>
+        <mat-card-title>Histórico de Pagos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="payments" class="payments-table" *ngIf="payments.length > 0">
+            <!-- Método -->
+            <ng-container matColumnDef="method">
+              <th mat-header-cell *matHeaderCellDef>Método</th>
+              <td mat-cell *matCellDef="let payment">
+                {{ getPaymentMethodLabel(payment.method) }}
+              </td>
+            </ng-container>
+
+            <!-- Monto -->
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef>Monto</th>
+              <td mat-cell *matCellDef="let payment">
+                {{ payment.amount | currency }}
+              </td>
+            </ng-container>
+
+            <!-- Moneda -->
+            <ng-container matColumnDef="currency">
+              <th mat-header-cell *matHeaderCellDef>Moneda</th>
+              <td mat-cell *matCellDef="let payment">
+                {{ payment.currency }}
+              </td>
+            </ng-container>
+
+            <!-- Estado -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let payment">
+                <mat-chip [color]="getPaymentStatusColor(payment.status)" selected>
+                  {{ getPaymentStatusLabel(payment.status) }}
+                </mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- N° Operación -->
+            <ng-container matColumnDef="operation_number">
+              <th mat-header-cell *matHeaderCellDef>N° Operación</th>
+              <td mat-cell *matCellDef="let payment">
+                <code *ngIf="payment.operation_number">{{ payment.operation_number }}</code>
+                <span *ngIf="!payment.operation_number" class="empty">-</span>
+              </td>
+            </ng-container>
+
+            <!-- Validado Por -->
+            <ng-container matColumnDef="validated_by">
+              <th mat-header-cell *matHeaderCellDef>Validado Por</th>
+              <td mat-cell *matCellDef="let payment">
+                <span *ngIf="payment.validated_by">{{ payment.validated_by }}</span>
+                <span *ngIf="!payment.validated_by" class="empty">-</span>
+              </td>
+            </ng-container>
+
+            <!-- Fecha Pago -->
+            <ng-container matColumnDef="paid_at">
+              <th mat-header-cell *matHeaderCellDef>Fecha Pago</th>
+              <td mat-cell *matCellDef="let payment">
+                {{ payment.paid_at | date: 'short' }}
+              </td>
+            </ng-container>
+
+            <!-- Acciones -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let payment">
+                <div class="actions" *ngIf="canValidate(payment)">
+                  <button
+                    mat-icon-button
+                    color="accent"
+                    (click)="validatePayment(payment)"
+                    [disabled]="validatingPayment"
+                    matTooltip="Validar pago"
+                  >
+                    <mat-icon>check_circle</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="rejectPayment(payment)"
+                    [disabled]="validatingPayment"
+                    matTooltip="Rechazar pago"
+                  >
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <div class="empty-state" *ngIf="payments.length === 0">
+            <mat-icon>receipt</mat-icon>
+            <p>No hay pagos registrados</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Formulario Crear Pago -->
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>Registrar Nuevo Pago</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="paymentForm" (ngSubmit)="onSubmitPayment()" class="payment-form">
+          <!-- Row 1: Method, Amount -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Método de Pago</mat-label>
+              <mat-select formControlName="method">
+                <mat-option value="">-- Seleccionar --</mat-option>
+                <mat-option *ngFor="let method of getAvailableMethods()" [value]="method">
+                  {{ getPaymentMethodLabel(method) }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="paymentForm.get('method')?.hasError('required')">
+                Método es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Monto</mat-label>
+              <input matInput type="number" formControlName="amount" step="0.01" min="0" />
+              <mat-error *ngIf="paymentForm.get('amount')?.hasError('required')">
+                Monto es requerido
+              </mat-error>
+              <mat-error *ngIf="paymentForm.get('amount')?.hasError('min')">
+                Monto debe ser mayor a 0
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Row 2: Currency, Operation Number -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Moneda</mat-label>
+              <mat-select formControlName="currency">
+                <mat-option value="PEN">PEN</mat-option>
+                <mat-option value="USD">USD</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+              class="form-field"
+              *ngIf="paymentForm.get('method')?.value && requiresOperationNumber(paymentForm.get('method')?.value)"
+            >
+              <mat-label>N° Operación *</mat-label>
+              <input matInput formControlName="operation_number" placeholder="Ej: YP-123456" />
+              <mat-error *ngIf="paymentForm.get('operation_number')?.hasError('required')">
+                N° de operación es requerido para este método
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Row 3: Date -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Fecha de Pago</mat-label>
+              <input matInput type="date" formControlName="paid_at" />
+            </mat-form-field>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="creatingPayment">
+              <mat-icon>add</mat-icon>
+              Registrar Pago
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

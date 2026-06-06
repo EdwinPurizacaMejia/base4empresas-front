@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { SearchService } from '../../services/search.service';
+import { MainMenuComponent } from '../main-menu.component';
 
 @Component({
   selector: 'app-horizontal-layout',
@@ -20,7 +21,8 @@ import { SearchService } from '../../services/search.service';
     MatIconModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MainMenuComponent,
   ],
   templateUrl: './horizontal-layout.component.html',
   styleUrls: ['./horizontal-layout.component.scss']
@@ -29,7 +31,7 @@ export class HorizontalLayoutComponent {
   searchTerm: string = '';
 
   constructor(private searchService: SearchService) {
-    console.log('🎨 HorizontalLayoutComponent inicializado');
+    console.log('🎨 HorizontalLayoutComponent inicializado con nuevo menú jerárquico');
   }
 
   /**

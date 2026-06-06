@@ -11,8 +11,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
 import { Stock } from '../../models/stock.model';
 import { StockService } from '../../services/stock.service';
+import { InventoryStockCurrentItem } from '../../models/inventory.model';
 import { SearchService } from '../../services/search.service';
 import { NotificationService } from '../../services/notification.service';
+import { Warehouse } from '../../models/warehouse.model';
+import { WarehouseService } from '../../services/warehouse.service';
 
 type StockStatus = 'ok' | 'warning' | 'critical';
 
@@ -44,8 +47,10 @@ export class StockListComponent implements OnInit, AfterViewInit, OnDestroy {
   private allStocks: StockWithStatus[] = []; // Copia de todos los stocks sin filtrar
   dataSource = new MatTableDataSource<StockWithStatus>([]);
   displayedColumns = ['sku', 'name', 'stock', 'min_stock', 'status', 'actions'];
+  warehouses: Warehouse[] = [];
   warehouseId = '';
   loading = false;
+  loadingWarehouses = false;
   error: string | null = null;
   initialLoad = true;
   private destroy$ = new Subject<void>();
@@ -55,17 +60,12 @@ export class StockListComponent implements OnInit, AfterViewInit, OnDestroy {
     private stockService: StockService,
     private searchService: SearchService,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private warehouseService: WarehouseService
   ) {}
 
   ngOnInit(): void {
-    // Cargar warehouse por defecto si lo hay
-    if (typeof localStorage !== 'undefined') {
-      this.warehouseId = localStorage.getItem('lastWarehouseId') || '';
-      if (this.warehouseId) {
-        this.loadStock();
-      }
-    }
+    this.loadWarehouses();
 
     // Suscribirse al buscador global
     this.searchService.searchTerm$Debounced
@@ -82,6 +82,45 @@ export class StockListComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  loadWarehouses(): void {
+    this.loadingWarehouses = true;
+
+    this.warehouseService.getWarehouses().subscribe({
+      next: (data) => {
+        this.warehouses = (data || []).filter(w => w.is_active);
+        this.loadingWarehouses = false;
+
+        // Cargar warehouse por defecto si lo hay
+        if (typeof localStorage !== 'undefined') {
+          const last = localStorage.getItem('lastWarehouseId') || '';
+          if (last && this.warehouses.some(w => w.id === last)) {
+            this.warehouseId = last;
+            this.loadStock();
+          }
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.loadingWarehouses = false;
+        this.warehouses = [];
+        this.error = 'No se pudo cargar la lista de almacenes.';
+        this.notificationService.error(this.error);
+      }
+    });
+  }
+
+  onSelectWarehouse(warehouseId: string): void {
+    this.warehouseId = warehouseId;
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('lastWarehouseId', warehouseId);
+    }
+
+    if (warehouseId) {
+      this.loadStock();
+    }
   }
 
   loadStock(): void {
@@ -102,9 +141,19 @@ export class StockListComponent implements OnInit, AfterViewInit, OnDestroy {
       localStorage.setItem('lastWarehouseId', this.warehouseId);
     }
 
-    this.stockService.getStock(this.warehouseId).subscribe({
+    this.stockService.getStockCurrent(this.warehouseId).subscribe({
       next: (data) => {
-        const enrichedData = data.map(stock => ({
+        // Mapeo mínimo para mantener la UI existente (Stock legacy)
+        const mapped: Stock[] = (data || []).map((i: InventoryStockCurrentItem) => ({
+          product_id: i.product_id,
+          warehouse_id: i.warehouse_id,
+          // Ahora el endpoint /inventory/stock/current ya devuelve sku/name.
+          sku: i.sku || '',
+          name: i.name || '',
+          stock: Number(i.quantity_on_hand) || 0,
+          min_stock: 0
+        }));
+        const enrichedData = mapped.map(stock => ({
           ...stock,
           status: this.getStockStatus(stock.stock, stock.min_stock),
           percentage: this.getStockPercentage(stock.stock, stock.min_stock)
@@ -196,4 +245,3 @@ export class StockListComponent implements OnInit, AfterViewInit, OnDestroy {
     return labels[status];
   }
 }
-

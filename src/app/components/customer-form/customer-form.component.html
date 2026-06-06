@@ -1,0 +1,140 @@
+<h2 mat-dialog-title>{{ titleText }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <div class="form-section">
+      <h3>Identificación</h3>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Tipo de Documento</mat-label>
+          <mat-select formControlName="document_type" [disabled]="isEditMode">
+            <mat-option *ngFor="let type of documentTypes" [value]="type">
+              {{ getDocumentTypeLabel(type) }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('document_type')?.hasError('required')">
+            Selecciona un tipo de documento
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="document-input">
+          <mat-label>Número de Documento</mat-label>
+          <input
+            matInput
+            formControlName="document_number"
+            placeholder="p.ej. 12345678"
+            [disabled]="isEditMode"
+          />
+          <mat-error *ngIf="form.get('document_number')?.hasError('required')">
+            El número de documento es requerido
+          </mat-error>
+          <mat-error *ngIf="form.get('document_number')?.hasError('minlength')">
+            Mínimo 8 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="validateDocument()"
+          [disabled]="isEditMode || validatingDocument || !form.get('document_number')?.value"
+          class="validate-btn"
+        >
+          <mat-spinner *ngIf="validatingDocument" diameter="20"></mat-spinner>
+          {{ validatingDocument ? 'Validando...' : 'Validar' }}
+        </button>
+      </div>
+
+      <div class="validation-status" *ngIf="documentValidated">
+        <mat-chip class="validation-chip accent">
+          <mat-icon>check_circle</mat-icon>
+          Documento validado
+        </mat-chip>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Información Registral (Solo lectura)</h3>
+
+      <mat-form-field appearance="outline" class="full-width" *ngIf="form.get('full_name')?.value">
+        <mat-label>Nombre Completo</mat-label>
+        <input
+          matInput
+          formControlName="full_name"
+          [disabled]="true"
+        />
+        <mat-hint>Obtenido de RENIEC</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width" *ngIf="form.get('business_name')?.value">
+        <mat-label>Razón Social</mat-label>
+        <input
+          matInput
+          formControlName="business_name"
+          [disabled]="true"
+        />
+        <mat-hint>Obtenido de SUNAT</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <div class="form-section">
+      <h3>Contacto</h3>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email (Opcional)</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email"
+          placeholder="correo@ejemplo.com"
+        />
+        <mat-error *ngIf="form.get('email')?.hasError('email')">
+          Ingresa un email válido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Teléfono (Opcional)</mat-label>
+        <input
+          matInput
+          formControlName="phone"
+          placeholder="987654321"
+        />
+        <mat-error *ngIf="form.get('phone')?.hasError('minlength')">
+          Mínimo 7 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Dirección (Opcional)</mat-label>
+        <textarea
+          matInput
+          formControlName="address"
+          placeholder="Calle, número, ciudad"
+          rows="2"
+        ></textarea>
+        <mat-error *ngIf="form.get('address')?.hasError('maxlength')">
+          Máximo 250 caracteres
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="loading">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="form.invalid || loading"
+  >
+    <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+    {{ isEditMode ? 'Actualizar' : 'Crear' }}
+  </button>
+</mat-dialog-actions>

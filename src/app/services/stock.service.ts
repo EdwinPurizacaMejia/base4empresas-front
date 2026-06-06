@@ -1,20 +1,31 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../environments/environment';
 import { Stock } from '../models/stock.model';
+import { InventoryStockCurrentItem } from '../models/inventory.model';
+import { ApiConfigService } from './api-config.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StockService {
+  private inventoryStockCurrentUrl: string;
 
-  private apiUrl = `${environment.apiUrl}/stock`;
+  constructor(
+    private http: HttpClient,
+    private apiConfig: ApiConfigService
+  ) {
+    this.inventoryStockCurrentUrl = this.apiConfig.buildUrl('/inventory/stock/current');
+  }
 
-  constructor(private http: HttpClient) {}
+  /**
+   * GET /inventory/stock/current?warehouse_id=... (&product_id=...)
+   */
+  getStockCurrent(warehouseId: string, productId?: string): Observable<InventoryStockCurrentItem[]> {
+    let params = new HttpParams().set('warehouse_id', warehouseId);
+    if (productId) params = params.set('product_id', productId);
 
-  getStock(warehouseId: string): Observable<Stock[]> {
-    return this.http.get<Stock[]>(`${this.apiUrl}/${warehouseId}`);
+    return this.http.get<InventoryStockCurrentItem[]>(this.inventoryStockCurrentUrl, { params });
   }
 }

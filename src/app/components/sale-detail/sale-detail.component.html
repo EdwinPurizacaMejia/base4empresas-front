@@ -61,7 +61,7 @@
           </div>
           <div class="info-item">
             <label>Fecha de Venta</label>
-            <p class="info-value">{{ sale.created_at | date: 'dd/MM/yyyy HH:mm' }}</p>
+            <p class="info-value">{{ sale.sale_date | date: 'dd/MM/yyyy HH:mm' }}</p>
           </div>
         </div>
 
@@ -91,6 +91,27 @@
               {{ sale.total | currency : 'USD' : 'symbol' : '1.2-2' }}
             </p>
           </div>
+
+          <div class="info-item">
+            <label>Costo total</label>
+            <p class="info-value currency">
+              {{ sale.cost_total ?? 0 | currency : 'USD' : 'symbol' : '1.2-2' }}
+            </p>
+          </div>
+
+          <div class="info-item">
+            <label>Utilidad bruta</label>
+            <p class="info-value currency">
+              {{ sale.gross_profit ?? 0 | currency : 'USD' : 'symbol' : '1.2-2' }}
+            </p>
+          </div>
+
+          <div class="info-item">
+            <label>Margen %</label>
+            <p class="info-value">
+              {{ (sale.gross_margin_pct ?? 0) | number : '1.2-2' }}%
+            </p>
+          </div>
           <div class="info-item">
             <label>Estado de Pago</label>
             <mat-chip-set>
@@ -106,6 +127,71 @@
             <label>Almacén</label>
             <p class="info-value">{{ sale.warehouse_id }}</p>
           </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Items de la venta -->
+    <mat-card class="detail-section">
+      <mat-card-header>
+        <mat-card-title>Items de la Venta</mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+
+      <mat-card-content class="section-content">
+        <div *ngIf="items.length === 0" class="info-section">
+          <p class="info-text">No hay items registrados en esta venta.</p>
+        </div>
+
+        <div *ngIf="items.length > 0" class="items-table-wrapper">
+          <table mat-table [dataSource]="items" class="mat-elevation-z0" style="width: 100%">
+            <!-- Producto -->
+            <ng-container matColumnDef="product">
+              <th mat-header-cell *matHeaderCellDef>Producto</th>
+              <td mat-cell *matCellDef="let it">
+                {{ getProductName(it) }}
+              </td>
+            </ng-container>
+
+            <!-- Cantidad -->
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef class="text-right">Cantidad</th>
+              <td mat-cell *matCellDef="let it" class="text-right">
+                {{ it?.quantity ?? 0 }}
+              </td>
+            </ng-container>
+
+            <!-- Precio unit -->
+            <ng-container matColumnDef="unit_price">
+              <th mat-header-cell *matHeaderCellDef class="text-right">Precio Unit.</th>
+              <td mat-cell *matCellDef="let it" class="text-right">
+                {{
+                  (it?.unit_price ?? it?.unit_cost ?? 0) | currency : 'PEN' : 'symbol' : '1.2-2'
+                }}
+              </td>
+            </ng-container>
+
+            <!-- Costo total -->
+            <ng-container matColumnDef="total_cost">
+              <th mat-header-cell *matHeaderCellDef class="text-right">Costo total</th>
+              <td mat-cell *matCellDef="let it" class="text-right">
+                {{
+                  (it?.total_cost ?? 0) | currency : 'PEN' : 'symbol' : '1.2-2'
+                }}
+              </td>
+            </ng-container>
+
+            <!-- Subtotal -->
+            <ng-container matColumnDef="subtotal">
+              <th mat-header-cell *matHeaderCellDef class="text-right">Subtotal</th>
+              <td mat-cell *matCellDef="let it" class="text-right">
+                {{ getItemSubtotal(it) | currency : 'PEN' : 'symbol' : '1.2-2' }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
         </div>
       </mat-card-content>
     </mat-card>

@@ -130,14 +130,17 @@ export class SaleFormComponent implements OnInit {
       error: (error) => {
         this.loading = false;
 
-        // Handle specific backend error for insufficient stock
-        if (error.status === 400 && error.error?.detail) {
-          if (error.error.detail.includes('stock')) {
-            this.errorMessage = `Stock insuficiente: ${error.error.detail}`;
-          } else {
-            this.errorMessage = error.error.detail;
-          }
-        } else if (error.error?.message) {
+        const status = error?.status;
+        const detail = error?.error?.detail;
+
+        if (status === 409) {
+          // recomendado: stock insuficiente / saldo negativo
+          this.errorMessage = 'Stock insuficiente para completar la venta.';
+        } else if ((status === 400 || status === 422) && detail) {
+          this.errorMessage = String(detail);
+        } else if (status === 400 && typeof detail === 'string' && detail.toLowerCase().includes('stock')) {
+          this.errorMessage = `Stock insuficiente: ${detail}`;
+        } else if (error?.error?.message) {
           this.errorMessage = error.error.message;
         } else {
           this.errorMessage = 'Error al registrar la venta. Por favor intenta de nuevo.';

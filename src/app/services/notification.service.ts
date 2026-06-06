@@ -62,7 +62,11 @@ export class NotificationService {
       type,
     };
 
-    this.snackBar.open(message, action, config);
+    // MatSnackBar por defecto renderiza texto plano, pero \n no siempre se muestra como salto.
+    // Normalizamos a un texto más legible reemplazando saltos por " • " para mantener 1 línea,
+    // evitando snackbars demasiado altos.
+    const normalized = String(message ?? '').replace(/\s*\n\s*/g, ' • ').trim();
+    this.snackBar.open(normalized, action, config);
   }
 
   /**

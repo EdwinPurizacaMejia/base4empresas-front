@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { ToolbarComponent } from './toolbar.component';
-import { SidebarComponent, MenuItem } from './sidebar.component';
+import { SidebarComponent } from './sidebar.component';
+import { MenuItem } from '../models/menu.model';
 
 @Component({
   selector: 'app-shell',

@@ -1,31 +1,21 @@
-<!-- Shell Layout: Toolbar + Sidebar + Content -->
-<div class="layout-container">
-  <!-- Toolbar Superior -->
-  <app-toolbar 
-    (menuToggle)="toggleSidebar()" 
-    (search)="onGlobalSearch($event)">
-  </app-toolbar>
+<!-- Layout Principal con Material Sidenav -->
+<app-toolbar (menuToggle)="sidenav.toggle()"></app-toolbar>
 
-  <!-- Layout Principal -->
-  <div class="layout-main">
-    <!-- Sidebar Navegación -->
-    <app-sidebar
-      [isOpen]="sidebarOpen"
-      [menuItems]="menuItems"
-      (toggleSidebar)="toggleSidebar()"
-    ></app-sidebar>
+<!-- Mat Sidenav Container: Flex Layout Sidebar + Contenido -->
+<mat-sidenav-container autosize>
+  <!-- Sidenav: Sidebar Izquierdo -->
+  <mat-sidenav
+    #sidenav
+    mode="side"
+    [opened]="sidebarOpen"
+    [attr.aria-label]="'Navegación'"
+    class="app-sidenav"
+  >
+    <app-sidebar [menuItems]="menuItems"></app-sidebar>
+  </mat-sidenav>
 
-    <!-- Área de Contenido -->
-    <main class="layout-content">
-      <router-outlet></router-outlet>
-    </main>
-
-    <!-- Overlay para móvil cuando sidebar está abierto -->
-    <div
-      class="layout-overlay"
-      *ngIf="sidebarOpen && isMobileView"
-      (click)="toggleSidebar()"
-      [@fadeInOut]
-    ></div>
-  </div>
-</div>
+  <!-- Contenido Principal: Derecha -->
+  <mat-sidenav-content class="app-content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

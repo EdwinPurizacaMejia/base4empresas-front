@@ -8,8 +8,10 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
 
-import { PurchaseListItem } from '../../models/purchase.model';
+import { Purchase } from '../../models/purchase.model';
 import { PurchaseService } from '../../services/purchase.service';
+import { ProductsService } from '../../services/products.service';
+import { Product } from '../../models/product.model';
 import { NotificationService } from '../../services/notification.service';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
@@ -32,16 +34,23 @@ import { ErrorStateComponent } from '../shared/error-state.component';
   styleUrl: './purchase-detail.component.css',
 })
 export class PurchaseDetailComponent implements OnInit {
-  purchase: PurchaseListItem | null = null;
+  purchase: Purchase | null = null;
   loading = false;
   error: string | null = null;
   purchaseId: string | null = null;
-  displayedColumns: string[] = ['product', 'quantity', 'unit_price', 'total'];
+  displayedColumns: string[] = ['product_id', 'quantity', 'unit_cost', 'subtotal'];
+
+  private productsById = new Map<string, Product>();
+
+  get itemsDataSource(): any[] {
+    return this.purchase?.items ?? [];
+  }
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private purchaseService: PurchaseService,
+    private productsService: ProductsService,
     private notificationService: NotificationService
   ) {}
 
@@ -58,28 +67,44 @@ export class PurchaseDetailComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.purchaseService.getPurchases().subscribe({
-      next: (purchases) => {
-        const found = purchases.find((p) => p.id === id);
-        if (found) {
-          this.purchase = found;
-          this.loading = false;
-        } else {
-          this.error = 'Compra no encontrada';
-          this.loading = false;
-        }
-      },
-      error: () => {
-        this.error = 'Error al cargar la compra';
+    // Preferimos el detalle por ID para asegurar que vengan los items.
+    this.purchaseService.getPurchaseById(id).subscribe({
+      next: (purchase) => {
+        this.purchase = purchase;
+        this.loadProductsForItems(purchase?.items ?? []);
         this.loading = false;
-        this.notificationService.error('Error al cargar la compra');
+      },
+      error: (err) => {
+        console.error(err);
+        this.error = err.userMessage || 'Error al cargar la compra';
+        this.loading = false;
+        this.notificationService.error(this.error ?? 'Error al cargar la compra');
       },
     });
   }
 
+  private loadProductsForItems(items: any[]): void {
+    const ids = Array.from(
+      new Set((items ?? []).map((it) => it?.product_id).filter(Boolean)),
+    ) as string[];
+
+    ids.forEach((id) => {
+      if (this.productsById.has(id)) return;
+      this.productsService.getProductById(id).subscribe({
+        next: (p) => this.productsById.set(id, p),
+        error: (err) => console.error('Error cargando producto', id, err),
+      });
+    });
+  }
+
+  getProductName(productId: string): string {
+    const p = this.productsById.get(productId);
+    return (p as any)?.name ?? (p as any)?.description ?? productId;
+  }
+
   onEdit(): void {
     if (this.purchase) {
-      this.router.navigate(['/purchases'], {
+      this.router.navigate(['/compras'], {
         queryParams: { editId: this.purchase.id },
       });
       this.notificationService.info('Abriendo editor...');
@@ -87,7 +112,7 @@ export class PurchaseDetailComponent implements OnInit {
   }
 
   onGoBack(): void {
-    this.router.navigate(['/purchases']);
+    this.router.navigate(['/compras']);
   }
 
   onRetry(): void {

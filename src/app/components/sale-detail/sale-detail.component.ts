@@ -9,9 +9,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { SaleListItem } from '../../models/sale.model';
+import { SaleDetail } from '../../models/sale.model';
 import { SalesService } from '../../services/sales.service';
 import { NotificationService } from '../../services/notification.service';
+import { ProductsService } from '../../services/products.service';
+import { Product } from '../../models/product.model';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
 
@@ -34,15 +36,18 @@ import { ErrorStateComponent } from '../shared/error-state.component';
   styleUrl: './sale-detail.component.css',
 })
 export class SaleDetailComponent implements OnInit {
-  sale: SaleListItem | null = null;
+  sale: SaleDetail | null = null;
   loading = false;
   error: string | null = null;
   saleId: string | null = null;
+
+  private productNameById: Record<string, string> = {};
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private salesService: SalesService,
+    private productsService: ProductsService,
     private notificationService: NotificationService
   ) {}
 
@@ -59,28 +64,56 @@ export class SaleDetailComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.salesService.getSales().subscribe({
-      next: (sales) => {
-        const found = sales.find((s) => s.id === id);
-        if (found) {
-          this.sale = found;
-          this.loading = false;
+    this.salesService.getSaleById(id).subscribe({
+      next: (sale) => {
+        this.sale = sale;
+
+        // Cargar nombres de productos para los items (si backend solo trae product_id)
+        const ids = Array.from(
+          new Set(
+            ((sale as any)?.items ?? [])
+              .map((it: any) => String(it?.product_id || it?.product?.id || ''))
+              .filter((x: string) => !!x),
+          ),
+        );
+
+        if (ids.length > 0) {
+          this.productsService.getProducts({ isActive: true }).subscribe({
+            next: (rows: Product[]) => {
+              this.productNameById = Object.fromEntries((rows ?? []).map((p) => [p.id, p.name || p.description || p.sku || p.id]));
+              this.loading = false;
+            },
+            error: () => {
+              this.productNameById = {};
+              this.loading = false;
+            },
+          });
         } else {
-          this.error = 'Venta no encontrada';
           this.loading = false;
         }
       },
-      error: () => {
+      error: (err) => {
         this.error = 'Error al cargar la venta';
         this.loading = false;
-        this.notificationService.error('Error al cargar la venta');
+
+        // Manejo recomendado: stock insuficiente / saldo negativo (probables 409/400)
+        const status = err?.status;
+        if (status === 409) {
+          this.notificationService.error('Stock insuficiente para completar la operación.');
+        } else if (status === 400 || status === 422) {
+          const detail = err?.error?.detail;
+          this.notificationService.error(detail ? String(detail) : 'Solicitud inválida.');
+        } else {
+          this.notificationService.error('Error al cargar la venta');
+        }
       },
     });
   }
 
   onEdit(): void {
     if (this.sale) {
-      this.router.navigate(['/sales'], {
+      // Rutas están en español en app.routes.ts
+      this.router.navigate(['/ventas'], {
         queryParams: { editId: this.sale.id },
       });
       this.notificationService.info('Abriendo editor...');
@@ -88,7 +121,31 @@ export class SaleDetailComponent implements OnInit {
   }
 
   onGoBack(): void {
-    this.router.navigate(['/sales']);
+    this.router.navigate(['/ventas']);
+  }
+
+  // Tabla de items
+  get displayedColumns(): string[] {
+    return ['product', 'quantity', 'unit_price', 'total_cost', 'subtotal'];
+  }
+
+  get items(): any[] {
+    return (this.sale as any)?.items ?? [];
+  }
+
+  getProductName(it: any): string {
+    const embedded = it?.product?.name || it?.product_name;
+    if (embedded) return embedded;
+    const id = it?.product_id || it?.product?.id;
+    if (!id) return '—';
+    return this.productNameById[String(id)] || String(id);
+  }
+
+  getItemSubtotal(it: any): number {
+    const qty = Number(it?.quantity) || 0;
+    // según backend puede venir unit_price o unit_cost
+    const unit = Number(it?.unit_price ?? it?.unit_cost ?? 0) || 0;
+    return qty * unit;
   }
 
   onRetry(): void {

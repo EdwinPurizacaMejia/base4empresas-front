@@ -1,20 +1,51 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../environments/environment';
-import { KardexMovement } from '../models/kardex.model';
+import { InventoryKardexLine } from '../models/inventory.model';
+import { ApiConfigService } from './api-config.service';
+
+/**
+ * Tipos de referencia para filtrar movimientos de Kardex
+ */
+export type KardexReferenceType = 
+  | 'ADJUSTMENT'    // Ajustes de inventario
+  | 'TRANSFER'      // Transferencias entre almacenes
+  | 'ORDER'         // Órdenes de venta
+  | 'CANCELLATION'  // Cancelaciones
+  | 'PURCHASE';     // Compras
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class KardexService {
+  private inventoryKardexUrl: string;
 
-  private apiUrl = `${environment.apiUrl}/stock/kardex`;
+  constructor(
+    private http: HttpClient,
+    private apiConfig: ApiConfigService
+  ) {
+    this.inventoryKardexUrl = this.apiConfig.buildUrl('/inventory/kardex');
+  }
 
-  constructor(private http: HttpClient) {}
+  /**
+   * GET /inventory/kardex con filtros opcionales
+   * Permite filtrar por tipo de movimiento (reference_type)
+   */
+  getKardex(params: {
+    warehouseId: string;
+    productId?: string;
+    fromDate?: string;
+    toDate?: string;
+    referenceType?: KardexReferenceType;  // Nuevo filtro
+  }): Observable<InventoryKardexLine[]> {
+    let httpParams = new HttpParams().set('warehouse_id', params.warehouseId);
 
-  getKardex(productId: string, warehouseId: string): Observable<KardexMovement[]> {
-    return this.http.get<KardexMovement[]>(`${this.apiUrl}/${productId}/${warehouseId}`);
+    if (params.productId) httpParams = httpParams.set('product_id', params.productId);
+    if (params.fromDate) httpParams = httpParams.set('from_date', params.fromDate);
+    if (params.toDate) httpParams = httpParams.set('to_date', params.toDate);
+    if (params.referenceType) httpParams = httpParams.set('reference_type', params.referenceType);
+
+    return this.http.get<InventoryKardexLine[]>(this.inventoryKardexUrl, { params: httpParams });
   }
 }

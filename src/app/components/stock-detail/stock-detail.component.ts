@@ -10,6 +10,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { Stock } from '../../models/stock.model';
+import { InventoryStockCurrentItem } from '../../models/inventory.model';
 import { StockService } from '../../services/stock.service';
 import { NotificationService } from '../../services/notification.service';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
@@ -60,17 +61,30 @@ export class StockDetailComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.stockService.getStock('').subscribe({
-      next: (stocks) => {
-        const found = stocks.find((s) => s.product_id === id);
-        if (found) {
-          this.stock = found;
-          this.calculateStockPercentage();
-          this.loading = false;
-        } else {
+    // Nota: este componente no recibe warehouseId por ruta; usamos el mismo default que el dashboard.
+    const warehouseId = 'bbbbbbbb-0000-0000-0000-000000000001';
+
+    this.stockService.getStockCurrent(warehouseId, id).subscribe({
+      next: (items: InventoryStockCurrentItem[]) => {
+        const found = items[0];
+        if (!found) {
           this.error = 'Stock no encontrado';
           this.loading = false;
+          return;
         }
+
+        // Mapeo mínimo para mantener compatibilidad con la UI actual (Stock model legacy)
+        // El endpoint /inventory/stock/current no incluye sku/name/min_stock, así que no los podemos poblar aquí.
+        this.stock = {
+          product_id: found.product_id,
+          sku: '',
+          name: '',
+          stock: found.quantity_on_hand,
+          min_stock: 0,
+        } as Stock;
+
+        this.calculateStockPercentage();
+        this.loading = false;
       },
       error: () => {
         this.error = 'Error al cargar el inventario';

@@ -1,64 +1,22 @@
 <div class="layout-container">
-  <!-- TOOLBAR SUPERIOR -->
+  <!-- TOOLBAR SUPERIOR CON LOGO Y MENÚ -->
   <mat-toolbar color="primary" class="main-toolbar">
     <!-- Logo -->
     <div class="logo-section">
       <span class="logo-text">Base4Empresas</span>
     </div>
 
-    <!-- Menú horizontal -->
-    <nav class="main-nav">
-      <a mat-button 
-         routerLink="/dashboard" 
-         routerLinkActive="active"
-         [routerLinkActiveOptions]="{ exact: true }">
-        Dashboard
-      </a>
-      <a mat-button 
-         routerLink="/productos" 
-         routerLinkActive="active">
-        Productos
-      </a>
-      <a mat-button 
-         routerLink="/compras" 
-         routerLinkActive="active">
-        Compras
-      </a>
-      <a mat-button 
-         routerLink="/ventas" 
-         routerLinkActive="active">
-        Ventas
-      </a>
-      <a mat-button 
-         routerLink="/inventario" 
-         routerLinkActive="active">
-        Inventario
-      </a>
-      <a mat-button 
-         routerLink="/kardex" 
-         routerLinkActive="active">
-        Kardex
-      </a>
-    </nav>
-
     <!-- Espaciador -->
     <span class="spacer"></span>
-
-    <!-- Buscador global -->
-    <mat-form-field class="search-field" appearance="outline">
-      <mat-icon matPrefix>search</mat-icon>
-      <input 
-        matInput 
-        [(ngModel)]="searchTerm"
-        (ngModelChange)="onSearchInput($event)"
-        placeholder="Producto, venta, compra...">
-    </mat-form-field>
 
     <!-- Perfil (placeholder) -->
     <button mat-icon-button class="profile-button">
       <mat-icon>account_circle</mat-icon>
     </button>
   </mat-toolbar>
+
+  <!-- MENÚ PRINCIPAL JERÁRQUICO (2 NIVELES) -->
+  <app-main-menu></app-main-menu>
 
   <!-- CONTENIDO PRINCIPAL -->
   <div class="content-container">

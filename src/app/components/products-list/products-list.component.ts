@@ -180,8 +180,27 @@ export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onEditProduct(product: Product): void {
-    console.log('Edit product:', product);
-    // TODO: Implementar edición en modal
+    const dialogRef = this.dialog.open(ProductFormComponent, {
+      width: '600px',
+      minWidth: '300px',
+      maxWidth: '90vw',
+      height: 'auto',
+      minHeight: '400px',
+      maxHeight: '95vh',
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      panelClass: 'crm-dialog-panel',
+      backdropClass: 'crm-dialog-backdrop',
+      data: { product }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.loadProducts();
+        this.notificationService.success('Producto actualizado exitosamente');
+      }
+    });
   }
 
   onDeleteProduct(product: Product): void {

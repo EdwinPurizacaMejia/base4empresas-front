@@ -4,12 +4,14 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { SalesService } from '../../services/sales.service';
 import { SearchService } from '../../services/search.service';
 import { SaleFormComponent } from '../sale-form/sale-form.component';
 import { SaleListItem } from '../../models/sale.model';
 import { GenericDataTableComponent, TableConfig } from '../generic-data-table/generic-data-table.component';
+import { WarehouseService } from '../../services/warehouse.service';
+import { SuppliersService } from '../../services/suppliers.service';
 
 @Component({
   selector: 'app-sale-list',
@@ -27,14 +29,53 @@ export class SaleListComponent implements OnInit, OnDestroy {
   successMessage = '';
   private destroy$ = new Subject<void>();
 
+  // Lookups para mostrar nombres en vez de IDs
+  private warehouseNameById: Record<string, string> = {};
+  // Re-usa suppliers como “clientes” temporalmente si el backend usa la misma entidad.
+  // Si luego existe CustomersService, solo se cambia aquí.
+  private customerNameById: Record<string, string> = {};
+
   tableConfig: TableConfig = {
     columns: [
       { key: 'number', label: 'Número', sortable: true, width: '120px' },
-      { key: 'created_at', label: 'Fecha', type: 'date', sortable: true, width: '160px' },
-      { key: 'customer_id', label: 'Cliente', sortable: true, formatter: (val) => val || '-' },
-      { key: 'warehouse_id', label: 'Almacén', sortable: true },
+      { key: 'sale_date', label: 'Fecha', type: 'date', sortable: true, width: '160px' },
+      {
+        key: 'customer_id',
+        label: 'Cliente',
+        sortable: true,
+        formatter: (val) => this.getCustomerLabel(val),
+      },
+      {
+        key: 'warehouse_id',
+        label: 'Almacén',
+        sortable: true,
+        formatter: (val) => this.getWarehouseLabel(val),
+      },
       { key: 'status', label: 'Estado', sortable: true, width: '100px', formatter: (val) => this.getStatusLabel(val) },
-      { key: 'total', label: 'Total', type: 'currency', sortable: true, width: '130px' }
+      { key: 'total', label: 'Total', type: 'currency', sortable: true, width: '130px' },
+      {
+        key: 'cost_total',
+        label: 'Costo total',
+        type: 'currency',
+        sortable: true,
+        width: '130px',
+        formatter: (val) => (val === null || val === undefined ? '—' : val),
+      },
+      {
+        key: 'gross_profit',
+        label: 'Utilidad',
+        type: 'currency',
+        sortable: true,
+        width: '130px',
+        formatter: (val) => (val === null || val === undefined ? '—' : val),
+      },
+      {
+        key: 'gross_margin_pct',
+        label: 'Margen %',
+        sortable: true,
+        width: '110px',
+        formatter: (val) => (val === null || val === undefined ? '—' : `${Number(val).toFixed(2)}%`),
+      }
     ],
     actions: [
       { id: 'view', label: 'Ver detalle', icon: 'visibility' },
@@ -51,11 +92,14 @@ export class SaleListComponent implements OnInit, OnDestroy {
   constructor(
     private salesService: SalesService,
     private searchService: SearchService,
+    private warehouseService: WarehouseService,
+    private suppliersService: SuppliersService,
     private router: Router,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    this.loadLookups();
     this.loadSales();
 
     // Suscribirse al buscador global
@@ -69,6 +113,38 @@ export class SaleListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private loadLookups(): void {
+    forkJoin({
+      warehouses: this.warehouseService.getWarehouses({ isActive: true }),
+      // OJO: si luego existe CustomersService, reemplazar esta llamada.
+      customers: this.suppliersService.getSuppliers(),
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: ({ warehouses, customers }) => {
+          this.warehouseNameById = Object.fromEntries((warehouses ?? []).map((w: any) => [w.id, w.name]));
+          this.customerNameById = Object.fromEntries(
+            (customers ?? []).map((c: any) => [c.id, c.business_name || c.name || c.id]),
+          );
+        },
+        error: () => {
+          // silencioso: si falla, se mostrará el ID como fallback
+          this.warehouseNameById = {};
+          this.customerNameById = {};
+        },
+      });
+  }
+
+  private getWarehouseLabel(id: any): string {
+    if (!id) return '—';
+    return this.warehouseNameById[String(id)] || String(id);
+  }
+
+  private getCustomerLabel(id: any): string {
+    if (!id) return '—';
+    return this.customerNameById[String(id)] || String(id);
   }
 
   loadSales(): void {
@@ -184,7 +260,8 @@ export class SaleListComponent implements OnInit, OnDestroy {
   }
 
   onViewSale(sale: SaleListItem): void {
-    this.router.navigate(['/sales', sale.id]);
+    // Rutas del sistema están en español: /ventas/:id
+    this.router.navigate(['/ventas', sale.id]);
   }
 
   onEditSale(sale: SaleListItem): void {

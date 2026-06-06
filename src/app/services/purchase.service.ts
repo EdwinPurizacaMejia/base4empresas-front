@@ -2,21 +2,26 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 
-import { environment } from '../../environments/environment';
 import {
   PurchaseCreate,
   PurchaseResponse,
   Purchase,
   PurchaseListItem,
 } from '../models/purchase.model';
+import { ApiConfigService } from './api-config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PurchaseService {
-  private apiUrl = `${environment.apiUrl}/purchases`;
+  private apiUrl: string;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private apiConfig: ApiConfigService
+  ) {
+    this.apiUrl = this.apiConfig.buildUrl('/purchases');
+  }
 
   createPurchase(payload: PurchaseCreate): Observable<PurchaseResponse> {
     return this.http
@@ -33,6 +38,12 @@ export class PurchaseService {
   getPurchaseById(purchaseId: string): Observable<Purchase> {
     return this.http
       .get<Purchase>(`${this.apiUrl}/${purchaseId}`)
+      .pipe(catchError((error) => this.handleError(error)));
+  }
+
+  updatePurchase(purchaseId: string, payload: PurchaseCreate): Observable<PurchaseResponse> {
+    return this.http
+      .put<PurchaseResponse>(`${this.apiUrl}/${encodeURIComponent(purchaseId)}`, payload)
       .pipe(catchError((error) => this.handleError(error)));
   }
 

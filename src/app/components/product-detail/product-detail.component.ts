@@ -80,7 +80,7 @@ export class ProductDetailComponent implements OnInit {
 
   onEdit(): void {
     if (this.product) {
-      this.router.navigate(['/products'], {
+      this.router.navigate(['/productos'], {
         queryParams: { editId: this.product.id },
       });
       this.notificationService.info('Abriendo editor...');
@@ -88,7 +88,7 @@ export class ProductDetailComponent implements OnInit {
   }
 
   onGoBack(): void {
-    this.router.navigate(['/products']);
+    this.router.navigate(['/productos']);
   }
 
   onRetry(): void {

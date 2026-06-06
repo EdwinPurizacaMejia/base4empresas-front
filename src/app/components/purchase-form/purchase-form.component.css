@@ -240,6 +240,28 @@ h2.dialog-title .close-button:hover:not([disabled]) {
   color: #0f172a;
   font-size: 16px;
   font-weight: 600;
+  text-align: right; /* evita que se vea "cortado" cuando hay prefijo o icono */
+  padding-right: 4px;
+}
+
+/* Mejor lectura para inputs numéricos (cantidad y costo) */
+.quantity-field .native-input-control input,
+.cost-field .native-input-control input {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2px;
+}
+
+/* Evitar que los spin-buttons resten espacio visible */
+.quantity-field .native-input-control input::-webkit-outer-spin-button,
+.quantity-field .native-input-control input::-webkit-inner-spin-button,
+.cost-field .native-input-control input::-webkit-outer-spin-button,
+.cost-field .native-input-control input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.quantity-field .native-input-control input[type='number'],
+.cost-field .native-input-control input[type='number'] {
+  -moz-appearance: textfield;
 }
 
 .native-select-error {
@@ -616,11 +638,11 @@ mat-form-field {
 }
 
 .quantity-field {
-  min-width: 112px;
+  min-width: 132px;
 }
 
 .cost-field {
-  min-width: 150px;
+  min-width: 170px;
 }
 
 .item-subtotal {

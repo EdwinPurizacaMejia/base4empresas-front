@@ -1,0 +1,21 @@
+.page {
+  padding: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.field {
+  min-width: 260px;
+  flex: 1 1 260px;
+}
+
+.muted {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
+}
