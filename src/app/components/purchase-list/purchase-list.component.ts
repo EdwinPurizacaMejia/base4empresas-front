@@ -26,6 +26,7 @@ import { Supplier } from '../../models/supplier.model';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { EmptyStateComponent } from '../shared/empty-state.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-purchase-list',
@@ -43,6 +44,7 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     LoadingSpinnerComponent,
     EmptyStateComponent,
     ErrorStateComponent,
+    AppCurrencyPipe,
   ],
   templateUrl: './purchase-list.component.html',
   styleUrl: './purchase-list.component.scss',

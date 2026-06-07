@@ -20,6 +20,7 @@ import { OrdersService } from '../../services/orders.service';
 import { SalesChannelsService } from '../../services/sales-channels.service';
 import { NotificationService } from '../../services/notification.service';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-orders-list',
@@ -37,7 +38,8 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
     MatSelectModule,
     MatCardModule,
     MatChipsModule,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    AppCurrencyPipe
   ],
   templateUrl: './orders-list.component.html',
   styleUrl: './orders-list.component.scss'
@@ -142,11 +144,11 @@ export class OrdersListComponent implements OnInit, OnDestroy {
   }
 
   viewDetail(orderId: string): void {
-    this.router.navigate(['/pedidos', orderId]);
+    this.router.navigate(['/ventas/pedidos', orderId]);
   }
 
   createOrder(): void {
-    this.router.navigate(['/pedidos/crear']);
+    this.router.navigate(['/ventas/pedidos/crear']);
   }
 
   onRefresh(): void {

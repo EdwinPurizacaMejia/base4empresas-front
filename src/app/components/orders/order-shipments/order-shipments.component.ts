@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormGroupDirective, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -64,6 +64,8 @@ export class OrderShipmentsComponent implements OnInit, OnDestroy {
   @Input() orderStatus?: string;
   @Output() shipmentCreated = new EventEmitter<Shipment>();
   @Output() shipmentUpdated = new EventEmitter<Shipment>();
+
+  @ViewChild(FormGroupDirective) shipmentFormDirective?: FormGroupDirective;
 
   shipments: Shipment[] = [];
   loading = false;
@@ -164,7 +166,29 @@ export class OrderShipmentsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (shipment) => {
           this.shipments.push(shipment);
-          this.shipmentForm.reset();
+          
+          // Limpiar formulario usando FormGroupDirective para resetear estado submitted
+          const defaultValues = {
+            shipping_method: null,
+            carrier_name: '',
+            tracking_number: '',
+            destination_address: '',
+            recipient_name: null,
+            recipient_phone: null,
+            scheduled_date: new Date().toISOString().split('T')[0]
+          };
+
+          this.shipmentFormDirective?.resetForm(defaultValues);
+
+          this.shipmentForm.markAsPristine();
+          this.shipmentForm.markAsUntouched();
+
+          Object.values(this.shipmentForm.controls).forEach((control) => {
+            control.markAsPristine();
+            control.markAsUntouched();
+            control.updateValueAndValidity({ emitEvent: false });
+          });
+
           this.notificationService.success('Envío registrado exitosamente');
           this.shipmentCreated.emit(shipment);
         },

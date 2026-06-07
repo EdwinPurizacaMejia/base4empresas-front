@@ -83,13 +83,13 @@
           <div class="info-item">
             <label>Precio de Compra</label>
             <p class="info-value currency">
-              {{ product.purchase_price | currency : 'USD' : 'symbol' : '1.2-2' }}
+              {{ product.purchase_price | appCurrency: 'PEN' }}
             </p>
           </div>
           <div class="info-item">
             <label>Precio de Venta</label>
             <p class="info-value currency">
-              {{ product.sale_price | currency : 'USD' : 'symbol' : '1.2-2' }}
+              {{ product.sale_price | appCurrency: 'PEN' }}
             </p>
           </div>
           <div class="info-item">

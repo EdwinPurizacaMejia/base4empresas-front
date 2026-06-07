@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormGroupDirective, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -19,6 +19,7 @@ import { Payment, PaymentCreate, getPaymentMethodLabel, getPaymentStatusLabel, g
 import { PaymentsService } from '../../../services/payments.service';
 import { NotificationService } from '../../../services/notification.service';
 import { LoadingSpinnerComponent } from '../../shared/loading-spinner.component';
+import { AppCurrencyPipe } from '../../../shared/pipes/app-currency.pipe';
 
 /**
  * OrderPaymentsComponent
@@ -55,7 +56,8 @@ import { LoadingSpinnerComponent } from '../../shared/loading-spinner.component'
     MatTooltipModule,
     MatMenuModule,
     MatDividerModule,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    AppCurrencyPipe
   ],
   templateUrl: './order-payments.component.html',
   styleUrl: './order-payments.component.scss'
@@ -63,6 +65,12 @@ import { LoadingSpinnerComponent } from '../../shared/loading-spinner.component'
 export class OrderPaymentsComponent implements OnInit, OnDestroy {
   @Input() orderId!: string;
   @Input() orderTotalAmount: number = 0;
+  @Input() orderCurrency: string = 'PEN';
+  @Input() initialPaymentAmount: number = 0;
+
+  @Output() paymentsChanged = new EventEmitter<void>();
+
+  @ViewChild(FormGroupDirective) paymentFormDirective?: FormGroupDirective;
 
   payments: Payment[] = [];
   paymentForm: FormGroup;
@@ -114,6 +122,10 @@ export class OrderPaymentsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  onRefreshPayments(): void {
+    this.loadPayments();
+  }
+
   private loadPayments(): void {
     this.loading = true;
 
@@ -133,14 +145,18 @@ export class OrderPaymentsComponent implements OnInit, OnDestroy {
       });
   }
 
-  getTotalPaid(): number {
+  getValidatedPaymentsTotal(): number {
     return this.payments
       .filter((p) => p.status === 'VALIDATED')
-      .reduce((sum, p) => sum + p.amount, 0);
+      .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+  }
+
+  getTotalPaid(): number {
+    return Number(this.initialPaymentAmount || 0) + this.getValidatedPaymentsTotal();
   }
 
   getBalancePending(): number {
-    return this.orderTotalAmount - this.getTotalPaid();
+    return Math.max(0, Number(this.orderTotalAmount || 0) - this.getTotalPaid());
   }
 
   getPaymentMethodLabel(method: string): string {
@@ -186,14 +202,31 @@ export class OrderPaymentsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (payment) => {
-          this.payments.push(payment);
-          this.paymentForm.reset({
-            method: '',
-            amount: '',
+          // Recargar lista completa desde backend para sincronizar
+          this.loadPayments();
+          // Notificar al padre para que recargue la orden
+          this.paymentsChanged.emit();
+          
+          // Limpiar formulario usando FormGroupDirective para resetear estado submitted
+          const defaultValues = {
+            method: null,
+            amount: null,
             currency: 'PEN',
             operation_number: '',
             paid_at: new Date().toISOString().split('T')[0]
+          };
+
+          this.paymentFormDirective?.resetForm(defaultValues);
+          
+          this.paymentForm.markAsPristine();
+          this.paymentForm.markAsUntouched();
+          
+          Object.values(this.paymentForm.controls).forEach(control => {
+            control.markAsPristine();
+            control.markAsUntouched();
+            control.updateValueAndValidity({ emitEvent: false });
           });
+          
           this.notificationService.success('Pago registrado exitosamente');
           this.creatingPayment = false;
         },
@@ -217,10 +250,10 @@ export class OrderPaymentsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedPayment) => {
-          const index = this.payments.findIndex((p) => p.id === payment.id);
-          if (index !== -1) {
-            this.payments[index] = updatedPayment;
-          }
+          // Recargar lista completa desde backend para sincronizar
+          this.loadPayments();
+          // Notificar al padre para que recargue la orden
+          this.paymentsChanged.emit();
           this.notificationService.success('Pago validado exitosamente');
           this.validatingPayment = false;
         },
@@ -244,10 +277,10 @@ export class OrderPaymentsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedPayment) => {
-          const index = this.payments.findIndex((p) => p.id === payment.id);
-          if (index !== -1) {
-            this.payments[index] = updatedPayment;
-          }
+          // Recargar lista completa desde backend para sincronizar
+          this.loadPayments();
+          // Notificar al padre para que recargue la orden
+          this.paymentsChanged.emit();
           this.notificationService.success('Pago rechazado');
           this.validatingPayment = false;
         },

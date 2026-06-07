@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Payment, PaymentCreate, PaymentValidate } from '../models/payment.model';
 import { ApiConfigService } from './api-config.service';
@@ -40,11 +41,22 @@ export class PaymentsService {
 
   /**
    * Obtener pagos de una orden específica
+   * Backend: GET /payments/orders/{order_id}/list?skip=0&limit=100
+   * Respuesta: { payments: [...], total: number, skip: number, limit: number }
    * @param orderId ID de la orden
+   * @param skip Número de registros a saltar (paginación)
+   * @param limit Número de registros a retornar
    */
-  getPaymentsByOrder(orderId: string): Observable<Payment[]> {
-    const params = new HttpParams().set('order_id', encodeURIComponent(orderId));
-    return this.http.get<Payment[]>(this.baseUrl, { params });
+  getPaymentsByOrder(orderId: string, skip: number = 0, limit: number = 100): Observable<Payment[]> {
+    const url = this.apiConfig.buildUrl(`/payments/orders/${encodeURIComponent(orderId)}/list`);
+    const params = new HttpParams()
+      .set('skip', skip.toString())
+      .set('limit', limit.toString());
+    
+    return this.http.get<{ payments: Payment[]; total: number; skip: number; limit: number }>(url, { params })
+      .pipe(
+        map((response) => response.payments || [])
+      );
   }
 
   /**

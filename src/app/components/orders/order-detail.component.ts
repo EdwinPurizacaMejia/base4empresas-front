@@ -24,6 +24,7 @@ import { NotificationService } from '../../services/notification.service';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { OrderPaymentsComponent } from './order-payments/order-payments.component';
 import { OrderShipmentsComponent } from './order-shipments/order-shipments.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-order-detail',
@@ -44,7 +45,8 @@ import { OrderShipmentsComponent } from './order-shipments/order-shipments.compo
     MatTooltipModule,
     LoadingSpinnerComponent,
     OrderPaymentsComponent,
-    OrderShipmentsComponent
+    OrderShipmentsComponent,
+    AppCurrencyPipe
   ],
   templateUrl: './order-detail.component.html',
   styleUrl: './order-detail.component.scss'
@@ -82,6 +84,12 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  reloadOrder(): void {
+    if (this.order?.id) {
+      this.loadOrder(this.order.id);
+    }
   }
 
   private loadOrder(orderId: string): void {

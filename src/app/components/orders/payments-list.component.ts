@@ -21,6 +21,7 @@ import { OrdersService } from '../../services/orders.service';
 import { SalesChannelsService } from '../../services/sales-channels.service';
 import { NotificationService } from '../../services/notification.service';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 /**
  * Componente para gestionar pagos pendientes
@@ -44,7 +45,8 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
     MatCardModule,
     MatChipsModule,
     MatTooltipModule,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    AppCurrencyPipe
   ],
   template: `
     <div class="container">
@@ -117,7 +119,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
           </div>
           <div class="stat-content">
             <div class="stat-label">Total a Cobrar</div>
-            <div class="stat-value">{{ getTotalPending() | currency:'PEN':'symbol-narrow':'1.2-2' }}</div>
+            <div class="stat-value">{{ getTotalPending() | appCurrency:'PEN' }}</div>
           </div>
         </mat-card>
       </div>
@@ -149,7 +151,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
             <ng-container matColumnDef="customer">
               <th mat-header-cell *matHeaderCellDef>Cliente</th>
               <td mat-cell *matCellDef="let order">
-                {{ order.customer_id }}
+                {{ order.customer_name || order.customer_id }}
               </td>
             </ng-container>
 
@@ -175,7 +177,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
             <ng-container matColumnDef="total_amount">
               <th mat-header-cell *matHeaderCellDef>Total</th>
               <td mat-cell *matCellDef="let order" class="amount-cell">
-                {{ order.total_amount | currency:'PEN':'symbol-narrow':'1.2-2' }}
+                {{ order.total_amount | appCurrency:order.currency }}
               </td>
             </ng-container>
 
@@ -183,7 +185,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
             <ng-container matColumnDef="paid_amount">
               <th mat-header-cell *matHeaderCellDef>Pagado</th>
               <td mat-cell *matCellDef="let order" class="amount-cell paid">
-                {{ order.paid_amount | currency:'PEN':'symbol-narrow':'1.2-2' }}
+                {{ order.paid_amount | appCurrency:order.currency }}
               </td>
             </ng-container>
 
@@ -191,7 +193,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
             <ng-container matColumnDef="pending_amount">
               <th mat-header-cell *matHeaderCellDef>Saldo Pendiente</th>
               <td mat-cell *matCellDef="let order" class="amount-cell pending">
-                <strong>{{ getPendingAmount(order) | currency:'PEN':'symbol-narrow':'1.2-2' }}</strong>
+                <strong>{{ getPendingAmount(order) | appCurrency:order.currency }}</strong>
               </td>
             </ng-container>
 

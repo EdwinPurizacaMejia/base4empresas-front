@@ -34,6 +34,7 @@ export interface Order {
   id: string;
   order_number: string;
   customer_id: string;
+  customer_name?: string;
   sales_channel_id: string;
   status: OrderStatus;
   separation_expiry_at?: string | null;

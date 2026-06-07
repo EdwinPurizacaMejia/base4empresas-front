@@ -4,15 +4,15 @@
     <h2>Pagos</h2>
     <div class="summary">
       <span class="summary-item">
-        <strong>Total Orden:</strong> {{ orderTotalAmount | currency }}
+        <strong>Total Orden:</strong> {{ orderTotalAmount | appCurrency: orderCurrency }}
       </span>
       <span class="summary-item">
         <strong>Pagado:</strong>
-        <span class="paid">{{ getTotalPaid() | currency }}</span>
+        <span class="paid">{{ getTotalPaid() | appCurrency: orderCurrency }}</span>
       </span>
       <span class="summary-item" [class.pending]="getBalancePending() > 0">
         <strong>Pendiente:</strong>
-        <span class="balance">{{ getBalancePending() | currency }}</span>
+        <span class="balance">{{ getBalancePending() | appCurrency: orderCurrency }}</span>
       </span>
     </div>
   </div>
@@ -24,6 +24,17 @@
     <mat-card class="payments-card">
       <mat-card-header>
         <mat-card-title>Histórico de Pagos</mat-card-title>
+        <div class="header-actions">
+          <button
+            mat-icon-button
+            (click)="onRefreshPayments()"
+            [disabled]="loading"
+            matTooltip="Actualizar pagos"
+            color="primary"
+          >
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
       </mat-card-header>
       <mat-card-content>
         <div class="table-container">
@@ -40,7 +51,7 @@
             <ng-container matColumnDef="amount">
               <th mat-header-cell *matHeaderCellDef>Monto</th>
               <td mat-cell *matCellDef="let payment">
-                {{ payment.amount | currency }}
+                {{ payment.amount | appCurrency: payment.currency }}
               </td>
             </ng-container>
 

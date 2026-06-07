@@ -16,6 +16,7 @@ import { ProductsService } from '../../services/products.service';
 import { Product } from '../../models/product.model';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-sale-detail',
@@ -31,6 +32,7 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     MatTooltipModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
+    AppCurrencyPipe,
   ],
   templateUrl: './sale-detail.component.html',
   styleUrl: './sale-detail.component.css',

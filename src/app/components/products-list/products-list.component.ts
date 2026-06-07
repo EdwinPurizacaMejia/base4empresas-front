@@ -22,6 +22,7 @@ import { ProductFormComponent } from '../product-form/product-form.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { EmptyStateComponent } from '../shared/empty-state.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-products-list',
@@ -42,7 +43,8 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     ProductFormComponent,
     LoadingSpinnerComponent,
     EmptyStateComponent,
-    ErrorStateComponent
+    ErrorStateComponent,
+    AppCurrencyPipe
   ],
   templateUrl: './products-list.component.html',
   styleUrl: './products-list.component.scss'

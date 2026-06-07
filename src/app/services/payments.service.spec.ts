@@ -84,9 +84,10 @@ describe('PaymentsService', () => {
   });
 
   describe('getPaymentsByOrder', () => {
-    it('should get payments by order ID', () => {
+    it('should get payments by order ID from new backend endpoint', () => {
       const orderId = 'ord-1';
       const mockPayments: Payment[] = [mockPayment];
+      const mockResponse = { payments: mockPayments, total: 1, skip: 0, limit: 100 };
 
       service.getPaymentsByOrder(orderId).subscribe((result) => {
         expect(result.length).toBe(1);
@@ -94,34 +95,53 @@ describe('PaymentsService', () => {
       });
 
       const req = httpMock.expectOne(
-        (r) => r.url === `${mockBaseUrl}/payments` && r.params.has('order_id')
+        (r) => r.url === `${mockBaseUrl}/payments/orders/ord-1/list`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.params.get('order_id')).toBe(encodeURIComponent(orderId));
-      req.flush(mockPayments);
+      expect(req.request.params.get('skip')).toBe('0');
+      expect(req.request.params.get('limit')).toBe('100');
+      req.flush(mockResponse);
     });
 
     it('should encode special characters in order ID', () => {
       const orderId = 'ord-1/special&chars';
+      const mockResponse = { payments: [], total: 0, skip: 0, limit: 100 };
 
       service.getPaymentsByOrder(orderId).subscribe();
 
-      const req = httpMock.expectOne(
-        (r) => r.url === `${mockBaseUrl}/payments` && r.params.has('order_id')
-      );
-      expect(req.request.params.get('order_id')).toBe(encodeURIComponent(orderId));
-      req.flush([]);
+      const expectedUrl = `${mockBaseUrl}/payments/orders/${encodeURIComponent(orderId)}/list`;
+      const req = httpMock.expectOne((r) => r.url === expectedUrl);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockResponse);
     });
 
     it('should return empty array when no payments exist', () => {
+      const mockResponse = { payments: [], total: 0, skip: 0, limit: 100 };
+
       service.getPaymentsByOrder('ord-1').subscribe((result) => {
         expect(result).toEqual([]);
       });
 
       const req = httpMock.expectOne(
-        (r) => r.url === `${mockBaseUrl}/payments` && r.params.has('order_id')
+        (r) => r.url === `${mockBaseUrl}/payments/orders/ord-1/list`
       );
-      req.flush([]);
+      req.flush(mockResponse);
+    });
+
+    it('should support pagination parameters', () => {
+      const mockPayments: Payment[] = [mockPayment];
+      const mockResponse = { payments: mockPayments, total: 50, skip: 10, limit: 20 };
+
+      service.getPaymentsByOrder('ord-1', 10, 20).subscribe((result) => {
+        expect(result.length).toBe(1);
+      });
+
+      const req = httpMock.expectOne(
+        (r) => r.url === `${mockBaseUrl}/payments/orders/ord-1/list`
+      );
+      expect(req.request.params.get('skip')).toBe('10');
+      expect(req.request.params.get('limit')).toBe('20');
+      req.flush(mockResponse);
     });
   });
 

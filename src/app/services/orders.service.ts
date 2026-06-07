@@ -73,10 +73,10 @@ export class OrdersService {
 
   /**
    * Actualizar el estado de una orden
-   * Backend: PATCH /orders/{id}
+   * Backend: PATCH /orders/{id}/status
    */
   updateOrderStatus(id: string, payload: OrderUpdateStatus): Observable<Order> {
-    const url = `${this.apiUrl}/${encodeURIComponent(id)}`;
+    const url = `${this.apiUrl}/${encodeURIComponent(id)}/status`;
     return this.http.patch<Order>(url, payload);
   }
 

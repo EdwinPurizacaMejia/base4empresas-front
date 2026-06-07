@@ -13,6 +13,7 @@ import { ProductsService } from '../../services/products.service';
 import { NotificationService } from '../../services/notification.service';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-product-detail',
@@ -27,6 +28,7 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     MatTabsModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
+    AppCurrencyPipe,
   ],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css',

@@ -68,7 +68,7 @@
         <ng-container matColumnDef="customer">
           <th mat-header-cell *matHeaderCellDef>Cliente</th>
           <td mat-cell *matCellDef="let order">
-            {{ order.customer_id }}
+            {{ order.customer_name || order.customer_id }}
           </td>
         </ng-container>
 
@@ -94,7 +94,7 @@
         <ng-container matColumnDef="total_amount">
           <th mat-header-cell *matHeaderCellDef>Total</th>
           <td mat-cell *matCellDef="let order">
-            {{ order.total_amount | currency }}
+            {{ order.total_amount | appCurrency: order.currency }}
           </td>
         </ng-container>
 
@@ -102,7 +102,7 @@
         <ng-container matColumnDef="paid_amount">
           <th mat-header-cell *matHeaderCellDef>Pagado</th>
           <td mat-cell *matCellDef="let order">
-            {{ order.paid_amount | currency }}
+            {{ order.paid_amount | appCurrency: order.currency }}
           </td>
         </ng-container>
 

@@ -15,6 +15,7 @@ import { Product } from '../../models/product.model';
 import { NotificationService } from '../../services/notification.service';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-purchase-detail',
@@ -29,6 +30,7 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     MatTableModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
+    AppCurrencyPipe,
   ],
   templateUrl: './purchase-detail.component.html',
   styleUrl: './purchase-detail.component.css',

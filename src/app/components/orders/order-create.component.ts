@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, forkJoin } from 'rxjs';
+import { Subject, takeUntil, forkJoin, catchError, of, debounceTime } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,6 +20,7 @@ import { SalesChannelsService } from '../../services/sales-channels.service';
 import { ProductsService } from '../../services/products.service';
 import { NotificationService } from '../../services/notification.service';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-order-create',
@@ -35,7 +36,8 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
     MatCardModule,
     MatTableModule,
     MatProgressSpinnerModule,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    AppCurrencyPipe
   ],
   templateUrl: './order-create.component.html',
   styleUrl: './order-create.component.scss'
@@ -50,6 +52,12 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
   channels: any[] = [];
   products: any[] = [];
 
+  // Propiedades cacheadas para evitar change detection infinito
+  itemsDataSource: any[] = [];
+  totalAmount = 0;
+  balanceAmount = 0;
+  itemSubtotals: number[] = [];
+
   itemsDisplayedColumns = ['product', 'quantity', 'unitPrice', 'discount', 'subtotal', 'actions'];
 
   private destroy$ = new Subject<void>();
@@ -58,12 +66,8 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
     return this.form.get('items') as FormArray;
   }
 
-  get totalAmount(): number {
-    return this.items.value.reduce((sum: number, item: any) => {
-      const subtotal = item.quantity * item.unitPrice;
-      const discounted = subtotal - (item.discount || 0);
-      return sum + discounted;
-    }, 0);
+  get selectedCurrency(): string {
+    return this.form.get('currency')?.value || 'PEN';
   }
 
   constructor(
@@ -80,11 +84,61 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadFormData();
+    this.setupFormListeners();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Configurar listeners para recalcular automáticamente
+   */
+  private setupFormListeners(): void {
+    // Escuchar cambios en items
+    this.items.valueChanges
+      .pipe(
+        debounceTime(100),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.recalculateTotals();
+      });
+
+    // Escuchar cambios en monto inicial
+    this.form.get('initial_payment_amount')?.valueChanges
+      .pipe(
+        debounceTime(100),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.recalculateTotals();
+      });
+  }
+
+  /**
+   * Recalcular totales y actualizar cache
+   */
+  private recalculateTotals(): void {
+    // Leer items una sola vez
+    const itemsValues = this.items.value;
+    
+    // Calcular subtotales por ítem
+    this.itemSubtotals = itemsValues.map((item: any) => {
+      const subtotal = (item.quantity || 0) * (item.unitPrice || 0);
+      return subtotal - (item.discount || 0);
+    });
+
+    // Calcular total
+    this.totalAmount = this.itemSubtotals.reduce((sum, subtotal) => sum + subtotal, 0);
+
+    // Calcular saldo
+    const initialPayment = this.form.get('initial_payment_amount')?.value || 0;
+    this.balanceAmount = this.totalAmount - initialPayment;
+
+    // Actualizar dataSource con copia estable
+    this.itemsDataSource = [...this.items.controls];
   }
 
   private createForm(): FormGroup {
@@ -100,26 +154,61 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
   private loadFormData(): void {
     this.loadingData = true;
 
-    forkJoin([
-      this.customersService.getCustomers(),
-      this.channelsService.getChannels(),
-      this.productsService.getProducts()
-    ])
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: ([customers, channels, products]) => {
-          this.customers = customers || [];
-          this.channels = channels || [];
-          this.products = products || [];
-          this.loadingData = false;
+    // Inicializar arrays vacíos para evitar errores
+    this.customers = [];
+    this.channels = [];
+    this.products = [];
+
+    // Usar forkJoin para esperar a que TODOS los servicios completen
+    forkJoin({
+      customers: this.customersService.getCustomers().pipe(
+        takeUntil(this.destroy$),
+        catchError((err) => {
+          console.error('Error loading customers:', err);
+          return of([]);
+        })
+      ),
+      channels: this.channelsService.getChannels().pipe(
+        takeUntil(this.destroy$),
+        catchError((err) => {
+          console.error('Error loading channels:', err);
+          return of([]);
+        })
+      ),
+      products: this.productsService.getProducts().pipe(
+        takeUntil(this.destroy$),
+        catchError((err) => {
+          console.error('Error loading products:', err);
+          return of([]);
+        })
+      )
+    }).subscribe({
+      next: (result) => {
+        this.customers = result.customers || [];
+        this.channels = result.channels || [];
+        this.products = result.products || [];
+        
+        if (this.items.length === 0) {
           this.addItem();
-        },
-        error: (err) => {
-          console.error('Error loading form data:', err);
-          this.notificationService.error('Error al cargar datos del formulario');
-          this.loadingData = false;
         }
-      });
+        
+        // Recalcular después de inicializar
+        this.recalculateTotals();
+        
+        this.loadingData = false;
+      },
+      error: (err) => {
+        console.error('Error loading form data:', err);
+        this.notificationService.error('Error al cargar los datos del formulario');
+        
+        if (this.items.length === 0) {
+          this.addItem();
+        }
+        
+        this.recalculateTotals();
+        this.loadingData = false;
+      }
+    });
   }
 
   addItem(): void {
@@ -131,11 +220,13 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
     });
 
     this.items.push(itemForm);
+    this.recalculateTotals();
   }
 
   removeItem(index: number): void {
     if (this.items.length > 1) {
       this.items.removeAt(index);
+      this.recalculateTotals();
     } else {
       this.notificationService.warning('Debe haber al menos un ítem en la orden');
     }
@@ -189,7 +280,7 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
         next: (order: Order) => {
           this.submitting = false;
           this.notificationService.success(`Orden ${order.order_number} creada exitosamente`);
-          this.router.navigate(['/pedidos', order.id]);
+          this.router.navigate(['/ventas/pedidos', order.id]);
         },
         error: (err) => {
           console.error('Error creating order:', err);
@@ -200,6 +291,6 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    this.router.navigate(['/pedidos']);
+    this.router.navigate(['/ventas/pedidos']);
   }
 }

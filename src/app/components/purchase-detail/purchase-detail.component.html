@@ -98,7 +98,7 @@
           <div class="info-item">
             <label>Total</label>
             <p class="info-value currency">
-              {{ purchase.total | currency : 'PEN' : 'symbol' : '1.2-2' }}
+              {{ purchase.total | appCurrency: 'PEN' }}
             </p>
           </div>
         </div>
@@ -137,14 +137,14 @@
           <ng-container matColumnDef="unit_cost">
             <th mat-header-cell *matHeaderCellDef>Costo Unit.</th>
             <td mat-cell *matCellDef="let item">
-              {{ item.unit_cost | currency : 'PEN' : 'symbol' : '1.2-2' }}
+              {{ item.unit_cost | appCurrency: 'PEN' }}
             </td>
           </ng-container>
 
           <ng-container matColumnDef="subtotal">
             <th mat-header-cell *matHeaderCellDef>Subtotal</th>
             <td mat-cell *matCellDef="let item">
-              {{ (item.subtotal ?? (item.quantity * item.unit_cost)) | currency : 'PEN' : 'symbol' : '1.2-2' }}
+              {{ (item.subtotal ?? (item.quantity * item.unit_cost)) | appCurrency: 'PEN' }}
             </td>
           </ng-container>
 
