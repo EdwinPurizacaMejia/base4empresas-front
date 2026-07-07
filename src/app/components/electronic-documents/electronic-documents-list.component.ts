@@ -11,6 +11,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 import { ElectronicDocumentsService } from '../../services/electronic-documents.service';
 import { NotificationService } from '../../services/notification.service';
@@ -31,6 +32,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatPaginatorModule,
     LoadingSpinnerComponent,
     AppCurrencyPipe
   ],
@@ -41,6 +43,12 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
   documents: any[] = [];
   loading = false;
   filters: FormGroup;
+
+  // Paginación
+  page = 1;
+  pageSize = 20;
+  total = 0;
+  pageSizeOptions = [10, 20, 50, 100];
 
   displayedColumns = [
     'document_number',
@@ -69,7 +77,10 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
 
     this.filters.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.loadDocuments());
+      .subscribe(() => {
+        this.page = 1; // Resetear a página 1 al cambiar filtros
+        this.loadDocuments();
+      });
   }
 
   ngOnDestroy(): void {
@@ -82,6 +93,8 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
 
     const filterValues = this.filters.value;
     const filters = {
+      page: this.page,
+      page_size: this.pageSize,
       search: filterValues.search || undefined,
       status: filterValues.status || undefined,
       document_type: filterValues.document_type || undefined
@@ -93,6 +106,7 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.documents = response.items || [];
+          this.total = response.total || 0;
           this.loading = false;
         },
         error: (err) => {
@@ -142,7 +156,14 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
   }
 
   clearFilters(): void {
+    this.page = 1;
     this.filters.reset();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.page = event.pageIndex + 1; // Material Paginator usa índice base 0
+    this.pageSize = event.pageSize;
+    this.loadDocuments();
   }
 
   getStatusOptions(): string[] {

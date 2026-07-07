@@ -99,6 +99,18 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="document-row"></tr>
       </table>
+
+      <!-- Paginador -->
+      <mat-paginator
+        *ngIf="documents.length > 0"
+        [length]="total"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="page - 1"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+        aria-label="Seleccionar página de documentos electrónicos">
+      </mat-paginator>
     </div>
   </mat-card>
 </div>
