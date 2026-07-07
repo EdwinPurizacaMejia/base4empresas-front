@@ -116,7 +116,7 @@ export const MAIN_MENU: MenuItem[] = [
   },
 
   // ========================================
-  // FASE 2-3: Ventas (Pedidos + Pagos)
+  // FASE 2-3: Ventas (Pedidos + Pagos + Documentos Electrónicos)
   // ========================================
   {
     label: 'Ventas',
@@ -134,6 +134,12 @@ export const MAIN_MENU: MenuItem[] = [
         icon: '💳',
         route: '/ventas/pagos',
         tooltip: 'Gestión y validación de pagos (FASE 3)',
+      },
+      {
+        label: 'Documentos Electrónicos',
+        icon: '📄',
+        route: '/ventas/documentos-electronicos',
+        tooltip: 'Facturas, boletas y comprobantes electrónicos',
       },
     ],
   },

@@ -12,11 +12,12 @@ import { SalesChannelsListComponent } from './components/sales-channels/sales-ch
 import { CustomersListComponent } from './components/customers-list/customers-list.component';
 import { SuppliersListComponent } from './components/suppliers-list/suppliers-list.component';
 
-// VENTAS (FASE 2-3: Pedidos + Pagos)
+// VENTAS (FASE 2-3: Pedidos + Pagos + Documentos Electrónicos)
 import { OrdersListComponent } from './components/orders/orders-list.component';
 import { OrderCreateComponent } from './components/orders/order-create.component';
 import { OrderDetailComponent } from './components/orders/order-detail.component';
 import { PaymentsListComponent } from './components/orders/payments-list.component';
+import { ElectronicDocumentsListComponent } from './components/electronic-documents/electronic-documents-list.component';
 
 // INVENTARIO (FASE 2-4)
 import { StockListComponent } from './components/stock-list/stock-list.component';
@@ -133,7 +134,7 @@ export const routes: Routes = [
       },
 
       // ========================================
-      // FASE 2-3: VENTAS (Pedidos + Pagos)
+      // FASE 2-3: VENTAS (Pedidos + Pagos + Documentos Electrónicos)
       // ========================================
       {
         path: 'ventas',
@@ -160,6 +161,13 @@ export const routes: Routes = [
             path: 'pagos',
             component: PaymentsListComponent,
             data: { title: 'Gestión de Pagos' }
+          },
+
+          // Documentos Electrónicos (Facturas, Boletas, NC, ND)
+          {
+            path: 'documentos-electronicos',
+            component: ElectronicDocumentsListComponent,
+            data: { title: 'Documentos Electrónicos' }
           }
         ]
       },
