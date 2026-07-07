@@ -1,0 +1,68 @@
+<div class="container">
+  <div class="header">
+    <h1>Documentos Electrónicos</h1>
+    <button mat-stroked-button (click)="onRefresh()">
+      <mat-icon>refresh</mat-icon>
+      Actualizar
+    </button>
+  </div>
+
+  <!-- Tabla de Documentos -->
+  <mat-card class="table-card">
+    <app-loading-spinner *ngIf="loading" message="Cargando documentos electrónicos..."></app-loading-spinner>
+
+    <div class="table-container" *ngIf="!loading">
+      <div class="empty-state" *ngIf="documents.length === 0">
+        <mat-icon>inbox</mat-icon>
+        <p>No hay documentos electrónicos</p>
+      </div>
+
+      <table mat-table [dataSource]="documents" class="documents-table" *ngIf="documents.length > 0">
+        <!-- Número de Documento -->
+        <ng-container matColumnDef="document_number">
+          <th mat-header-cell *matHeaderCellDef>Número</th>
+          <td mat-cell *matCellDef="let doc" class="document-number">
+            {{ doc.document_number || '-' }}
+          </td>
+        </ng-container>
+
+        <!-- Tipo de Documento -->
+        <ng-container matColumnDef="document_type">
+          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let doc">
+            {{ getDocumentTypeLabel(doc.document_type) }}
+          </td>
+        </ng-container>
+
+        <!-- Estado -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let doc">
+            <mat-chip [color]="getStatusColor(doc.status)" selected>
+              {{ getStatusLabel(doc.status) }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Monto Total -->
+        <ng-container matColumnDef="total_amount">
+          <th mat-header-cell *matHeaderCellDef>Monto Total</th>
+          <td mat-cell *matCellDef="let doc">
+            {{ doc.total_amount | appCurrency: doc.currency }}
+          </td>
+        </ng-container>
+
+        <!-- Fecha de Emisión -->
+        <ng-container matColumnDef="issue_date">
+          <th mat-header-cell *matHeaderCellDef>Fecha de Emisión</th>
+          <td mat-cell *matCellDef="let doc">
+            {{ doc.issue_date ? (doc.issue_date | date: 'short') : '-' }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="document-row"></tr>
+      </table>
+    </div>
+  </mat-card>
+</div>
