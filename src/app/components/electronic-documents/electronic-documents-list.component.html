@@ -96,6 +96,68 @@
           </td>
         </ng-container>
 
+        <!-- Acciones -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let doc" class="actions-cell">
+            <!-- Ver -->
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="onView(doc)"
+              matTooltip="Ver detalle">
+              <mat-icon>visibility</mat-icon>
+            </button>
+
+            <!-- Emitir -->
+            <button
+              *ngIf="canEmit(doc)"
+              mat-icon-button
+              color="accent"
+              (click)="onEmit(doc)"
+              matTooltip="Emitir documento">
+              <mat-icon>send</mat-icon>
+            </button>
+
+            <!-- Cancelar -->
+            <button
+              *ngIf="canCancel(doc)"
+              mat-icon-button
+              color="warn"
+              (click)="onCancel(doc)"
+              matTooltip="Cancelar documento">
+              <mat-icon>cancel</mat-icon>
+            </button>
+
+            <!-- PDF -->
+            <button
+              *ngIf="hasPdf(doc)"
+              mat-icon-button
+              (click)="onDownloadPdf(doc)"
+              matTooltip="Descargar PDF">
+              <mat-icon>picture_as_pdf</mat-icon>
+            </button>
+
+            <!-- XML -->
+            <button
+              *ngIf="hasXml(doc)"
+              mat-icon-button
+              (click)="onDownloadXml(doc)"
+              matTooltip="Descargar XML">
+              <mat-icon>code</mat-icon>
+            </button>
+
+            <!-- CDR -->
+            <button
+              *ngIf="hasCdr(doc)"
+              mat-icon-button
+              (click)="onDownloadCdr(doc)"
+              matTooltip="Descargar CDR">
+              <mat-icon>receipt_long</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="document-row"></tr>
       </table>

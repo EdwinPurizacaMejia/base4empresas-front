@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ElectronicDocumentsService } from '../../services/electronic-documents.service';
 import { NotificationService } from '../../services/notification.service';
@@ -33,6 +34,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     MatInputModule,
     MatSelectModule,
     MatPaginatorModule,
+    MatTooltipModule,
     LoadingSpinnerComponent,
     AppCurrencyPipe
   ],
@@ -55,7 +57,8 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
     'document_type',
     'status',
     'total_amount',
-    'issue_date'
+    'issue_date',
+    'actions'
   ];
 
   private destroy$ = new Subject<void>();
@@ -177,5 +180,51 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
       { value: 'credit_note', label: 'Nota de Crédito' },
       { value: 'debit_note', label: 'Nota de Débito' }
     ];
+  }
+
+  // Handlers de acciones
+  onView(document: any): void {
+    console.log('Ver documento:', document);
+  }
+
+  onEmit(document: any): void {
+    console.log('Emitir documento:', document);
+  }
+
+  onCancel(document: any): void {
+    console.log('Cancelar documento:', document);
+  }
+
+  onDownloadPdf(document: any): void {
+    console.log('Descargar PDF:', document);
+  }
+
+  onDownloadXml(document: any): void {
+    console.log('Descargar XML:', document);
+  }
+
+  onDownloadCdr(document: any): void {
+    console.log('Descargar CDR:', document);
+  }
+
+  // Helpers de visibilidad de botones
+  canEmit(document: any): boolean {
+    return document.status === 'DRAFT' || document.status === 'READY';
+  }
+
+  canCancel(document: any): boolean {
+    return document.status === 'ACCEPTED' || document.status === 'PROCESSING';
+  }
+
+  hasPdf(document: any): boolean {
+    return !!document.pdf_url;
+  }
+
+  hasXml(document: any): boolean {
+    return !!document.xml_url;
+  }
+
+  hasCdr(document: any): boolean {
+    return !!document.cdr_url;
   }
 }
