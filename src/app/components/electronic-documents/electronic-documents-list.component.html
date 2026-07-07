@@ -7,6 +7,42 @@
     </button>
   </div>
 
+  <!-- Filtros -->
+  <mat-card class="filters-card">
+    <form [formGroup]="filters" class="filters-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Buscar</mat-label>
+        <input matInput formControlName="search" placeholder="Buscar por número o ID proveedor">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="">Todos</mat-option>
+          <mat-option *ngFor="let status of getStatusOptions()" [value]="status">
+            {{ getStatusLabel(status) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de Documento</mat-label>
+        <mat-select formControlName="document_type">
+          <mat-option value="">Todos</mat-option>
+          <mat-option *ngFor="let type of getDocumentTypeOptions()" [value]="type.value">
+            {{ type.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button type="button" (click)="clearFilters()">
+        <mat-icon>clear</mat-icon>
+        Limpiar
+      </button>
+    </form>
+  </mat-card>
+
   <!-- Tabla de Documentos -->
   <mat-card class="table-card">
     <app-loading-spinner *ngIf="loading" message="Cargando documentos electrónicos..."></app-loading-spinner>

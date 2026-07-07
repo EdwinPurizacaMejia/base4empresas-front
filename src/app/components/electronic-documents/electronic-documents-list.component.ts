@@ -1,12 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 
 import { ElectronicDocumentsService } from '../../services/electronic-documents.service';
 import { NotificationService } from '../../services/notification.service';
@@ -18,11 +22,15 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatButtonModule,
     MatIconModule,
     MatTableModule,
     MatCardModule,
     MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
     LoadingSpinnerComponent,
     AppCurrencyPipe
   ],
@@ -32,6 +40,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
   documents: any[] = [];
   loading = false;
+  filters: FormGroup;
 
   displayedColumns = [
     'document_number',
@@ -45,11 +54,22 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
 
   constructor(
     private documentsService: ElectronicDocumentsService,
-    private notificationService: NotificationService
-  ) {}
+    private notificationService: NotificationService,
+    private fb: FormBuilder
+  ) {
+    this.filters = this.fb.group({
+      search: [''],
+      status: [''],
+      document_type: ['']
+    });
+  }
 
   ngOnInit(): void {
     this.loadDocuments();
+
+    this.filters.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadDocuments());
   }
 
   ngOnDestroy(): void {
@@ -60,8 +80,15 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
   private loadDocuments(): void {
     this.loading = true;
 
+    const filterValues = this.filters.value;
+    const filters = {
+      search: filterValues.search || undefined,
+      status: filterValues.status || undefined,
+      document_type: filterValues.document_type || undefined
+    };
+
     this.documentsService
-      .listDocuments()
+      .listDocuments(filters)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -112,5 +139,22 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
 
   onRefresh(): void {
     this.loadDocuments();
+  }
+
+  clearFilters(): void {
+    this.filters.reset();
+  }
+
+  getStatusOptions(): string[] {
+    return ['DRAFT', 'PENDING', 'PROCESSING', 'ACCEPTED', 'REJECTED', 'OBSERVED', 'CANCELLED', 'ERROR'];
+  }
+
+  getDocumentTypeOptions(): Array<{ value: string; label: string }> {
+    return [
+      { value: 'invoice', label: 'Factura' },
+      { value: 'boleta', label: 'Boleta' },
+      { value: 'credit_note', label: 'Nota de Crédito' },
+      { value: 'debit_note', label: 'Nota de Débito' }
+    ];
   }
 }

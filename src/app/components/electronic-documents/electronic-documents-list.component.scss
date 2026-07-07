@@ -18,6 +18,29 @@
   }
 }
 
+.filters-card {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filters-form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+
+  mat-form-field {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  button {
+    height: 56px;
+    margin-top: 0;
+  }
+}
+
 .table-card {
   padding: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -86,6 +109,24 @@
 
     h1 {
       font-size: 1.5rem;
+    }
+  }
+
+  .filters-card {
+    padding: 1rem;
+  }
+
+  .filters-form {
+    flex-direction: column;
+    align-items: stretch;
+
+    mat-form-field {
+      width: 100%;
+      min-width: auto;
+    }
+
+    button {
+      width: 100%;
     }
   }
 
