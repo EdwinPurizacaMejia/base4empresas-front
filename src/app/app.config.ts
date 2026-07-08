@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideClientHydration(),
-    provideHttpClient(withFetch(), withInterceptors([apiErrorInterceptor])),
+    provideHttpClient(withInterceptors([apiErrorInterceptor])),
     provideAnimations(), // Requerido por Angular Material
     ApiConfigService // Servicio centralizado para configuración de API
   ]
