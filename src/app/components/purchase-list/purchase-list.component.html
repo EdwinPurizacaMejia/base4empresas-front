@@ -48,7 +48,7 @@
         <ng-container matColumnDef="created_at">
           <th mat-header-cell *matHeaderCellDef class="column-date">Fecha</th>
           <td mat-cell *matCellDef="let element" class="column-date">
-            {{ getPurchaseDate(element) ? (getPurchaseDate(element) | date:'short') : '-' }}
+            {{ getPurchaseDate(element) ? (getPurchaseDate(element) | date:'dd/MM/yyyy hh:mm a') : '-' }}
           </td>
         </ng-container>
 
