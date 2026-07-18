@@ -1,0 +1,598 @@
+// ============================================================================
+// PURCHASE FORM COMPONENT — Formulario de compra (modal)
+// Fase 4 — Formularios y Diálogos — Base4Empresas
+//
+// Migrado y optimizado desde purchase-form.component.css (12.79KB → <11KB)
+// Eliminadas: reglas duplicadas, dark-mode override innecesario, !important redundantes
+// ============================================================================
+
+@import '../../../styles/variables';
+
+// ============================================================================
+// HEADER DEL DIÁLOGO
+// ============================================================================
+
+h2.dialog-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: $space-6 $space-4;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-dark;
+  background: linear-gradient(135deg, $color-background 0%, $color-surface-hover 100%);
+  border-bottom: 2px solid $color-text-lighter;
+  box-shadow: $shadow-xs;
+
+  .close-button {
+    color: $color-text-light;
+    margin-left: auto;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 0;
+    border-radius: $border-radius-md;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    box-shadow: none;
+    transition: color $transition-base, background-color $transition-base, transform $transition-fast;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+    }
+
+    &:hover:not([disabled]) {
+      color: $color-primary;
+      background-color: $color-primary-lighter;
+      transform: scale(1.05);
+    }
+  }
+}
+
+// ============================================================================
+// CONTENIDO DEL DIÁLOGO
+// ============================================================================
+
+.dialog-content {
+  padding: $space-3 $space-5 $space-6 * 4 !important;
+  background-color: $color-background !important;
+  min-height: 0;
+  box-sizing: border-box !important;
+}
+
+.subtitle {
+  margin: 0 0 $space-2;
+  padding: 0 $space-2;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-medium;
+  line-height: $line-height-relaxed;
+}
+
+// ============================================================================
+// CONTENEDOR PRINCIPAL DEL FORMULARIO
+// ============================================================================
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding: 2px;
+  background-color: $color-surface;
+  border-radius: $border-radius-md;
+}
+
+// ============================================================================
+// GRID DE CAMPOS PRINCIPALES
+// ============================================================================
+
+.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 28px;
+  row-gap: $space-3;
+  padding: 0 2px;
+  align-items: start;
+
+  @media (max-width: #{$breakpoint-md}) {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.purchase-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 28px;
+  row-gap: $space-2;
+  padding: 0 2px;
+
+  @media (max-width: #{$breakpoint-md}) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.purchase-field {
+  display: block;
+  min-height: 74px;
+}
+
+// ============================================================================
+// CAMPOS NATIVOS (select, input, textarea sin Material)
+// ============================================================================
+
+// Contenedor base para campos nativos
+%native-field-base {
+  position: relative;
+  padding-top: $space-2;
+}
+
+%native-label-base {
+  position: absolute;
+  top: 0;
+  left: $space-4;
+  z-index: 1;
+  padding: 0 $space-1;
+  background-color: $color-surface;
+  color: $color-text-medium;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  line-height: 16px;
+  cursor: default;
+}
+
+%native-control-base {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 $space-3;
+  border: 1px solid $color-text-lighter;
+  border-radius: $border-radius-sm;
+  background-color: $color-surface;
+  box-sizing: border-box;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+
+  &:focus-within {
+    border-color: $color-primary;
+    box-shadow: inset 0 0 0 1px $color-primary;
+  }
+
+  mat-icon {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    margin-right: $space-3;
+    color: $color-text-dark;
+    font-size: 20px;
+    line-height: 20px;
+  }
+}
+
+.native-select-field {
+  @extend %native-field-base;
+  min-height: 60px;
+}
+
+.native-select-label {
+  @extend %native-label-base;
+}
+
+.native-select-control {
+  @extend %native-control-base;
+
+  select {
+    flex: 1;
+    min-width: 0;
+    height: 54px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: $color-text-dark;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+  }
+}
+
+.item-native-select-field {
+  @extend %native-field-base;
+  min-width: 220px;
+  min-height: 60px;
+}
+
+.native-input-field {
+  @extend %native-field-base;
+  min-height: 60px;
+}
+
+.native-input-label {
+  @extend %native-label-base;
+}
+
+.native-input-control {
+  @extend %native-control-base;
+
+  .native-input-prefix {
+    flex: 0 0 auto;
+    margin-right: $space-2;
+    color: $color-text-dark;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    height: 54px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: $color-text-dark;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    text-align: right;
+    padding-right: $space-1;
+  }
+}
+
+// Inputs numéricos — quitar spin buttons
+.quantity-field,
+.cost-field {
+  .native-input-control input {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.2px;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &[type='number'] {
+      -moz-appearance: textfield;
+    }
+  }
+}
+
+.native-select-error {
+  margin: $space-1 0 0 $space-4;
+  color: $color-danger;
+  font-size: $font-size-xs;
+  line-height: 16px;
+}
+
+.native-notes-field {
+  @extend %native-field-base;
+  width: 100%;
+}
+
+.native-notes-label {
+  @extend %native-label-base;
+}
+
+.native-notes-control {
+  @extend %native-control-base;
+  align-items: flex-start;
+  min-height: 88px;
+  padding: 18px $space-3 $space-2;
+
+  mat-icon {
+    margin: $space-2 $space-3 0 0;
+  }
+
+  textarea {
+    flex: 1;
+    min-width: 0;
+    min-height: 58px;
+    border: 0;
+    outline: 0;
+    resize: vertical;
+    background: transparent;
+    color: $color-text-dark;
+    font-size: $font-size-sm;
+    line-height: 1.4;
+  }
+}
+
+.native-notes-hint {
+  margin: $space-1 0 0 $space-4;
+  color: $color-text-dark;
+  font-size: $font-size-xs;
+  line-height: 16px;
+}
+
+.full-width,
+.half-width,
+.item-field {
+  width: 100%;
+}
+
+.description-field {
+  grid-column: 1 / -1;
+  max-width: 100%;
+}
+
+// ============================================================================
+// SECCIÓN ITEMS
+// ============================================================================
+
+.items-section {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding: $space-4 $space-5 !important;
+  border: 1px solid $color-border !important;
+  border-radius: $border-radius-lg;
+  background-color: $color-surface !important;
+  box-shadow: $shadow-xs;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 40px;
+
+  h3 {
+    margin: 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-text-dark;
+  }
+
+  button {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    flex: 0 0 40px;
+    border-radius: 50% !important;
+    background-color: $color-primary !important;
+    color: white !important;
+    box-shadow: $shadow-md !important;
+
+    mat-icon {
+      margin: 0 !important;
+      width: 24px !important;
+      height: 24px !important;
+      font-size: 24px !important;
+    }
+  }
+}
+
+// ============================================================================
+// TARJETA DE ÍTEM
+// ============================================================================
+
+.item-card {
+  background-color: $color-surface !important;
+  border: 1px solid $color-border !important;
+  border-radius: $border-radius-lg !important;
+  padding: $space-4 !important;
+  box-shadow: $shadow-xs;
+}
+
+.item-form {
+  display: grid;
+  grid-template-columns: minmax(220px, 2.2fr) minmax(112px, 0.9fr) minmax(150px, 1fr) 176px;
+  gap: $space-3;
+  align-items: center;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+
+    .product-field,
+    .item-actions-cell {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: #{$breakpoint-sm}) {
+    grid-template-columns: 1fr;
+
+    .product-field,
+    .quantity-field,
+    .cost-field {
+      min-width: 0;
+    }
+  }
+}
+
+.item-field {
+  margin-bottom: 0;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    min-height: 18px;
+  }
+}
+
+.product-field {
+  min-width: 220px;
+}
+
+.quantity-field {
+  min-width: 112px;
+}
+
+.cost-field {
+  min-width: 150px;
+}
+
+// Celda de acciones del ítem (subtotal + botón eliminar)
+.item-actions-cell {
+  display: grid;
+  grid-template-columns: 132px 40px;
+  column-gap: $space-1;
+  align-items: center;
+  justify-content: end;
+  width: 176px;
+  min-width: 176px;
+  box-sizing: border-box;
+}
+
+// Subtotal del ítem
+.item-subtotal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 60px;
+  width: 132px;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.subtotal-label {
+  font-size: $font-size-xs;
+  color: $color-text-medium;
+  font-weight: $font-weight-semibold;
+  text-align: right;
+  line-height: 1.2;
+  display: block;
+  width: 100%;
+}
+
+.subtotal-value {
+  display: block;
+  width: 100%;
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  color: $color-text-dark;
+  text-align: right;
+  margin-top: $space-1;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+// Botón eliminar
+.remove-item-button {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  padding: 0 !important;
+  align-self: center;
+  justify-self: end;
+
+  mat-icon {
+    margin: 0 !important;
+  }
+}
+
+// ============================================================================
+// TOTAL
+// ============================================================================
+
+.total-section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $space-4 $space-5 !important;
+  background: linear-gradient(135deg, $color-background 0%, $color-surface 100%) !important;
+  border: 1px solid $color-border !important;
+  border-radius: $border-radius-lg !important;
+}
+
+.total-label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-text-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.total-value {
+  min-width: 120px;
+  text-align: right;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-extrabold;
+  color: $color-primary;
+}
+
+.empty-state {
+  color: $color-text-medium;
+  background-color: $color-surface;
+}
+
+// ============================================================================
+// FOOTER — ACCIONES
+// ============================================================================
+
+.dialog-actions {
+  padding: $space-5 $space-7 !important;
+  border-top: 2px solid $color-text-lighter !important;
+  background: linear-gradient(to right, $color-background, $color-surface) !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: $space-3 !important;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+
+  button {
+    font-weight: $font-weight-bold !important;
+    font-size: $font-size-sm !important;
+    text-transform: none !important;
+    min-width: 140px;
+    padding: $space-3 $space-5 !important;
+    border-radius: $border-radius-md !important;
+    transition: all $transition-base;
+
+    mat-icon {
+      margin-right: $space-2;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:first-child {
+      background-color: transparent !important;
+      color: $color-text-medium !important;
+      border: 1px solid $color-text-lighter !important;
+
+      &:not(:disabled):hover {
+        background-color: $color-background !important;
+        color: $color-text-dark !important;
+        border-color: $color-text-dark !important;
+        transform: translateY(-2px);
+      }
+    }
+
+    &:last-child {
+      background-color: $color-primary !important;
+      color: white !important;
+      border: none !important;
+      box-shadow: $shadow-md;
+
+      &:not(:disabled):hover {
+        background-color: $color-primary-dark !important;
+        transform: translateY(-3px);
+        box-shadow: $shadow-lg;
+      }
+    }
+  }
+
+  @media (max-width: #{$breakpoint-md}) {
+    padding: $spacing-md !important;
+  }
+
+  @media (max-width: #{$breakpoint-sm}) {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+}

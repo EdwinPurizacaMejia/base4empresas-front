@@ -1,0 +1,393 @@
+// ============================================================================
+// MODAL FORM — Patrón estándar de formularios en diálogo
+// Fase 4 — Formularios y Diálogos — Base4Empresas
+//
+// Importado en styles.scss como Capa 7 (después de _components.scss)
+//
+// Clases globales reutilizables en cualquier formulario modal:
+//   .modal-form-header
+//   .modal-form-content
+//   .modal-form-section
+//   .modal-form-footer
+//   .form-field-readonly
+//   .form-error-banner
+// ============================================================================
+
+@import 'variables';
+
+// ============================================================================
+// HEADER DEL MODAL — Título + botón cerrar
+// ============================================================================
+
+.modal-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $space-5 $space-6;
+  background-color: $color-surface;
+  border-bottom: 1px solid $color-border;
+  margin: 0;
+
+  .modal-form-header__title {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-dark;
+    margin: 0;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      color: $color-primary;
+    }
+  }
+
+  .modal-form-header__close {
+    color: $color-text-light;
+    margin-left: auto;
+    flex-shrink: 0;
+
+    &:hover {
+      color: $color-text-medium;
+      background-color: $color-surface-hover;
+    }
+  }
+
+  // Variante: con badge de estado en el título
+  .modal-form-header__badge {
+    margin-left: $space-3;
+  }
+}
+
+// ============================================================================
+// CONTENT DEL MODAL — Scrollable body
+// ============================================================================
+
+.modal-form-content {
+  padding: $space-5 $space-6 $space-3 !important;
+  background-color: $color-background !important;
+  max-height: 72vh !important;
+  overflow-y: auto !important;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  // Scrollbar sutil dentro del content
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-border;
+    border-radius: $border-radius-full;
+  }
+}
+
+// ============================================================================
+// BANNER DE ERROR — Mensaje de error en el formulario
+// ============================================================================
+
+.form-error-banner {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  background-color: $color-danger-light;
+  border: 1px solid lighten(#ef4444, 20%);
+  border-left: 4px solid $color-danger;
+  border-radius: $border-radius-md;
+  color: $color-danger-variant;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  animation: slideDown 200ms ease-out;
+
+  mat-icon,
+  .form-error-banner__icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: $color-danger;
+  }
+}
+
+// ============================================================================
+// SECCIÓN DE FORMULARIO — Bloque de campos agrupados
+// ============================================================================
+
+.modal-form-section {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-5;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  transition: border-color $transition-fast;
+
+  &:focus-within {
+    border-color: $color-primary-light;
+  }
+
+  // Etiqueta de sección
+  .modal-form-section__label {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    color: $color-text-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding-bottom: $space-2;
+    border-bottom: 1px solid $color-border-light;
+    margin-bottom: $space-1;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: $color-primary;
+    }
+  }
+
+  // Header de sección con acciones
+  .modal-form-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+// ============================================================================
+// GRIDS DE CAMPOS
+// ============================================================================
+
+.form-fields-row {
+  display: grid;
+  gap: $spacing-md;
+
+  &.two-cols {
+    grid-template-columns: 1fr 1fr;
+
+    @media (max-width: #{$breakpoint-sm}) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &.three-cols {
+    grid-template-columns: 1fr 1fr 1fr;
+
+    @media (max-width: #{$breakpoint-md}) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: #{$breakpoint-sm}) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &.full-width {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================================
+// CAMPO READONLY — Diferenciación visual campo solo lectura
+// ============================================================================
+
+.form-field-readonly {
+  // Para mat-form-field con apariencia outline en modo readonly
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background-color: $color-surface-variant !important;
+    opacity: 0.85;
+  }
+
+  ::ng-deep .mat-mdc-floating-label {
+    color: $color-text-light !important;
+  }
+
+  ::ng-deep input,
+  ::ng-deep textarea {
+    color: $color-text-medium !important;
+    cursor: default !important;
+  }
+}
+
+// Indicador visual de campo readonly (icono de candado)
+.form-readonly-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  font-size: 10px;
+  color: $color-text-light;
+  font-weight: $font-weight-medium;
+  background-color: $color-surface-variant;
+  padding: 2px $space-2;
+  border-radius: $border-radius-sm;
+  border: 1px solid $color-border;
+
+  mat-icon {
+    font-size: 10px;
+    width: 10px;
+    height: 10px;
+  }
+}
+
+// ============================================================================
+// FOOTER DEL MODAL — Acciones con sticky
+// ============================================================================
+
+.modal-form-footer {
+  padding: $space-4 $space-6 !important;
+  border-top: 1px solid $color-border !important;
+  background-color: $color-surface !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: $spacing-sm !important;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+
+  button {
+    min-width: 120px;
+    font-weight: $font-weight-semibold !important;
+    border-radius: $border-radius-md !important;
+    font-size: $font-size-sm !important;
+  }
+}
+
+// ============================================================================
+// TOTAL BAR — Resumen de total del formulario
+// ============================================================================
+
+.modal-form-total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $space-5;
+  padding: $space-4 $space-5;
+  background: linear-gradient(135deg, $color-primary-lighter 0%, $color-primary-light 100%);
+  border: 1px solid $color-primary-light;
+  border-radius: $border-radius-lg;
+
+  .modal-form-total__label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    color: $color-text-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .modal-form-total__amount {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-extrabold;
+    color: $color-primary-dark;
+    min-width: 130px;
+    text-align: right;
+    line-height: $line-height-tight;
+  }
+}
+
+// ============================================================================
+// ITEM CARD — Tarjeta de línea de ítem en formularios de venta/compra
+// ============================================================================
+
+.modal-form-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+  background-color: $color-background;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  padding: $space-4;
+  transition: border-color $transition-fast;
+
+  &:hover {
+    border-color: $color-text-lighter;
+  }
+
+  .modal-form-item__index {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    background-color: $color-primary;
+    color: white;
+    border-radius: $border-radius-full;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    margin-top: $space-3;
+    flex-shrink: 0;
+  }
+
+  .modal-form-item__fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    min-width: 0;
+  }
+
+  .modal-form-item__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto;
+    align-items: center;
+    gap: $space-3;
+
+    @media (max-width: #{$breakpoint-sm}) {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+    }
+  }
+}
+
+// Subtotal box dentro de item
+.modal-form-item__subtotal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: $space-2 $space-3;
+  background-color: $color-primary-lighter;
+  border: 1px solid $color-primary-light;
+  border-radius: $border-radius-md;
+  white-space: nowrap;
+  min-width: 110px;
+
+  .subtotal-label {
+    font-size: 10px;
+    font-weight: $font-weight-bold;
+    color: $color-text-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .subtotal-amount {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-primary-dark;
+    line-height: $line-height-tight;
+  }
+}
+
+// ============================================================================
+// ESTADO LOADING / SUBMIT DEL FORMULARIO
+// ============================================================================
+
+.form-submit-loading {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-sm;
+  color: $color-text-medium;
+}
