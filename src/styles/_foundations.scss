@@ -247,6 +247,22 @@ select:not([class]) {
 }
 
 // ============================================================================
+// TABLA — ZEBRA STRIPING (filas alternadas)
+// Consistente con products-list. Aplica a cualquier componente que use
+// .list-table + .data-row (categories, units, warehouses, customers, etc.)
+// ============================================================================
+
+.list-table {
+  tr.data-row:nth-child(even) {
+    background: #fafcff; // azul muy suave — mismo valor que products-list
+  }
+
+  tr.data-row:nth-child(odd) {
+    background: $color-surface; // blanco puro
+  }
+}
+
+// ============================================================================
 // HEADER SUBTITLE — Para componentes con .header > h1 (clientes, proveedores, etc.)
 // ============================================================================
 
