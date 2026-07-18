@@ -1,84 +1,105 @@
+// ============================================================================
+// ORDER PAYMENTS COMPONENT — Gestión de pagos de pedido (panel)
+// Fase 4 / Oleada 3 — Base4Empresas
+//
+// Migrado desde colores hardcoded a variables del sistema
+// Criterios Oleada 1: campos compactos, footer uniforme, sin spinners
+// ============================================================================
+
+@import '../../../../styles/variables';
+
 .container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: $spacing-lg;
 }
+
+// ============================================================================
+// ENCABEZADO CON RESUMEN FINANCIERO
+// ============================================================================
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: $spacing-md;
 
   h2 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-dark;
   }
 
   .summary {
     display: flex;
-    gap: 24px;
+    gap: $spacing-lg;
     align-items: center;
     flex-wrap: wrap;
 
     .summary-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 13px;
+      gap: $space-2;
+      font-size: $font-size-xs;
 
       strong {
-        color: #666;
+        color: $color-text-medium;
+        font-weight: $font-weight-medium;
       }
 
       .paid {
-        color: #4caf50;
-        font-weight: 600;
-        font-size: 14px;
+        color: $color-success-variant;
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-sm;
       }
 
       .balance {
-        font-weight: 600;
-        font-size: 14px;
-        color: #f44336;
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-sm;
+        color: $color-danger;
       }
 
       &.pending {
-        color: #f44336;
+        color: $color-danger;
       }
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: #{$breakpoint-md}) {
     flex-direction: column;
     align-items: flex-start;
 
     .summary {
       flex-direction: column;
-      gap: 8px;
+      gap: $space-2;
       width: 100%;
     }
   }
 }
 
+// ============================================================================
+// CONTENIDO
+// ============================================================================
+
 .content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: $spacing-lg;
 }
 
 mat-card {
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
 
   mat-card-header {
-    margin-bottom: 16px;
+    margin-bottom: $spacing-md;
   }
 
   mat-card-title {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-dark;
     margin: 0;
   }
 
@@ -87,7 +108,10 @@ mat-card {
   }
 }
 
-// Tabla de Pagos
+// ============================================================================
+// TABLA DE PAGOS
+// ============================================================================
+
 .payments-card {
   .table-container {
     overflow-x: auto;
@@ -98,38 +122,41 @@ mat-card {
     border-collapse: collapse;
 
     th {
-      background-color: #f5f5f5;
-      padding: 12px 8px;
+      background-color: $color-surface-variant;
+      padding: $space-3 $space-2;
       text-align: left;
-      font-weight: 600;
-      font-size: 13px;
+      font-weight: $font-weight-semibold;
+      font-size: $font-size-xs;
       text-transform: uppercase;
-      border-bottom: 2px solid #ddd;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid $color-border;
+      color: $color-text-dark;
     }
 
     td {
-      padding: 12px 8px;
-      border-bottom: 1px solid #eee;
-      font-size: 14px;
+      padding: $space-3 $space-2;
+      border-bottom: 1px solid $color-border-light;
+      font-size: $font-size-sm;
+      color: $color-text-medium;
     }
 
     code {
-      background-color: #f0f0f0;
-      padding: 2px 6px;
-      border-radius: 2px;
-      font-family: monospace;
-      font-size: 12px;
-      color: #333;
+      background-color: $color-surface-variant;
+      padding: 2px $space-2;
+      border-radius: $border-radius-sm;
+      font-family: $font-family-monospace;
+      font-size: $font-size-xs;
+      color: $color-text-dark;
     }
 
     .empty {
-      color: #999;
+      color: $color-text-light;
       font-style: italic;
     }
 
     .actions {
       display: flex;
-      gap: 4px;
+      gap: $space-1;
 
       button {
         margin: 0;
@@ -146,36 +173,39 @@ mat-card {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 48px 24px;
+    padding: $spacing-2xl $spacing-xl;
     text-align: center;
-    color: #999;
+    color: $color-text-light;
 
     mat-icon {
       font-size: 48px;
       width: 48px;
       height: 48px;
-      color: #ccc;
-      margin-bottom: 12px;
+      color: $color-text-lighter;
+      margin-bottom: $space-3;
     }
 
     p {
       margin: 0;
-      font-size: 14px;
+      font-size: $font-size-sm;
     }
   }
 }
 
-// Formulario Crear Pago
+// ============================================================================
+// FORMULARIO DE PAGO — Oleada 1: campos compactos
+// ============================================================================
+
 .form-card {
   .payment-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: $spacing-md;
   }
 
   .form-row {
     display: flex;
-    gap: 16px;
+    gap: $spacing-md;
     flex-wrap: wrap;
 
     .form-field {
@@ -187,24 +217,34 @@ mat-card {
   .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    margin-top: 8px;
+    gap: $spacing-sm;
+    margin-top: $space-2;
+    padding-top: $space-3;
+    border-top: 1px solid $color-border;
 
     button {
       white-space: nowrap;
-    }
-  }
+      min-width: 100px;
+      font-weight: $font-weight-semibold !important;
+      font-size: $font-size-sm !important;
+      border-radius: $border-radius-md !important;
+      padding: $space-2 $space-4 !important;
+      transition: all $transition-base;
 
-  @media (max-width: 768px) {
-    .form-row {
-      flex-direction: column;
+      &:first-child {
+        background-color: transparent !important;
+        color: $color-text-medium !important;
+        border: 1px solid $color-text-lighter !important;
+      }
 
-      .form-field {
-        width: 100%;
+      &:last-child {
+        background-color: $color-primary !important;
+        color: white !important;
+        border: none !important;
       }
     }
 
-    .form-actions {
+    @media (max-width: #{$breakpoint-md}) {
       flex-direction: column;
 
       button {
@@ -212,15 +252,43 @@ mat-card {
       }
     }
   }
+
+  @media (max-width: #{$breakpoint-md}) {
+    .form-row {
+      flex-direction: column;
+
+      .form-field {
+        width: 100%;
+      }
+    }
+  }
 }
 
-@media (max-width: 768px) {
+// ============================================================================
+// RESPONSIVE TABLA
+// ============================================================================
+
+@media (max-width: #{$breakpoint-md}) {
   .payments-table {
-    font-size: 12px;
+    font-size: $font-size-xs;
 
     th,
     td {
-      padding: 8px 4px;
+      padding: $space-2 $space-1;
     }
+  }
+}
+
+// ============================================================================
+// OLEADA 1 — Spinners en inputs numéricos eliminados
+// ============================================================================
+
+input[type='number'] {
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }

@@ -1,12 +1,21 @@
+// ============================================================================
+// SALES CHANNEL FORM COMPONENT — Formulario de canal de venta (modal)
+// Fase 4 / Oleada 3 — Base4Empresas
+//
+// Migrado desde valores hardcoded a variables del sistema
+// ============================================================================
+
+@import '../../../styles/variables';
+
 .full-width {
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: $spacing-md;
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $spacing-md;
 }
 
 mat-form-field {
@@ -15,12 +24,62 @@ mat-form-field {
 
 mat-spinner {
   display: inline-block;
-  margin-right: 8px;
+  margin-right: $space-2;
 }
+
+// ============================================================================
+// FOOTER DE ACCIONES — Oleada 1: uniforme y compacto
+// ============================================================================
 
 mat-dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  margin-top: 24px;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding: $space-3 0 0 !important;
+  border-top: 1px solid $color-border;
+
+  button {
+    min-width: 100px;
+    font-weight: $font-weight-semibold !important;
+    font-size: $font-size-sm !important;
+    border-radius: $border-radius-md !important;
+    padding: $space-2 $space-4 !important;
+    transition: all $transition-base;
+
+    &:first-child {
+      background-color: transparent !important;
+      color: $color-text-medium !important;
+      border: 1px solid $color-text-lighter !important;
+
+      &:not(:disabled):hover {
+        background-color: $color-background !important;
+        color: $color-text-dark !important;
+        border-color: $color-text-dark !important;
+      }
+    }
+
+    &:last-child {
+      background-color: $color-primary !important;
+      color: white !important;
+      border: none !important;
+
+      &:not(:disabled):hover {
+        background-color: $color-primary-dark !important;
+        transform: translateY(-1px);
+        box-shadow: $shadow-sm;
+      }
+    }
+  }
+}
+
+// Spinners numéricos (Oleada 1)
+input[type='number'] {
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }

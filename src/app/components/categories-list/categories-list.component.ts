@@ -109,6 +109,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
       </mat-card>
     </div>
   `,
+  styleUrls: ['./categories-list.component.scss'],
   styles: [`
     .container {
       padding: 24px;

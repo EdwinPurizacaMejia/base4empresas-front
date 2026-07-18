@@ -15,6 +15,7 @@ Incluye:
 - Sistema visual base (tokens, tipografia, colores, espaciado, estados).
 - Layout principal (topbar, sidebar, contenedor de contenido).
 - Componentes compartidos de UI para listados, filtros, formularios y dialogos.
+- Propagacion transversal del rediseño a todos los formularios de ALTA/EDICION.
 - Estandarizacion visual y de comportamiento en dashboard.
 - Pruebas funcionales, visuales y de accesibilidad.
 
@@ -133,10 +134,14 @@ Cambios:
 - Diferenciacion visual de campos editables y read-only.
 - Validaciones inline consistentes.
 - Mensajeria de ayuda y error estandar.
+- Estandar de densidad visual transversal:
+  - inputs/selects compactos
+  - textarea con altura moderada
+  - campos numericos sin spinner visual
 
 Impacto tecnico esperado:
 
-- Refactor de formularios principales para consumir plantilla base.
+- Refactor de todos los formularios de ALTA/EDICION para consumir plantilla base.
 
 ### 5.5 Popup de eliminacion
 
@@ -305,6 +310,7 @@ Riesgo 4: Impacto en productividad durante transicion.
 - Sin regresiones funcionales criticas en flujos CRUD principales.
 - Cumplimiento de accesibilidad AA en vistas priorizadas.
 - Sin warnings de presupuesto de estilos en componentes intervenidos.
+- Cobertura 100% de formularios ALTA/EDICION con estandar visual unificado.
 
 ## 11. Entregables tecnicos
 
