@@ -1,13 +1,22 @@
+// ============================================================================
+// COSTING CONFIG COMPONENT — Configuración de método de costeo
+// Fase 4 / Oleada 3 — Base4Empresas
+//
+// Migrado desde colores hardcoded a variables del sistema
+// ============================================================================
+
+@import '../../../styles/variables';
+
 .page {
-  padding: 16px;
+  padding: $space-4;
 }
 
 .row {
   display: flex;
-  gap: 12px;
+  gap: $space-3;
   align-items: center;
   flex-wrap: wrap;
-  margin-top: 12px;
+  margin-top: $space-3;
 }
 
 .field {
@@ -16,29 +25,48 @@
 }
 
 .muted {
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 13px;
+  color: $color-text-medium;
+  font-size: $font-size-xs;
 }
 
 .subtitle {
-  color: rgba(0, 0, 0, 0.5);
-  font-size: 14px;
-  margin: 0 0 16px;
+  color: $color-text-light;
+  font-size: $font-size-sm;
+  margin: 0 0 $spacing-md;
 }
+
+// ============================================================================
+// BADGE DE CONFIGURACIÓN ACTIVA
+// ============================================================================
 
 .config-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 8px 16px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 8px;
-  font-size: 14px;
+  gap: $space-2;
+  margin-top: $space-3;
+  padding: $space-2 $space-4;
+  background-color: $color-primary-lighter;
+  border: 1px solid $color-primary-light;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
 
   strong {
-    color: #1d4ed8;
-    font-size: 15px;
+    color: $color-primary-dark;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// ============================================================================
+// OLEADA 1 — Spinners en inputs numéricos eliminados
+// ============================================================================
+
+input[type='number'] {
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }
