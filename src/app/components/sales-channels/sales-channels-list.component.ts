@@ -51,7 +51,7 @@ export class SalesChannelsListComponent implements OnInit, AfterViewInit, OnDest
 
   channels: SalesChannel[] = [];
   dataSource = new MatTableDataSource<SalesChannel>([]);
-  displayedColumns = ['code', 'name', 'description', 'is_active', 'created_at', 'actions'];
+  displayedColumns = ['code', 'name', 'description', 'is_active', 'actions'];
   loading = false;
   error: string | null = null;
   pageSizeOptions = [5, 10, 25, 50];

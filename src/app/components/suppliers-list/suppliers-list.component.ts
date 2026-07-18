@@ -51,7 +51,7 @@ export class SuppliersListComponent implements OnInit, AfterViewInit, OnDestroy 
 
   suppliers: Supplier[] = [];
   dataSource = new MatTableDataSource<Supplier>([]);
-  displayedColumns = ['document_type', 'document_number', 'business_name', 'email', 'validated', 'created_at', 'actions'];
+  displayedColumns = ['document_type', 'document_number', 'business_name', 'email', 'validated', 'actions'];
   loading = false;
   error: string | null = null;
   pageSizeOptions = [5, 10, 25, 50];

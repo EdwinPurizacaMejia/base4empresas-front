@@ -51,7 +51,7 @@ export class CustomersListComponent implements OnInit, AfterViewInit, OnDestroy 
 
   customers: Customer[] = [];
   dataSource = new MatTableDataSource<Customer>([]);
-  displayedColumns = ['document_type', 'document_number', 'full_name', 'email', 'validated', 'created_at', 'actions'];
+  displayedColumns = ['document_type', 'document_number', 'full_name', 'email', 'validated', 'actions'];
   loading = false;
   error: string | null = null;
   pageSizeOptions = [5, 10, 25, 50];
