@@ -1,0 +1,143 @@
+// ============================================================================
+// LAYOUT COMPONENT — Estilos del shell principal
+// Fase 2 — Layout, Menú y Navegación — Base4Empresas
+//
+// Migrado desde layout.component.css (Fase 0 identificó problemas):
+//   - Paleta violet (#667eea) reemplazada por $color-primary-dark del sistema
+//   - background hardcoded #f5f6fa reemplazado por $color-background
+//   - Breakpoints hardcoded reemplazados por variables $breakpoint-*
+// ============================================================================
+
+@import '../../styles/variables';
+
+// ============================================================================
+// HOST — Contenedor raíz del layout
+// ============================================================================
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-color: $color-background;
+}
+
+// ============================================================================
+// MAT-SIDENAV-CONTAINER
+// ============================================================================
+
+mat-sidenav-container {
+  flex: 1;
+  height: 100%;
+  background-color: $color-background;
+}
+
+// ============================================================================
+// SIDEBAR (app-sidenav)
+// Paleta corregida: usa $color-primary-dark del sistema (azul índigo #1e40af)
+// en lugar del gradiente violet/purple que estaba desconectado del sistema.
+// ============================================================================
+
+.app-sidenav {
+  width: $sidebar-width !important;
+  background: linear-gradient(
+    175deg,
+    $color-primary-dark 0%,
+    darken($color-primary-dark, 8%) 100%
+  ) !important;
+  border-right: none !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // Scrollbar minimalista dentro del sidebar
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: $border-radius-full;
+  }
+}
+
+// Color blanco para todos los elementos hijos del sidebar
+.app-sidenav ::ng-deep {
+  color: white !important;
+
+  // Panel de expansión transparente
+  mat-expansion-panel {
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .mat-mdc-expansion-panel-header {
+    color: white !important;
+    background-color: transparent !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+  }
+
+  // Flecha del expansion panel en blanco
+  .mat-expansion-indicator::after {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .mat-mdc-expansion-panel-header-title {
+    color: white !important;
+  }
+}
+
+// ============================================================================
+// CONTENIDO PRINCIPAL (.app-content)
+// Background corregido: $color-background (#f8fafc) del sistema
+// ============================================================================
+
+.app-content {
+  overflow-y: auto;
+  padding: $space-6;
+  background-color: $color-background;
+  min-height: 100%;
+
+  // Scroll suave en el contenido principal
+  scroll-behavior: smooth;
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+// Tablet
+@media (max-width: #{$breakpoint-lg}) {
+  .app-content {
+    padding: $space-5;
+  }
+}
+
+// Mobile
+@media (max-width: #{$breakpoint-md}) {
+  .app-content {
+    padding: $space-4;
+  }
+
+  .app-sidenav {
+    width: 240px !important;
+  }
+}
+
+// Small phone
+@media (max-width: #{$breakpoint-sm}) {
+  .app-content {
+    padding: $space-3;
+  }
+
+  .app-sidenav {
+    width: 100vw !important;
+    max-width: 280px !important;
+  }
+}
