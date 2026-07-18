@@ -1,75 +1,91 @@
 // ============================================================================
-// CATEGORIES LIST COMPONENT — Lista de categorías + formulario inline
-// Fase 4 / Oleada 2 — Base4Empresas
-//
-// Migrado desde inline styles en TypeScript a archivo externo
-// Criterios Oleada 2: variables del sistema, formulario inline hereda _modal-form
+// CATEGORIES LIST COMPONENT — Lista de categorías de productos
+// Fix Causa 2+3: estilos limpios alineados con el sistema de diseño
+// Las clases globales .page-header, .empty-state vienen de _foundations.scss
 // ============================================================================
 
 @import '../../../styles/variables';
 
 // ============================================================================
-// LAYOUT DE PÁGINA
+// CONTENEDOR DE PÁGINA — hereda .list-page de sale-list pattern
 // ============================================================================
 
-.container {
-  padding: $space-6;
-  max-width: 1200px;
+.list-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  max-width: $container-max-width;
   margin: 0 auto;
+  padding: $space-6;
 
   @media (max-width: #{$breakpoint-md}) {
     padding: $space-4;
   }
-}
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: $spacing-lg;
-
-  h1 {
-    margin: 0;
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-medium;
-    color: $color-text-dark;
+  @media (max-width: #{$breakpoint-sm}) {
+    padding: $space-3;
+    gap: $spacing-sm;
   }
 }
 
 // ============================================================================
-// TABLA
+// TARJETA DE TABLA
 // ============================================================================
 
-.table-card {
-  padding: 0;
+.list-table-card {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
 }
 
-.table-container {
-  overflow-x: auto;
-}
+// ============================================================================
+// TABLA PRINCIPAL
+// ============================================================================
 
-.categories-table {
+.list-table {
   width: 100%;
 
-  th {
+  // Header
+  th.mat-header-cell {
     background-color: $color-surface-variant;
-    font-weight: $font-weight-semibold;
     color: $color-text-dark;
     font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    padding: $space-4;
+    border-bottom: 2px solid $color-border;
+  }
+
+  // Celdas
+  td.mat-cell {
+    padding: $space-4;
+    border-bottom: 1px solid $color-border-light;
+    color: $color-text-medium;
+    font-size: $font-size-sm;
+  }
+
+  // Fila hover
+  tr.data-row {
+    transition: background-color $transition-fast;
+
+    &:hover {
+      background-color: $color-surface-hover;
+    }
+
+    &:last-child td.mat-cell {
+      border-bottom: none;
+    }
   }
 }
 
-.category-row {
-  transition: background-color $transition-fast;
+// ============================================================================
+// NOMBRE DEL ÍTEM CON ÍCONO
+// ============================================================================
 
-  &:hover {
-    background-color: $color-surface-hover;
-  }
-}
-
-.category-name {
+.item-name {
   display: flex;
   align-items: center;
   gap: $space-2;
@@ -77,33 +93,65 @@
   color: $color-text-dark;
 }
 
-.category-icon {
+.item-icon {
   font-size: 18px;
   width: 18px;
   height: 18px;
+  flex-shrink: 0;
+}
+
+.category-icon {
   color: $color-primary;
 }
 
-.no-categories {
-  padding: $spacing-2xl;
-  text-align: center;
-  color: $color-text-light;
-  font-style: italic;
-  font-size: $font-size-sm;
+// ============================================================================
+// ACCIONES DE FILA
+// ============================================================================
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+}
+
+.action-btn {
+  color: $color-text-lighter;
+  transition: color $transition-fast, background-color $transition-fast;
+
+  &.edit:not([disabled]):hover {
+    color: $color-primary;
+    background-color: $color-primary-light;
+  }
+
+  &.delete:not([disabled]):hover {
+    color: $color-danger;
+    background-color: $color-danger-light;
+  }
 }
 
 // ============================================================================
-// FORMULARIO INLINE — Hereda criterios Oleada 1 desde _modal-form.scss
-// Los dialogs de alta/edición usan mat-dialog-actions que hereda estilos globales
+// PIE DE TABLA — ESTADÍSTICAS
 // ============================================================================
 
-// Supresión de spinners en inputs numéricos (consistencia Oleada 1)
-input[type='number'] {
-  -moz-appearance: textfield;
+.table-footer {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background-color: $color-surface-variant;
+  border-top: 1px solid $color-border;
+  font-size: $font-size-sm;
+  color: $color-text-medium;
 
-  &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  .footer-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: $color-primary;
+  }
+
+  strong {
+    color: $color-text-dark;
+    font-weight: $font-weight-bold;
   }
 }

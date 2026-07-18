@@ -14,7 +14,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 
 /**
  * Componente para listar categorías de productos
- * Muestra todas las categorías disponibles en el sistema
+ * Fix Causa 2+3: template migrado al patrón visual del sistema + inline styles eliminados
  */
 @Component({
   selector: 'app-categories-list',
@@ -26,213 +26,101 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
     MatTableModule,
     MatCardModule,
     MatTooltipModule,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
   ],
   template: `
-    <div class="container">
-      <div class="header">
-        <h1>📚 Categorías de Productos</h1>
-        <button 
-          mat-raised-button 
-          color="primary"
-          matTooltip="Próximamente: Crear nueva categoría"
-          disabled
-        >
-          <mat-icon>add</mat-icon>
-          Nueva Categoría
-        </button>
+    <!-- Patrón page-header consistente con el sistema de diseño -->
+    <div class="list-page">
+
+      <div class="page-header">
+        <div class="page-header__title-group">
+          <h1 class="page-header__title">Categorías de Productos</h1>
+          <p class="page-header__subtitle">Organización de productos por categoría</p>
+        </div>
+        <div class="page-header__actions">
+          <button
+            mat-raised-button
+            color="primary"
+            matTooltip="Próximamente: Crear nueva categoría"
+            disabled
+          >
+            <mat-icon>add</mat-icon>
+            Nueva Categoría
+          </button>
+        </div>
       </div>
 
-      <mat-card class="table-card">
+      <!-- Tabla -->
+      <div class="list-table-card">
         <app-loading-spinner *ngIf="loading" message="Cargando categorías..."></app-loading-spinner>
 
-        <div class="table-container" *ngIf="!loading">
+        <ng-container *ngIf="!loading">
           <!-- Estado vacío -->
           <div class="empty-state" *ngIf="categories.length === 0">
-            <mat-icon>category</mat-icon>
-            <p>No hay categorías registradas</p>
-            <p class="empty-subtitle">Las categorías permiten organizar tus productos</p>
+            <mat-icon class="empty-state__icon">category</mat-icon>
+            <h3 class="empty-state__title">Sin categorías</h3>
+            <p class="empty-state__message">No hay categorías registradas en el sistema</p>
           </div>
 
           <!-- Tabla de categorías -->
-          <table mat-table [dataSource]="categories" class="categories-table" *ngIf="categories.length > 0">
-            <!-- ID -->
-            <ng-container matColumnDef="id">
-              <th mat-header-cell *matHeaderCellDef>ID</th>
-              <td mat-cell *matCellDef="let category">{{ category.id }}</td>
-            </ng-container>
-
+          <table
+            mat-table
+            [dataSource]="categories"
+            class="list-table"
+            *ngIf="categories.length > 0"
+          >
             <!-- Nombre -->
             <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Nombre</th>
-              <td mat-cell *matCellDef="let category" class="category-name">
-                <mat-icon class="category-icon">label</mat-icon>
-                {{ category.name }}
+              <th mat-header-cell *matHeaderCellDef>NOMBRE</th>
+              <td mat-cell *matCellDef="let category">
+                <span class="item-name">
+                  <mat-icon class="item-icon category-icon">label</mat-icon>
+                  {{ category.name }}
+                </span>
               </td>
             </ng-container>
 
             <!-- Acciones -->
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
               <td mat-cell *matCellDef="let category">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  matTooltip="Editar"
-                  disabled
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  matTooltip="Eliminar"
-                  disabled
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
+                <div class="row-actions">
+                  <button
+                    mat-icon-button
+                    class="action-btn edit"
+                    matTooltip="Editar categoría"
+                    disabled
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    class="action-btn delete"
+                    matTooltip="Eliminar categoría"
+                    disabled
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
               </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="category-row"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="data-row"></tr>
           </table>
-        </div>
+        </ng-container>
 
-        <!-- Estadísticas -->
-        <div class="stats" *ngIf="!loading && categories.length > 0">
-          <span class="stat-item">
-            <mat-icon>category</mat-icon>
-            <strong>{{ categories.length }}</strong> categorías registradas
-          </span>
+        <!-- Estadísticas pie de tabla -->
+        <div class="table-footer" *ngIf="!loading && categories.length > 0">
+          <mat-icon class="footer-icon">category</mat-icon>
+          <strong>{{ categories.length }}</strong>&nbsp;categorías registradas
         </div>
-      </mat-card>
+      </div>
+
     </div>
   `,
+  // Fix Causa 3: eliminado bloque `styles: [...]` — solo styleUrls externo
   styleUrls: ['./categories-list.component.scss'],
-  styles: [`
-    .container {
-      padding: 24px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 500;
-      color: #1a237e;
-    }
-
-    .table-card {
-      padding: 0;
-    }
-
-    .table-container {
-      overflow-x: auto;
-    }
-
-    .categories-table {
-      width: 100%;
-    }
-
-    .categories-table th {
-      background-color: #f5f5f5;
-      font-weight: 600;
-      color: #424242;
-    }
-
-    .category-row {
-      transition: background-color 0.2s;
-    }
-
-    .category-row:hover {
-      background-color: #f5f5f5;
-    }
-
-    .category-name {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 500;
-    }
-
-    .category-icon {
-      color: #1976d2;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .empty-state mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      color: #bdbdbd;
-      margin-bottom: 16px;
-    }
-
-    .empty-state p {
-      font-size: 18px;
-      color: #424242;
-      margin: 8px 0;
-    }
-
-    .empty-subtitle {
-      font-size: 14px !important;
-      color: #999 !important;
-    }
-
-    .stats {
-      padding: 16px 24px;
-      background-color: #f5f5f5;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .stat-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      color: #666;
-    }
-
-    .stat-item mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-      color: #1976d2;
-    }
-
-    .stat-item strong {
-      color: #1a237e;
-      font-size: 16px;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 16px;
-      }
-
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-      }
-    }
-  `]
 })
 export class CategoriesListComponent implements OnInit, OnDestroy {
   categories: CategoryDto[] = [];
@@ -272,7 +160,7 @@ export class CategoriesListComponent implements OnInit, OnDestroy {
           this.notificationService.error('Error al cargar las categorías');
           this.loading = false;
           this.categories = [];
-        }
+        },
       });
   }
 }
