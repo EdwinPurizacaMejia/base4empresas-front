@@ -24,6 +24,9 @@
 // 7. COMPONENTES REUTILIZABLES (Capa 5 - clases .app-*)
 @import 'styles/components';
 
+// 8. MODAL FORM (Capa 6 - patrón formularios modales)
+@import 'styles/modal-form';
+
 // ============================================================================
 // ESTILOS GLOBALES (Capa 6 - layout base + overrides Material)
 // NOTA: body base está en _reset.scss con variables del sistema.

@@ -12,121 +12,90 @@ export interface ConfirmationDialogData {
   severity: 'info' | 'warning' | 'error';
 }
 
+/**
+ * ConfirmationDialogComponent — Diálogo de confirmación reutilizable
+ *
+ * Fase 4: inline styles migrados a confirmation-dialog.component.scss
+ * - Colores hardcoded reemplazados por variables del sistema
+ * - Diseño mejorado con iconos por severidad
+ * - Accesibilidad: aria-label en botones
+ *
+ * Uso:
+ * ```typescript
+ * const ref = this.dialog.open(ConfirmationDialogComponent, {
+ *   width: '400px',
+ *   panelClass: 'crm-dialog-panel',
+ *   backdropClass: 'crm-dialog-backdrop',
+ *   data: {
+ *     title: '¿Eliminar registro?',
+ *     message: 'Esta acción no se puede deshacer.',
+ *     confirmText: 'Eliminar',
+ *     cancelText: 'Cancelar',
+ *     severity: 'error'
+ *   }
+ * });
+ * ref.afterClosed().subscribe((confirmed: boolean) => { ... });
+ * ```
+ */
 @Component({
   selector: 'app-confirmation-dialog',
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
+  styleUrls: ['./confirmation-dialog.component.scss'],
   template: `
     <div class="confirmation-dialog" [ngClass]="'severity-' + data.severity">
-      <!-- Icon -->
+
+      <!-- Icono de severidad -->
       <div class="dialog-icon">
-        <mat-icon [ngSwitch]="data.severity">
-          <span *ngSwitchCase="'info'">info</span>
-          <span *ngSwitchCase="'warning'">warning</span>
-          <span *ngSwitchCase="'error'">error</span>
+        <mat-icon>
+          {{ getSeverityIcon() }}
         </mat-icon>
       </div>
 
-      <!-- Title -->
-      <h2 mat-dialog-title>{{ data.title }}</h2>
+      <!-- Título -->
+      <h2 mat-dialog-title class="dialog-title-confirm">{{ data.title }}</h2>
 
-      <!-- Message -->
+      <!-- Mensaje -->
       <div mat-dialog-content>
-        <p>{{ data.message }}</p>
+        <p class="dialog-message">{{ data.message }}</p>
       </div>
 
-      <!-- Actions -->
-      <div mat-dialog-actions align="end">
-        <button 
-          mat-button 
+      <!-- Acciones -->
+      <div mat-dialog-actions class="dialog-confirm-actions">
+        <button
+          mat-button
           (click)="onCancel()"
-          class="btn-cancel">
+          class="btn-cancel"
+          [attr.aria-label]="data.cancelText">
           {{ data.cancelText }}
         </button>
-        <button 
-          mat-raised-button 
+        <button
+          mat-raised-button
           (click)="onConfirm()"
           [ngClass]="'btn-' + data.severity"
-          class="btn-confirm">
+          class="btn-confirm"
+          [attr.aria-label]="data.confirmText">
           {{ data.confirmText }}
         </button>
       </div>
+
     </div>
   `,
-  styles: [`
-    .confirmation-dialog {
-      text-align: center;
-      padding: 8px 0;
-    }
-
-    .dialog-icon {
-      margin: 16px 0 8px 0;
-    }
-
-    .dialog-icon mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .severity-info .dialog-icon mat-icon {
-      color: #1976d2;
-    }
-
-    .severity-warning .dialog-icon mat-icon {
-      color: #ff9800;
-    }
-
-    .severity-error .dialog-icon mat-icon {
-      color: #f44336;
-    }
-
-    h2 {
-      margin: 16px 0 8px 0;
-      font-size: 20px;
-      font-weight: 500;
-    }
-
-    p {
-      margin: 0;
-      color: #666;
-      line-height: 1.5;
-    }
-
-    [mat-dialog-actions] {
-      padding: 16px 0 0 0;
-      gap: 8px;
-    }
-
-    .btn-cancel {
-      color: #666;
-    }
-
-    .btn-confirm {
-      color: white;
-    }
-
-    .btn-info {
-      background-color: #1976d2;
-    }
-
-    .btn-warning {
-      background-color: #ff9800;
-    }
-
-    .btn-error {
-      background-color: #f44336;
-    }
-  `]
 })
 export class ConfirmationDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ConfirmationDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ConfirmationDialogData
-  ) { }
+  ) {}
+
+  getSeverityIcon(): string {
+    switch (this.data.severity) {
+      case 'info':    return 'info';
+      case 'warning': return 'warning';
+      case 'error':   return 'error';
+      default:        return 'help';
+    }
+  }
 
   onConfirm(): void {
     this.dialogRef.close(true);
