@@ -1,0 +1,494 @@
+// ============================================================================
+// FOUNDATIONS.SCSS — Capa 2: Estilos fundacionales de elementos base
+// Fase 1 — Fundaciones UI — Base4Empresas
+//
+// Posición en la cascada:
+//   1. _variables.scss  → tokens SCSS
+//   2. _tokens.scss     → CSS Custom Properties en :root
+//   3. _reset.scss      → normalización HTML5
+//   4. _foundations.scss → fundaciones de elementos interactivos  ← AQUÍ
+//   5. _components.scss → clases reutilizables (.app-button, etc.)
+//   6. styles.scss      → overrides Material + utilidades globales
+//
+// REGLA: este archivo solo define estilos de ELEMENTOS BASE (sin clases de
+// componente). Solo selectores de elementos HTML, :root y pseudo-clases
+// universales. Sin !important salvo donde Material fuerza override.
+// ============================================================================
+
+@import 'variables';
+@import 'functions';
+
+// ============================================================================
+// SCROLL Y COMPORTAMIENTO DE PÁGINA
+// ============================================================================
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ============================================================================
+// FOCUS RING ACCESIBLE — Unificado para toda la app
+// Reemplaza el outline nativo del browser por uno consistente con el sistema
+// ============================================================================
+
+// Focus visible para teclado (no se muestra en click)
+:focus-visible {
+  outline: 2px solid $color-primary;
+  outline-offset: 2px;
+  border-radius: $border-radius-sm;
+}
+
+// Eliminar outline en click (mantenerlo solo para teclado)
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// ============================================================================
+// BOTÓN BASE — Fundación para todos los botones sin clase
+// Los botones con clase .app-button o Material no se ven afectados
+// ============================================================================
+
+button:not([class]),
+button.unstyled {
+  font-family: $font-family-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-tight;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: $space-2 $space-3;
+  border-radius: $border-radius-md;
+  transition: background-color $transition-fast, color $transition-fast, opacity $transition-fast;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// ============================================================================
+// INPUT BASE — Fundación para inputs sin clase (fuera de Angular Material)
+// Los inputs dentro de mat-form-field no se ven afectados por el encapsulamiento
+// ============================================================================
+
+input:not([class]):not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+select:not([class]),
+textarea:not([class]) {
+  font-family: $font-family-primary;
+  font-size: $font-size-sm;
+  color: $color-text-dark;
+  background-color: $color-surface-variant;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  padding: $space-3 $space-4;
+  width: 100%;
+  transition: border-color $transition-fast, background-color $transition-fast, box-shadow $transition-fast;
+  appearance: none;
+  -webkit-appearance: none;
+
+  &::placeholder {
+    color: $color-text-light;
+  }
+
+  &:hover:not(:disabled):not(:focus) {
+    border-color: $color-text-lighter;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary;
+    background-color: $color-surface;
+    box-shadow: 0 0 0 3px $color-primary-light;
+  }
+
+  &:disabled {
+    background-color: $color-surface-variant;
+    color: $color-text-light;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  &:invalid:not(:placeholder-shown) {
+    border-color: $color-danger;
+    box-shadow: 0 0 0 3px $color-danger-light;
+  }
+}
+
+// Ajuste específico para textarea
+textarea:not([class]) {
+  resize: vertical;
+  min-height: 80px;
+  line-height: $line-height-normal;
+}
+
+// Ajuste específico para select
+select:not([class]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2394a3b8' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $space-4 center;
+  padding-right: $space-10;
+  cursor: pointer;
+}
+
+// ============================================================================
+// BADGE / CHIP BASE — Estado visual estándar para etiquetas de estado
+// ============================================================================
+
+// Clase base unificada para badges de estado en toda la app
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-3;
+  border-radius: $border-radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+  line-height: $line-height-tight;
+
+  // Variantes de estado
+  &.status-active,
+  &.status-success,
+  &.status-completed {
+    background-color: $color-success-light;
+    color: $color-success-variant;
+  }
+
+  &.status-pending,
+  &.status-warning,
+  &.status-partial {
+    background-color: $color-warning-light;
+    color: $color-warning-variant;
+  }
+
+  &.status-inactive,
+  &.status-danger,
+  &.status-cancelled,
+  &.status-error {
+    background-color: $color-danger-light;
+    color: $color-danger-variant;
+  }
+
+  &.status-draft,
+  &.status-info,
+  &.status-processing {
+    background-color: $color-info-light;
+    color: $color-info;
+  }
+
+  &.status-neutral,
+  &.status-default {
+    background-color: $color-surface-variant;
+    color: $color-text-medium;
+  }
+
+  &.status-primary {
+    background-color: $color-primary-light;
+    color: $color-primary-dark;
+  }
+}
+
+// ============================================================================
+// CARD BASE — Estructura semántica para contenedores de sección
+// ============================================================================
+
+.section-card {
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  .section-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $color-border;
+    gap: $spacing-sm;
+
+    .section-card__title {
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      color: $color-text-dark;
+      margin: 0;
+      line-height: $line-height-tight;
+    }
+
+    .section-card__subtitle {
+      font-size: $font-size-sm;
+      color: $color-text-medium;
+      margin: 0;
+    }
+  }
+
+  .section-card__body {
+    padding: $spacing-lg;
+  }
+
+  .section-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $color-border;
+    background-color: $color-surface-variant;
+    border-radius: 0 0 $border-radius-lg $border-radius-lg;
+  }
+}
+
+// ============================================================================
+// PAGE HEADER — Encabezado estándar de páginas de módulo
+// ============================================================================
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+  flex-wrap: wrap;
+
+  .page-header__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  .page-header__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $color-text-dark;
+    margin: 0;
+    line-height: $line-height-tight;
+  }
+
+  .page-header__subtitle {
+    font-size: $font-size-sm;
+    color: $color-text-medium;
+    margin: 0;
+  }
+
+  .page-header__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    .page-header__actions {
+      justify-content: flex-end;
+    }
+  }
+}
+
+// ============================================================================
+// FORM SECTION — Sección semántica dentro de formularios
+// ============================================================================
+
+.form-section {
+  margin-bottom: $spacing-lg;
+
+  .form-section__title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $color-border;
+  }
+
+  .form-section__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (min-width: $breakpoint-lg) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    &.grid-2 {
+      @media (min-width: $breakpoint-md) {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    &.grid-full {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ============================================================================
+// ESTADO VACÍO — Pantalla/sección sin datos
+// ============================================================================
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  padding: $spacing-2xl $spacing-xl;
+  text-align: center;
+  color: $color-text-light;
+
+  .empty-state__icon {
+    font-size: 48px;
+    width: 64px;
+    height: 64px;
+    opacity: 0.4;
+    color: $color-text-lighter;
+  }
+
+  .empty-state__title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-text-dark;
+    margin: 0;
+  }
+
+  .empty-state__message {
+    font-size: $font-size-sm;
+    color: $color-text-medium;
+    max-width: 360px;
+    margin: 0;
+    line-height: $line-height-relaxed;
+  }
+
+  .empty-state__action {
+    margin-top: $spacing-sm;
+  }
+}
+
+// ============================================================================
+// LOADING STATE — Skeleton y spinner
+// ============================================================================
+
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-2xl;
+  min-height: 200px;
+}
+
+// Skeleton animation
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    $color-surface-variant 25%,
+    $color-border-light 50%,
+    $color-surface-variant 75%
+  );
+  background-size: 800px 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+  border-radius: $border-radius-md;
+
+  &.skeleton--text {
+    height: 16px;
+    margin-bottom: $space-2;
+
+    &:last-child {
+      width: 70%;
+    }
+  }
+
+  &.skeleton--title {
+    height: 24px;
+    width: 60%;
+    margin-bottom: $space-4;
+  }
+
+  &.skeleton--card {
+    height: 120px;
+  }
+
+  &.skeleton--row {
+    height: 48px;
+    margin-bottom: $space-2;
+  }
+}
+
+// ============================================================================
+// DIVIDER — Separador visual semántico
+// ============================================================================
+
+.divider {
+  border: none;
+  border-top: 1px solid $color-border;
+  margin: $spacing-md 0;
+
+  &.divider--sm {
+    margin: $spacing-sm 0;
+  }
+
+  &.divider--lg {
+    margin: $spacing-lg 0;
+  }
+
+  &.divider--dashed {
+    border-top-style: dashed;
+  }
+}
+
+// ============================================================================
+// TOOLTIP BASE — Fundación para tooltips sin librería
+// ============================================================================
+
+[data-tooltip] {
+  position: relative;
+
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + #{$space-2});
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: $color-text-dark;
+    color: white;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    padding: $space-2 $space-3;
+    border-radius: $border-radius-sm;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity $transition-fast;
+    z-index: $z-tooltip;
+    box-shadow: $shadow-md;
+  }
+
+  &:hover::after,
+  &:focus::after {
+    opacity: 1;
+  }
+}

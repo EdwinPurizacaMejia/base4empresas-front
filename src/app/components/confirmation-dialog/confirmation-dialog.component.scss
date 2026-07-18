@@ -1,0 +1,119 @@
+// ============================================================================
+// CONFIRMATION DIALOG — Diálogo de confirmación estándar
+// Fase 4 — Formularios y Diálogos — Base4Empresas
+//
+// Migrado desde inline styles con colores hardcoded
+// ============================================================================
+
+@import '../../../styles/variables';
+
+// ============================================================================
+// CONTENEDOR PRINCIPAL
+// ============================================================================
+
+.confirmation-dialog {
+  text-align: center;
+  padding: $space-2 0;
+}
+
+// ============================================================================
+// ICONO CENTRAL
+// ============================================================================
+
+.dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: $space-4 0 $space-2;
+
+  mat-icon {
+    font-size: 52px;
+    width: 52px;
+    height: 52px;
+    padding: $space-3;
+    border-radius: $border-radius-full;
+  }
+}
+
+// Variantes de color según severidad
+.severity-info .dialog-icon mat-icon {
+  color: $color-info;
+  background-color: $color-info-light;
+}
+
+.severity-warning .dialog-icon mat-icon {
+  color: $color-warning-variant;
+  background-color: $color-warning-light;
+}
+
+.severity-error .dialog-icon mat-icon {
+  color: $color-danger;
+  background-color: $color-danger-light;
+}
+
+// ============================================================================
+// TÍTULO
+// ============================================================================
+
+h2.dialog-title-confirm {
+  margin: $space-4 0 $space-2;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-dark;
+  line-height: $line-height-tight;
+}
+
+// ============================================================================
+// MENSAJE
+// ============================================================================
+
+p.dialog-message {
+  margin: 0;
+  color: $color-text-medium;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  padding: 0 $space-4;
+}
+
+// ============================================================================
+// ACCIONES
+// ============================================================================
+
+.dialog-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $space-4 0 $space-2;
+
+  .btn-cancel {
+    color: $color-text-medium;
+    font-weight: $font-weight-medium;
+
+    &:hover {
+      color: $color-text-dark;
+      background-color: $color-surface-hover;
+    }
+  }
+
+  .btn-confirm {
+    color: white;
+    font-weight: $font-weight-semibold;
+    border-radius: $border-radius-md !important;
+    min-width: 100px;
+  }
+
+  // Botón de confirmación por severidad
+  .btn-info {
+    background-color: $color-info !important;
+  }
+
+  .btn-warning {
+    background-color: $color-warning !important;
+    color: white !important;
+  }
+
+  .btn-error {
+    background-color: $color-danger !important;
+  }
+}

@@ -1,0 +1,180 @@
+// ============================================================================
+// TOOLBAR COMPONENT — Barra superior de la aplicación
+// Fase 2 — Layout, Menú y Navegación — Base4Empresas
+//
+// Extraído desde inline styles en toolbar.component.ts
+// ============================================================================
+
+@import '../../styles/variables';
+
+// ============================================================================
+// TOOLBAR PRINCIPAL
+// ============================================================================
+
+.app-toolbar {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: 0 $space-4;
+  height: $toolbar-height;
+  background-color: $color-surface !important;
+  border-bottom: 1px solid $color-border;
+  box-shadow: $shadow-xs;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+}
+
+// ============================================================================
+// LOGO Y TÍTULO
+// ============================================================================
+
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-dark;
+  margin-left: $space-4;
+  flex-shrink: 0;
+  text-decoration: none;
+
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+  border-radius: $border-radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: white;
+  }
+}
+
+// ============================================================================
+// SPACER
+// ============================================================================
+
+.spacer {
+  flex: 1;
+}
+
+// ============================================================================
+// CAMPO DE BÚSQUEDA GLOBAL
+// ============================================================================
+
+.search-field {
+  max-width: 400px;
+  width: 100%;
+
+  // Override de Material para que el campo de búsqueda encaje en el toolbar
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background-color: $color-surface-variant !important;
+    border-radius: $border-radius-lg !important;
+
+    &:hover {
+      background-color: $color-surface-hover !important;
+    }
+  }
+
+  ::ng-deep .mat-mdc-form-field-infix {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    min-height: 40px;
+  }
+}
+
+// ============================================================================
+// BOTONES DE ACCIÓN DERECHA
+// ============================================================================
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  flex-shrink: 0;
+}
+
+.toolbar-icon-btn {
+  color: $color-text-medium;
+  transition: color $transition-fast, background-color $transition-fast;
+
+  &:hover {
+    color: $color-primary;
+    background-color: $color-primary-lighter;
+  }
+}
+
+.user-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  border-radius: $border-radius-lg;
+  color: $color-text-dark;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $color-surface-hover;
+  }
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: $border-radius-full;
+  background-color: $color-primary-light;
+  color: $color-primary-dark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  flex-shrink: 0;
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+@media (max-width: #{$breakpoint-md}) {
+  .app-title {
+    margin-left: $space-2;
+    font-size: $font-size-base;
+
+    span:not(.logo-icon) {
+      display: none;
+    }
+  }
+
+  .search-field {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: #{$breakpoint-sm}) {
+  .search-field {
+    display: none;
+  }
+
+  .app-toolbar {
+    gap: $space-2;
+    padding: 0 $space-2;
+  }
+}

@@ -57,7 +57,7 @@ import { Product } from "../../models/product.model";
     MatProgressSpinnerModule,
   ],
   templateUrl: "./sale-form.component.html",
-  styleUrls: ["./sale-form.component.css"],
+  styleUrls: ["./sale-form.component.scss"],
 })
 export class SaleFormComponent implements OnInit, OnDestroy {
   @Output() saleCreated = new EventEmitter<void>();

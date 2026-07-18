@@ -8,34 +8,35 @@
 
 // 2. GOOGLE FONTS se carga desde index.html para evitar errores de inline en build de producción
 
-// 3. VARIABLES Y CONFIGURACIÓN
+// 3. VARIABLES Y CONFIGURACIÓN (Capa 1 - tokens SCSS)
 @import 'styles/variables';
 @import 'styles/functions';
 
-// 4. RESET Y BASE
+// 4. TOKENS CSS (Capa 2 - CSS Custom Properties en :root)
+@import 'styles/tokens';
+
+// 5. RESET Y BASE (Capa 3 - normalización HTML5)
 @import 'styles/reset';
 
-// 6. COMPONENTES REUTILIZABLES
+// 6. FUNDACIONES (Capa 4 - elementos interactivos base)
+@import 'styles/foundations';
+
+// 7. COMPONENTES REUTILIZABLES (Capa 5 - clases .app-*)
 @import 'styles/components';
 
+// 8. MODAL FORM (Capa 6 - patrón formularios modales)
+@import 'styles/modal-form';
+
 // ============================================================================
-// ESTILOS GLOBALES - PROFESIONALES & SaaS
+// ESTILOS GLOBALES (Capa 6 - layout base + overrides Material)
+// NOTA: body base está en _reset.scss con variables del sistema.
+// Aquí solo definimos lo que _reset.scss no puede establecer (height 100%).
 // ============================================================================
 
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background-color: #f8fafc;
-  color: $color-text-medium;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 // ============================================================================
@@ -138,10 +139,12 @@ body {
   background-color: rgba(15, 23, 42, 0.65) !important;
   backdrop-filter: blur(6px) !important;
   -webkit-backdrop-filter: blur(6px) !important;
-  animation: fadeIn 0.3s ease-out;
+  animation: backdropFadeIn 0.3s ease-out;
 }
 
-@keyframes fadeIn {
+// FIX Fase 1: renombrado de fadeIn→backdropFadeIn para evitar conflicto
+// con @keyframes fadeIn global definido en la sección de animaciones
+@keyframes backdropFadeIn {
   from {
     opacity: 0;
     backdrop-filter: blur(0px);

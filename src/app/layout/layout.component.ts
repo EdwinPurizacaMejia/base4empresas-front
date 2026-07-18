@@ -33,7 +33,7 @@ import { MenuItem, MAIN_MENU } from '../models/menu.model';
     SidebarComponent
   ],
   templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.css']
+  styleUrls: ['./layout.component.scss']
 })
 export class LayoutComponent implements OnInit {
   @ViewChild('sidenav') sidenav!: MatSidenav;

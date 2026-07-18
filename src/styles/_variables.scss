@@ -115,7 +115,9 @@ $shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.
 $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 $shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
-// TRANSITIONS
+// ============================================================================
+// TRANSITIONS - FIX: eliminadas declaraciones duplicadas (FASE 0)
+// Valor canónico: cubic-bezier(0.4, 0, 0.2, 1) = Material Design standard
 // ============================================================================
 $transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
 $transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -128,22 +130,8 @@ $easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
 // ============================================================================
 // BREAKPOINTS - Responsive Design
-// ============================================================================
-$breakpoint-xs: 320px;
-$breakpoint-sm: 480px;
-$breakpoint-md: 768px;
-$breakpoint-lg: 1024px;
-$breakpoint-xl: 1280px;
-$breakpoint-2xl: 1536px;
-$transition-base: 250ms cubic-bezier(0.4, 0, 1, 1);
-$transition-slow: 350ms cubic-bezier(0.4, 0, 1, 1);
-
-$easing-in: cubic-bezier(0.4, 0, 1, 1);
-$easing-out: cubic-bezier(0, 0, 0.2, 1);
-$easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-
-// ============================================================================
-// BREAKPOINTS - Responsive design
+// FIX: eliminadas declaraciones duplicadas. $breakpoint-sm canónico = 640px
+// (estándar Tailwind/SaaS moderno). Valor anterior erróneo: 480px).
 // ============================================================================
 $breakpoint-xs: 320px;
 $breakpoint-sm: 640px;
@@ -171,6 +159,18 @@ $sidebar-width: 260px;
 $sidebar-width-collapsed: 70px;
 $toolbar-height: 64px;
 $container-max-width: 1400px;
+
+// ============================================================================
+// COLORES ADICIONALES — Fase 5 Dashboard
+// Tokens que el dashboard usa y no tenían variable exacta
+// ============================================================================
+$color-text-slate: #64748b;      // slate-500: subtítulos y metadatos del dashboard
+$color-dash-primary: #2563eb;    // blue-600: color primario del dashboard (variante más oscura)
+$color-dash-primary-dark: #1d4ed8; // blue-700: totales y énfasis del dashboard
+$color-dash-success-text: #166534; // green-800: texto en badges de éxito
+$color-dash-danger-text: #991b1b;  // red-800: texto en badges de error
+$color-bg-dash: #f5f7fb;         // fondo ligeramente diferente del dashboard
+$color-dash-warning-text: #92400e; // amber-800: texto en badges de advertencia
 
 // ============================================================================
 // OPACIDADES

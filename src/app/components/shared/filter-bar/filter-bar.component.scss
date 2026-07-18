@@ -1,0 +1,221 @@
+// ============================================================================
+// FILTER BAR COMPONENT — Barra de filtros estándar reutilizable
+// Fase 3 — Listados y Filtros — Base4Empresas
+// ============================================================================
+
+@import '../../../../styles/variables';
+
+// ============================================================================
+// CONTENEDOR PRINCIPAL
+// ============================================================================
+
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding: $space-4 $space-5;
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  margin-bottom: $spacing-md;
+
+  &--has-chips {
+    padding-bottom: $space-3;
+  }
+}
+
+// ============================================================================
+// FILA PRINCIPAL (búsqueda + extras + limpiar)
+// ============================================================================
+
+.filter-bar__row {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-wrap: wrap;
+}
+
+// ============================================================================
+// CAMPO DE BÚSQUEDA
+// ============================================================================
+
+.filter-bar__search {
+  flex: 1;
+  min-width: 240px;
+  max-width: 480px;
+}
+
+.search-field {
+  width: 100%;
+
+  // Override para que el prefix quede alineado
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background-color: $color-surface-variant !important;
+    border-radius: $border-radius-md !important;
+
+    &:hover {
+      background-color: $color-surface-hover !important;
+    }
+  }
+
+  ::ng-deep .mat-mdc-form-field-infix {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    min-height: 44px;
+  }
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+.search-prefix {
+  color: $color-text-light;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: $space-1;
+}
+
+.clear-search-btn {
+  color: $color-text-light;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+
+  &:hover {
+    color: $color-text-medium;
+    background-color: $color-surface-variant;
+  }
+}
+
+// ============================================================================
+// FILTROS EXTRA (content projection)
+// ============================================================================
+
+.filter-bar__extra {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+// ============================================================================
+// ACCIONES (botón limpiar)
+// ============================================================================
+
+.filter-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  flex-shrink: 0;
+}
+
+.clear-all-btn {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  height: 36px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-medium;
+  border-color: $color-border;
+  border-radius: $border-radius-md;
+  padding: 0 $space-3;
+  transition: all $transition-fast;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    color: $color-danger;
+    border-color: $color-danger;
+    background-color: $color-danger-light;
+  }
+}
+
+// ============================================================================
+// CHIPS DE FILTROS ACTIVOS
+// ============================================================================
+
+.filter-bar__chips {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-wrap: wrap;
+  padding-top: $space-1;
+  border-top: 1px solid $color-border-light;
+}
+
+.chips-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-text-light;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.filter-chip {
+  font-size: $font-size-xs !important;
+  font-weight: $font-weight-medium;
+  background-color: $color-primary-light !important;
+  color: $color-primary-dark !important;
+
+  ::ng-deep .mat-mdc-chip-action-label {
+    color: $color-primary-dark;
+  }
+
+  ::ng-deep .mat-icon[matChipRemove] {
+    color: $color-primary;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+
+    &:hover {
+      color: $color-danger;
+    }
+  }
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+@media (max-width: #{$breakpoint-md}) {
+  .filter-bar {
+    padding: $space-3 $space-4;
+  }
+
+  .filter-bar__search {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .filter-bar__row {
+    gap: $space-2;
+  }
+
+  .clear-all-btn span {
+    display: none;
+  }
+
+  .clear-all-btn {
+    min-width: 36px;
+    padding: 0 $space-2;
+  }
+}
+
+@media (max-width: #{$breakpoint-sm}) {
+  .filter-bar__extra {
+    width: 100%;
+  }
+
+  .chips-label {
+    display: none;
+  }
+}
