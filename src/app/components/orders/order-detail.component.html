@@ -267,5 +267,13 @@
         </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- Documentos Electrónicos del Pedido -->
+    <app-electronic-document-panel
+      *ngIf="order"
+      [saleId]="order.id"
+      [saleNumber]="order.order_number"
+    />
+
   </div>
 </div>

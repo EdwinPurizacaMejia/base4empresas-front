@@ -39,7 +39,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     AppCurrencyPipe
   ],
   templateUrl: './electronic-documents-list.component.html',
-  styleUrl: './electronic-documents-list.component.scss'
+  styleUrls: ['./electronic-documents-list.component.scss']
 })
 export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
   documents: any[] = [];
@@ -81,7 +81,7 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
     this.filters.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        this.page = 1; // Resetear a página 1 al cambiar filtros
+        this.page = 1;
         this.loadDocuments();
       });
   }
@@ -103,8 +103,7 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
       document_type: filterValues.document_type || undefined
     };
 
-    this.documentsService
-      .listDocuments(filters)
+    this.documentsService.listDocuments(filters)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -113,7 +112,7 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (err) => {
-          console.error('Error loading documents:', err);
+          console.error('Error al cargar documentos electrónicos:', err);
           this.notificationService.error('Error al cargar documentos electrónicos');
           this.loading = false;
         }
@@ -122,10 +121,11 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
 
   getDocumentTypeLabel(type: string): string {
     const labels: Record<string, string> = {
-      'INVOICE': 'Factura',
-      'BOLETA': 'Boleta',
-      'CREDIT_NOTE': 'Nota de Crédito',
-      'DEBIT_NOTE': 'Nota de Débito'
+      '01': 'Factura',
+      '03': 'Boleta',
+      'invoice': 'Factura/Boleta',
+      'credit_note': 'Nota de Crédito',
+      'debit_note': 'Nota de Débito'
     };
     return labels[type] || type;
   }
@@ -133,28 +133,34 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
       'DRAFT': 'Borrador',
-      'ISSUED': 'Emitido',
-      'SENT': 'Enviado',
+      'READY': 'Listo',
+      'PENDING': 'Pendiente',
       'ACCEPTED': 'Aceptado',
       'REJECTED': 'Rechazado',
-      'CANCELLED': 'Anulado'
+      'CANCELLED': 'Anulado',
+      'draft': 'Borrador',
+      'pending': 'Pendiente',
+      'accepted': 'Aceptado',
+      'rejected': 'Rechazado',
+      'cancelled': 'Anulado'
     };
     return labels[status] || status;
   }
 
   getStatusColor(status: string): string {
     const colors: Record<string, string> = {
-      'DRAFT': 'accent',
-      'ISSUED': 'primary',
-      'SENT': 'primary',
+      'DRAFT': 'default',
+      'READY': 'accent',
+      'PENDING': 'accent',
       'ACCEPTED': 'primary',
       'REJECTED': 'warn',
-      'CANCELLED': 'accent'
+      'CANCELLED': 'default'
     };
-    return colors[status] || 'primary';
+    return colors[status] || 'default';
   }
 
   onRefresh(): void {
+    this.page = 1;
     this.loadDocuments();
   }
 
@@ -164,67 +170,60 @@ export class ElectronicDocumentsListComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(event: PageEvent): void {
-    this.page = event.pageIndex + 1; // Material Paginator usa índice base 0
+    this.page = event.pageIndex + 1;
     this.pageSize = event.pageSize;
     this.loadDocuments();
   }
 
   getStatusOptions(): string[] {
-    return ['DRAFT', 'PENDING', 'PROCESSING', 'ACCEPTED', 'REJECTED', 'OBSERVED', 'CANCELLED', 'ERROR'];
+    return ['DRAFT', 'READY', 'PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED'];
   }
 
   getDocumentTypeOptions(): Array<{ value: string; label: string }> {
     return [
-      { value: 'invoice', label: 'Factura' },
-      { value: 'boleta', label: 'Boleta' },
-      { value: 'credit_note', label: 'Nota de Crédito' },
-      { value: 'debit_note', label: 'Nota de Débito' }
+      { value: '01', label: 'Factura' },
+      { value: '03', label: 'Boleta' },
     ];
   }
 
-  // Handlers de acciones
-  onView(document: any): void {
-    console.log('Ver documento:', document);
-  }
+  onView(document: any): void { }
 
   onEmit(document: any): void {
-    console.log('Emitir documento:', document);
+    if (!confirm(`¿Enviar "${document.full_number}" a SUNAT vía NubeFact?`)) return;
+
+    this.documentsService.emitDocument(document.id, { provider_mode: 'sandbox' })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.notificationService.success(`Documento ${document.full_number} emitido. Estado: ${response.status}`);
+          } else {
+            this.notificationService.error(`SUNAT rechazó: ${response.message || 'Sin detalle'}`);
+          }
+          this.loadDocuments();
+        },
+        error: (err) => {
+          this.notificationService.error(err?.error?.detail || 'Error al emitir el documento');
+        }
+      });
   }
 
-  onCancel(document: any): void {
-    console.log('Cancelar documento:', document);
-  }
+  onCancel(document: any): void { }
+  onDownloadPdf(document: any): void { }
+  onDownloadXml(document: any): void { }
+  onDownloadCdr(document: any): void { }
 
-  onDownloadPdf(document: any): void {
-    console.log('Descargar PDF:', document);
-  }
-
-  onDownloadXml(document: any): void {
-    console.log('Descargar XML:', document);
-  }
-
-  onDownloadCdr(document: any): void {
-    console.log('Descargar CDR:', document);
-  }
-
-  // Helpers de visibilidad de botones
   canEmit(document: any): boolean {
-    return document.status === 'DRAFT' || document.status === 'READY';
+    const s = (document.status || '').toUpperCase();
+    return s === 'DRAFT' || s === 'READY';
   }
 
   canCancel(document: any): boolean {
-    return document.status === 'ACCEPTED' || document.status === 'PROCESSING';
+    const s = (document.status || '').toUpperCase();
+    return s === 'ACCEPTED';
   }
 
-  hasPdf(document: any): boolean {
-    return !!document.pdf_url;
-  }
-
-  hasXml(document: any): boolean {
-    return !!document.xml_url;
-  }
-
-  hasCdr(document: any): boolean {
-    return !!document.cdr_url;
-  }
+  hasPdf(document: any): boolean { return !!document.pdf_url; }
+  hasXml(document: any): boolean { return !!document.xml_url; }
+  hasCdr(document: any): boolean { return !!document.cdr_url; }
 }

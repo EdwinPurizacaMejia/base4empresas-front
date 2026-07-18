@@ -26,7 +26,7 @@ import { CostingConfigResponse, CostingMethod } from '../../models/costing-confi
     MatFormFieldModule,
   ],
   templateUrl: './costing-config.component.html',
-  styleUrl: './costing-config.component.scss',
+  styleUrls: ['./costing-config.component.scss'],
 })
 export class CostingConfigComponent implements OnInit, OnDestroy {
   warehouses: Warehouse[] = [];

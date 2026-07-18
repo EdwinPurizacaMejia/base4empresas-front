@@ -6,8 +6,7 @@
 // 1. IMPORTAR TEMA PRECOMPILADO DE ANGULAR MATERIAL
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
-// 2. IMPORTAR GOOGLE FONTS
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+// 2. GOOGLE FONTS se carga desde index.html para evitar errores de inline en build de producción
 
 // 3. VARIABLES Y CONFIGURACIÓN
 @import 'styles/variables';

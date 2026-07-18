@@ -47,7 +47,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     AppCurrencyPipe,
   ],
   templateUrl: './purchase-list.component.html',
-  styleUrl: './purchase-list.component.scss',
+  styleUrls: ['./purchase-list.component.scss'],
 })
 export class PurchaseListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

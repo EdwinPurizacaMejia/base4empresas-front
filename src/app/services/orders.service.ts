@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { Order, OrderCreate, OrderUpdateStatus, OrderFilters } from '../models/order.model';
+import { Order, OrderCreate, OrderUpdateStatus, OrderFilters, OrderUpdate } from '../models/order.model';
 import { ApiConfigService } from './api-config.service';
 
 /**
@@ -73,6 +73,14 @@ export class OrdersService {
 
   /**
    * Actualizar el estado de una orden
+   * Backend: PATCH /orders/{id} — Editar información general del pedido.
+   * items solo editables en estado DRAFT o SEPARATED.
+   */
+  updateOrder(orderId: string, payload: OrderUpdate): Observable<Order> {
+    return this.http.patch<Order>(`${this.apiUrl}/${orderId}`, payload);
+  }
+
+  /**
    * Backend: PATCH /orders/{id}/status
    */
   updateOrderStatus(id: string, payload: OrderUpdateStatus): Observable<Order> {

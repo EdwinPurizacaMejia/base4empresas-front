@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 import { Order, OrderCreate } from '../../models/order.model';
 import { OrdersService } from '../../services/orders.service';
@@ -36,11 +37,12 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     MatCardModule,
     MatTableModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
     LoadingSpinnerComponent,
     AppCurrencyPipe
   ],
   templateUrl: './order-create.component.html',
-  styleUrl: './order-create.component.scss'
+  styleUrls: ['./order-create.component.scss']
 })
 export class OrderCreateComponent implements OnInit, OnDestroy {
   form: FormGroup;
@@ -70,6 +72,9 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
     return this.form.get('currency')?.value || 'PEN';
   }
 
+  /** Cuando el componente se usa como diálogo, este ref estará disponible */
+  get isDialogMode(): boolean { return !!this.dialogRef; }
+
   constructor(
     private fb: FormBuilder,
     private ordersService: OrdersService,
@@ -77,7 +82,8 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
     private channelsService: SalesChannelsService,
     private productsService: ProductsService,
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    @Optional() private dialogRef: MatDialogRef<OrderCreateComponent>
   ) {
     this.form = this.createForm();
   }
@@ -280,7 +286,11 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
         next: (order: Order) => {
           this.submitting = false;
           this.notificationService.success(`Orden ${order.order_number} creada exitosamente`);
-          this.router.navigate(['/ventas/pedidos', order.id]);
+          if (this.isDialogMode) {
+            this.dialogRef.close(true);
+          } else {
+            this.router.navigate(['/ventas/pedidos', order.id]);
+          }
         },
         error: (err) => {
           console.error('Error creating order:', err);
@@ -291,6 +301,10 @@ export class OrderCreateComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    this.router.navigate(['/ventas/pedidos']);
+    if (this.isDialogMode) {
+      this.dialogRef.close(false);
+    } else {
+      this.router.navigate(['/ventas/pedidos']);
+    }
   }
 }

@@ -1,217 +1,153 @@
-<div class="container">
-  <div class="header">
+<!-- ── MODO DIÁLOGO: encabezado ────────────────────────────── -->
+<ng-container *ngIf="isDialogMode">
+  <h2 mat-dialog-title class="oc-title">
+    Nueva Orden
+    <button mat-icon-button (click)="onCancel()" [disabled]="submitting" class="oc-close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </h2>
+</ng-container>
+
+<!-- ── MODO PÁGINA: encabezado ────────────────────────────── -->
+<ng-container *ngIf="!isDialogMode">
+  <div class="page-header">
     <h1>Crear Nueva Orden</h1>
   </div>
+</ng-container>
 
+<!-- ── CONTENIDO (compartido) ────────────────────────────── -->
+<div [class]="isDialogMode ? 'oc-dialog-content' : 'container'">
   <app-loading-spinner *ngIf="loadingData" message="Cargando datos..."></app-loading-spinner>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!loadingData">
-    <!-- Sección: Cliente y Canal -->
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Información General</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Cliente</mat-label>
-            <mat-select formControlName="customer_id">
-              <mat-option *ngFor="let customer of customers" [value]="customer.id">
-                {{ customer.full_name || customer.business_name }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="form.get('customer_id')?.hasError('required')">
-              Selecciona un cliente
-            </mat-error>
-          </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Canal de Venta</mat-label>
-            <mat-select formControlName="sales_channel_id">
-              <mat-option *ngFor="let channel of channels" [value]="channel.id">
-                {{ channel.name }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="form.get('sales_channel_id')?.hasError('required')">
-              Selecciona un canal
-            </mat-error>
-          </mat-form-field>
-        </div>
+    <!-- Información General -->
+    <div class="oc-section">
+      <div class="oc-section-label"><mat-icon>info_outline</mat-icon>Información General</div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Moneda</mat-label>
-            <mat-select formControlName="currency">
-              <mat-option value="PEN">PEN - Soles Peruanos</mat-option>
-              <mat-option value="USD">USD - Dólares</mat-option>
-            </mat-select>
-          </mat-form-field>
+      <div class="oc-two-cols">
+        <mat-form-field appearance="outline" class="oc-fw">
+          <mat-label>Cliente *</mat-label>
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-select formControlName="customer_id">
+            <mat-option *ngFor="let customer of customers" [value]="customer.id">
+              {{ customer.full_name || customer.business_name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('customer_id')?.hasError('required')">
+            Selecciona un cliente
+          </mat-error>
+        </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Monto Inicial (Opcional)</mat-label>
-            <input
-              matInput
-              type="number"
-              formControlName="initial_payment_amount"
-              placeholder="0.00"
-            />
-            <mat-hint>Para separaciones/depósito inicial</mat-hint>
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        <mat-form-field appearance="outline" class="oc-fw">
+          <mat-label>Canal de Venta *</mat-label>
+          <mat-icon matPrefix>storefront</mat-icon>
+          <mat-select formControlName="sales_channel_id">
+            <mat-option *ngFor="let channel of channels" [value]="channel.id">
+              {{ channel.name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('sales_channel_id')?.hasError('required')">
+            Selecciona un canal
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-    <!-- Sección: Ítems de la Orden -->
-    <mat-card class="items-section">
-      <mat-card-header>
-        <mat-card-title>Ítems de la Orden</mat-card-title>
-        <button
-          mat-raised-button
-          color="primary"
-          type="button"
-          (click)="addItem()"
-          class="add-item-btn"
-        >
+      <div class="oc-two-cols">
+        <mat-form-field appearance="outline" class="oc-fw">
+          <mat-label>Moneda *</mat-label>
+          <mat-icon matPrefix>attach_money</mat-icon>
+          <mat-select formControlName="currency">
+            <mat-option value="PEN">PEN - Soles Peruanos</mat-option>
+            <mat-option value="USD">USD - Dólares</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="oc-fw">
+          <mat-label>Monto Inicial (Opcional)</mat-label>
+          <mat-icon matPrefix>payments</mat-icon>
+          <input matInput type="number" formControlName="initial_payment_amount" placeholder="0.00"/>
+          <mat-hint>Para separaciones/depósito inicial</mat-hint>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Items del Pedido -->
+    <div class="oc-section">
+      <div class="oc-section-header">
+        <div class="oc-section-label"><mat-icon>shopping_bag</mat-icon>Ítems de la Orden</div>
+        <button mat-mini-fab color="primary" type="button" (click)="addItem()" matTooltip="Agregar ítem">
           <mat-icon>add</mat-icon>
-          Agregar Ítem
         </button>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="table-container" *ngIf="items.length > 0">
-          <table mat-table [dataSource]="itemsDataSource" class="items-table">
-            <!-- Producto -->
-            <ng-container matColumnDef="product">
-              <th mat-header-cell *matHeaderCellDef>Producto</th>
-              <td mat-cell *matCellDef="let item; let i = index">
-                <mat-form-field appearance="outline" class="cell-field">
-                  <mat-label>Producto</mat-label>
-                  <mat-select [formControl]="getItemControl(i, 'product_id')">
-                    <mat-option *ngFor="let product of products" [value]="product.id">
-                      {{ product.name }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </td>
-            </ng-container>
+      </div>
 
-            <!-- Cantidad -->
-            <ng-container matColumnDef="quantity">
-              <th mat-header-cell *matHeaderCellDef>Cantidad</th>
-              <td mat-cell *matCellDef="let item; let i = index">
-                <mat-form-field appearance="outline" class="cell-field">
-                  <input
-                    matInput
-                    type="number"
-                    min="1"
-                    [formControl]="getItemControl(i, 'quantity')"
-                  />
-                </mat-form-field>
-              </td>
-            </ng-container>
-
-            <!-- Precio Unitario -->
-            <ng-container matColumnDef="unitPrice">
-              <th mat-header-cell *matHeaderCellDef>Precio Unitario</th>
-              <td mat-cell *matCellDef="let item; let i = index">
-                <mat-form-field appearance="outline" class="cell-field">
-                  <input
-                    matInput
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    [formControl]="getItemControl(i, 'unitPrice')"
-                  />
-                </mat-form-field>
-              </td>
-            </ng-container>
-
-            <!-- Descuento -->
-            <ng-container matColumnDef="discount">
-              <th mat-header-cell *matHeaderCellDef>Descuento</th>
-              <td mat-cell *matCellDef="let item; let i = index">
-                <mat-form-field appearance="outline" class="cell-field">
-                  <input
-                    matInput
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    [formControl]="getItemControl(i, 'discount')"
-                  />
-                </mat-form-field>
-              </td>
-            </ng-container>
-
-            <!-- Subtotal -->
-            <ng-container matColumnDef="subtotal">
-              <th mat-header-cell *matHeaderCellDef>Subtotal</th>
-              <td mat-cell *matCellDef="let item; let i = index" class="subtotal-cell">
-                {{ itemSubtotals[i] | appCurrency: selectedCurrency }}
-              </td>
-            </ng-container>
-
-            <!-- Acciones -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Acciones</th>
-              <td mat-cell *matCellDef="let item; let i = index">
-                <button
-                  mat-icon-button
-                  color="warn"
-                  type="button"
-                  (click)="removeItem(i)"
-                  matTooltip="Eliminar ítem"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="itemsDisplayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: itemsDisplayedColumns;"></tr>
-          </table>
+      <div class="oc-items-list" formArrayName="items">
+        <div *ngFor="let item of itemsDataSource; let i = index" class="oc-item-card" [formGroupName]="i">
+          <div class="oc-item-idx">{{ i + 1 }}</div>
+          <div class="oc-item-fields">
+            <mat-form-field appearance="outline" class="oc-fw">
+              <mat-label>Producto *</mat-label>
+              <mat-icon matPrefix>inventory_2</mat-icon>
+              <mat-select [formControl]="getItemControl(i, 'product_id')">
+                <mat-option *ngFor="let product of products" [value]="product.id">
+                  {{ product.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div class="oc-item-row2">
+              <mat-form-field appearance="outline" class="oc-qty">
+                <mat-label>Cantidad *</mat-label>
+                <mat-icon matPrefix>numbers</mat-icon>
+                <input matInput type="number" min="1" [formControl]="getItemControl(i, 'quantity')" placeholder="1"/>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="oc-price">
+                <mat-label>Precio Unit. *</mat-label>
+                <span matPrefix class="oc-prefix">S/&nbsp;</span>
+                <input matInput type="number" min="0" step="0.01" [formControl]="getItemControl(i, 'unitPrice')" placeholder="0.00"/>
+              </mat-form-field>
+              <div class="oc-subtotal">
+                <span class="oc-sub-lbl">Subtotal</span>
+                <span class="oc-sub-amt">{{ itemSubtotals[i] | appCurrency: selectedCurrency }}</span>
+              </div>
+              <button mat-icon-button type="button" (click)="removeItem(i)" [disabled]="items.length === 1" matTooltip="Eliminar">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <div class="empty-state" *ngIf="items.length === 0">
-          <p>No hay ítems. Haz clic en "Agregar Ítem" para comenzar.</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
+    <!-- Total -->
+    <div class="oc-total-bar">
+      <div class="oc-total-row">
+        <span class="oc-total-lbl">TOTAL NETO</span>
+        <span class="oc-total-amt">{{ totalAmount | appCurrency: selectedCurrency }}</span>
+      </div>
+      <div class="oc-total-row" *ngIf="form.get('initial_payment_amount')?.value">
+        <span class="oc-total-lbl">SALDO</span>
+        <span class="oc-total-amt oc-balance">{{ balanceAmount | appCurrency: selectedCurrency }}</span>
+      </div>
+    </div>
 
-    <!-- Resumen de Totales -->
-    <mat-card class="summary-section">
-      <mat-card-header>
-        <mat-card-title>Resumen</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="summary-row">
-          <span>Total Neto:</span>
-          <strong>{{ totalAmount | appCurrency: selectedCurrency }}</strong>
-        </div>
-        <div class="summary-row" *ngIf="form.get('initial_payment_amount')?.value">
-          <span>Monto Inicial:</span>
-          <strong>{{ form.get('initial_payment_amount')?.value | appCurrency: selectedCurrency }}</strong>
-        </div>
-        <div class="summary-row">
-          <span>Saldo:</span>
-          <strong>{{ balanceAmount | appCurrency: selectedCurrency }}</strong>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Botones de Acción -->
-    <div class="actions">
-      <button mat-stroked-button (click)="onCancel()" [disabled]="submitting">
-        Cancelar
-      </button>
-      <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="form.invalid || submitting"
-      >
-        <mat-spinner *ngIf="submitting" diameter="20"></mat-spinner>
+    <!-- Botones: solo en modo página -->
+    <div class="oc-page-actions" *ngIf="!isDialogMode">
+      <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="submitting">Cancelar</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || submitting">
+        <mat-spinner *ngIf="submitting" diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
         {{ submitting ? 'Creando...' : 'Crear Orden' }}
       </button>
     </div>
+
   </form>
 </div>
+
+<!-- ── ACCIONES DEL DIÁLOGO ───────────────────────────────── -->
+<mat-dialog-actions align="end" class="oc-dialog-actions" *ngIf="isDialogMode">
+  <button mat-stroked-button (click)="onCancel()" [disabled]="submitting">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="form?.invalid || submitting">
+    <mat-icon *ngIf="!submitting">save</mat-icon>
+    <mat-spinner *ngIf="submitting" diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
+    {{ submitting ? 'Creando...' : 'Crear Orden' }}
+  </button>
+</mat-dialog-actions>

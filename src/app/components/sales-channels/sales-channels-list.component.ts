@@ -43,7 +43,7 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     ErrorStateComponent
   ],
   templateUrl: './sales-channels-list.component.html',
-  styleUrl: './sales-channels-list.component.scss'
+  styleUrls: ['./sales-channels-list.component.scss']
 })
 export class SalesChannelsListComponent implements OnInit, AfterViewInit, OnDestroy {
 

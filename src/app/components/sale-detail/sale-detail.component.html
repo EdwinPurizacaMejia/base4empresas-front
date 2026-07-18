@@ -66,8 +66,8 @@
         </div>
 
         <div class="info-section">
-          <label>ID de Cliente</label>
-          <p class="info-text">{{ sale.customer_id || 'Cliente sin especificar' }}</p>
+          <label>Cliente</label>
+          <p class="info-text">{{ sale.customer_name || 'Cliente sin especificar' }}</p>
         </div>
 
         <div class="info-section" *ngIf="sale.notes">
@@ -125,7 +125,7 @@
           </div>
           <div class="info-item">
             <label>Almacén</label>
-            <p class="info-value">{{ sale.warehouse_id }}</p>
+            <p class="info-value">{{ sale.warehouse_name || sale.warehouse_id }}</p>
           </div>
         </div>
       </mat-card-content>
@@ -195,6 +195,13 @@
         </div>
       </mat-card-content>
     </mat-card>
+
+    <!-- Documentos Electrónicos -->
+    <app-electronic-document-panel
+      *ngIf="sale && saleId"
+      [saleId]="saleId"
+      [saleNumber]="sale.number"
+    />
 
     <!-- Acciones -->
     <div class="action-section">

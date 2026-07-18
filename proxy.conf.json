@@ -1,0 +1,82 @@
+{
+  "/api": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/products": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/purchases": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/inventory": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/orders": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/sales-channels": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/warehouses": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+    "/units": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+    },
+  "/categories": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/customers": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/suppliers": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/sales": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/shipments": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/payments": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/electronic-documents": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/config/costing": {
+    "target": "http://127.0.0.1:8000",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

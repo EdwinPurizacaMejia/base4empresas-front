@@ -31,7 +31,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     AppCurrencyPipe,
   ],
   templateUrl: './product-detail.component.html',
-  styleUrl: './product-detail.component.css',
+  styleUrls: ['./product-detail.component.css'],
 })
 export class ProductDetailComponent implements OnInit {
   product: Product | null = null;

@@ -44,7 +44,7 @@ interface DialogData {
     MatDialogModule
   ],
   templateUrl: './purchase-form.component.html',
-  styleUrl: './purchase-form.component.css'
+  styleUrls: ['./purchase-form.component.css']
 })
 export class PurchaseFormComponent implements OnInit, OnDestroy {
   @Output() purchaseCreated = new EventEmitter<void>();

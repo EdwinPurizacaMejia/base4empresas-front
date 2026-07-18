@@ -13,6 +13,8 @@ import { CustomersListComponent } from './components/customers-list/customers-li
 import { SuppliersListComponent } from './components/suppliers-list/suppliers-list.component';
 
 // VENTAS (FASE 2-3: Pedidos + Pagos + Documentos Electrónicos)
+import { SaleListComponent } from './components/sale-list/sale-list.component';
+import { SaleDetailComponent } from './components/sale-detail/sale-detail.component';
 import { OrdersListComponent } from './components/orders/orders-list.component';
 import { OrderCreateComponent } from './components/orders/order-create.component';
 import { OrderDetailComponent } from './components/orders/order-detail.component';
@@ -161,6 +163,18 @@ export const routes: Routes = [
             path: 'pagos',
             component: PaymentsListComponent,
             data: { title: 'Gestión de Pagos' }
+          },
+
+          // Ventas directas
+          {
+            path: 'ventas',
+            component: SaleListComponent,
+            data: { title: 'Ventas' }
+          },
+          {
+            path: 'ventas/:id',
+            component: SaleDetailComponent,
+            data: { title: 'Detalle de Venta' }
           },
 
           // Documentos Electrónicos (Facturas, Boletas, NC, ND)

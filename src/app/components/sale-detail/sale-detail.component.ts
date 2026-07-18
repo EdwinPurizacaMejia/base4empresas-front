@@ -17,6 +17,9 @@ import { Product } from '../../models/product.model';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { ErrorStateComponent } from '../shared/error-state.component';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
+import { ElectronicDocumentPanelComponent } from '../electronic-documents/electronic-document-panel.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { SaleFormComponent } from '../sale-form/sale-form.component';
 
 @Component({
   selector: 'app-sale-detail',
@@ -30,12 +33,14 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     MatChipsModule,
     MatTableModule,
     MatTooltipModule,
+    MatDialogModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
     AppCurrencyPipe,
+    ElectronicDocumentPanelComponent,
   ],
   templateUrl: './sale-detail.component.html',
-  styleUrl: './sale-detail.component.css',
+  styleUrls: ['./sale-detail.component.css'],
 })
 export class SaleDetailComponent implements OnInit {
   sale: SaleDetail | null = null;
@@ -50,7 +55,8 @@ export class SaleDetailComponent implements OnInit {
     private router: Router,
     private salesService: SalesService,
     private productsService: ProductsService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -113,17 +119,33 @@ export class SaleDetailComponent implements OnInit {
   }
 
   onEdit(): void {
-    if (this.sale) {
-      // Rutas están en español en app.routes.ts
-      this.router.navigate(['/ventas'], {
-        queryParams: { editId: this.sale.id },
-      });
-      this.notificationService.info('Abriendo editor...');
-    }
+    if (!this.sale) return;
+
+    const dialogRef = this.dialog.open(SaleFormComponent, {
+      width: '760px',
+      minWidth: '300px',
+      maxWidth: '95vw',
+      height: 'auto',
+      minHeight: '400px',
+      maxHeight: '95vh',
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      panelClass: 'crm-dialog-panel',
+      backdropClass: 'crm-dialog-backdrop',
+      data: { sale: this.sale },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true && this.saleId) {
+        this.notificationService.success('Venta actualizada exitosamente');
+        this.loadSale(this.saleId); // recargar los datos del detalle
+      }
+    });
   }
 
   onGoBack(): void {
-    this.router.navigate(['/ventas']);
+    this.router.navigate(['/ventas/ventas']);
   }
 
   // Tabla de items

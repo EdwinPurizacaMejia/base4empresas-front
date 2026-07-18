@@ -47,7 +47,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     AppCurrencyPipe
   ],
   templateUrl: './products-list.component.html',
-  styleUrl: './products-list.component.scss'
+  styleUrls: ['./products-list.component.scss']
 })
 export class ProductsListComponent implements OnInit, AfterViewInit, OnDestroy {
 

@@ -49,7 +49,7 @@ interface ProductFormData {
     MatSelectModule
   ],
   templateUrl: './improved-form-example.component.html',
-  styleUrl: './improved-form-example.component.css'
+  styleUrls: ['./improved-form-example.component.css']
 })
 export class ImprovedFormExampleComponent implements OnDestroy {
   @Output() formSubmitted = new EventEmitter<ProductFormData>();

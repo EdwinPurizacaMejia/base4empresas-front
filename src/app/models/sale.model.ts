@@ -11,6 +11,18 @@ export interface SaleCreate {
   items: SaleItemCreate[];
 }
 
+export interface SaleItemUpdate {
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+}
+
+export interface SaleUpdate {
+  customer_id?: string | null;
+  notes?: string | null;
+  items?: SaleItemUpdate[];
+}
+
 /**
  * Nota: backend actual devuelve SaleResponse (GET /sales y GET /sales/{id}) con:
  * - sale_date (datetime)
@@ -25,7 +37,9 @@ export interface SaleResponse {
   id: string;
   number: string;
   customer_id: string | null;
+  customer_name: string | null;
   warehouse_id: string;
+  warehouse_name: string | null;
   sale_date: string;
   status: string;
   payment_status: string;

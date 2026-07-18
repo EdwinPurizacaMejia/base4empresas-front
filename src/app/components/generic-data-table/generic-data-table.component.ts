@@ -65,7 +65,7 @@ export interface TableConfig {
     MatProgressSpinnerModule
   ],
   templateUrl: './generic-data-table.component.html',
-  styleUrl: './generic-data-table.component.css'
+  styleUrls: ['./generic-data-table.component.css']
 })
 export class GenericDataTableComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() data: any[] = [];

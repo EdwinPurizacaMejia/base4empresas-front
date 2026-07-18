@@ -39,7 +39,7 @@ import { PermissionService } from '../services/permission.service';
         [class.parent-menu]="!!item.children?.length"
         [class.disabled]="item.disabled"
         [title]="item.tooltip || ''"
-        (click)="selectMenuItem(item)"
+        (click)="selectMenuItem(item, $event)"
       >
         <span class="menu-icon" *ngIf="item.icon">{{ item.icon }}</span>
         <span class="menu-label">{{ item.label }}</span>
@@ -272,12 +272,12 @@ export class MainMenuComponent implements OnInit, OnDestroy {
 
   /**
    * Selecciona un item del menú principal
-   * Si tiene children, lo marca como activo sin navegar
-   * Si no tiene children, routerLink maneja la navegación
+   * Si tiene children, previene navegación y despliega submenú
+   * Si no tiene children, permite que routerLink maneje la navegación
    */
-  selectMenuItem(item: MenuItem): void {
+  selectMenuItem(item: MenuItem, event: Event): void {
     if (item.children && item.children.length > 0) {
-      // Si ya está activo, permitir que se despliegue
+      event.preventDefault();
       this.activeParent = this.activeParent?.label === item.label ? item : item;
     }
   }

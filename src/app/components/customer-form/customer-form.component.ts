@@ -32,7 +32,7 @@ import { NotificationService } from '../../services/notification.service';
     MatChipsModule
   ],
   templateUrl: './customer-form.component.html',
-  styleUrl: './customer-form.component.scss'
+  styleUrls: ['./customer-form.component.scss']
 })
 export class CustomerFormComponent implements OnInit {
   form: FormGroup;

@@ -237,7 +237,7 @@ export class CategoriesListComponent implements OnInit, OnDestroy {
   categories: CategoryDto[] = [];
   loading = false;
 
-  displayedColumns = ['id', 'name', 'actions'];
+  displayedColumns = ['name', 'actions'];
 
   private destroy$ = new Subject<void>();
 

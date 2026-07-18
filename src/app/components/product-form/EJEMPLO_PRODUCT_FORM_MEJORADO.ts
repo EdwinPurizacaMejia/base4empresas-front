@@ -45,7 +45,7 @@ import { ConfirmationService } from '../../services/confirmation.service';
     MatSelectModule
   ],
   templateUrl: './product-form-improved.component.html',
-  styleUrl: './product-form-improved.component.css'
+  styleUrls: ['./product-form-improved.component.css']
 })
 export class ProductFormImprovedComponent implements OnDestroy {
   @Output() productCreated = new EventEmitter<void>();

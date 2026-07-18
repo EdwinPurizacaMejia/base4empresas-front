@@ -38,7 +38,7 @@ interface StockWithStatus extends Stock {
     MatProgressSpinnerModule
   ],
   templateUrl: './stock-list.component.html',
-  styleUrl: './stock-list.component.scss'
+  styleUrls: ['./stock-list.component.scss']
 })
 export class StockListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;

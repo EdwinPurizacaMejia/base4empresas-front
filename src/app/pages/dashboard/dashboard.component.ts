@@ -68,7 +68,7 @@ interface LowStockProduct {
     MatDividerModule
   ],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.scss'
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   // Para SSR: Chart.js usa canvas; en server no existe. Renderizamos charts solo en browser.

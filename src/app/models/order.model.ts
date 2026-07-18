@@ -72,6 +72,28 @@ export interface OrderUpdateStatus {
   status: OrderStatus;
 }
 
+export interface OrderItemUpdate {
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  discount?: number;
+}
+
+/**
+ * Payload para editar la información general de una orden.
+ * PATCH /orders/{order_id}
+ * Todos los campos son opcionales.
+ * items solo se puede editar si el pedido está en DRAFT o SEPARATED.
+ */
+export interface OrderUpdate {
+  customer_id?: string;
+  sales_channel_id?: string;
+  currency?: string;
+  initial_payment_amount?: number | null;
+  notes?: string | null;
+  items?: OrderItemUpdate[];
+}
+
 /**
  * Filtros opcionales para listar órdenes
  */

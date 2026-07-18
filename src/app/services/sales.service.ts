@@ -9,6 +9,7 @@ import {
   SaleListItem,
   SaleResponse,
   SaleCostsSummary,
+  SaleUpdate,
 } from '../models/sale.model';
 import { ApiConfigService } from './api-config.service';
 
@@ -37,6 +38,15 @@ export class SalesService {
     return this.http.get<SaleResponse[]>(this.apiUrl).pipe(
       map((rows) => rows.map((s) => this.enrichSaleCosts(s)))
     );
+  }
+
+  /**
+   * PATCH /sales/{id} — Actualizar una venta existente.
+   * Campos editables: customer_id, notes, items (reemplaza todos).
+   * warehouse_id, status y sale_date NO son editables.
+   */
+  updateSale(saleId: string, payload: SaleUpdate): Observable<SaleResponse> {
+    return this.http.patch<SaleResponse>(`${this.apiUrl}/${saleId}`, payload);
   }
 
   getSaleById(id: string): Observable<SaleDetail> {

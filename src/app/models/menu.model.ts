@@ -124,6 +124,12 @@ export const MAIN_MENU: MenuItem[] = [
     tooltip: 'Gestión de pedidos, pagos y transacciones',
     children: [
       {
+        label: 'Ventas',
+        icon: '🛒',
+        route: '/ventas/ventas',
+        tooltip: 'Lista de ventas realizadas',
+      },
+      {
         label: 'Pedidos',
         icon: '📋',
         route: '/ventas/pedidos',

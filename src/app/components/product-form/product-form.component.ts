@@ -38,7 +38,7 @@ interface DialogData {
     MatSnackBarModule
   ],
   templateUrl: './product-form.component.html',
-  styleUrl: './product-form.component.scss'
+  styleUrls: ['./product-form.component.scss']
 })
 export class ProductFormComponent implements OnInit, OnDestroy {
   productForm!: FormGroup;

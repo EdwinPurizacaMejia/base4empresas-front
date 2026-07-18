@@ -38,7 +38,7 @@ interface LowStockProduct {
     MatProgressSpinnerModule
   ],
   templateUrl: './dashboard-new.component.html',
-  styleUrl: './dashboard.component.scss'
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardNewComponent implements OnInit, OnDestroy {
   // State

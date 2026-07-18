@@ -94,3 +94,5 @@ temp/
 .angular/cache/**
 angular.json.bak
 src/environments/environment.prod.ts
+# graphify-axet
+.graphify/

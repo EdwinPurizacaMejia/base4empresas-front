@@ -18,7 +18,7 @@ import { InventoryKardexLine, InventoryValuationResponse } from '../../models/in
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './kardex.component.html',
-  styleUrl: './kardex.component.css'
+  styleUrls: ['./kardex.component.css']
 })
 export class KardexComponent implements OnInit, OnDestroy {
   movements: InventoryKardexLine[] = [];

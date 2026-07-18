@@ -60,7 +60,7 @@ import { AppCurrencyPipe } from '../../../shared/pipes/app-currency.pipe';
     AppCurrencyPipe
   ],
   templateUrl: './order-payments.component.html',
-  styleUrl: './order-payments.component.scss'
+  styleUrls: ['./order-payments.component.scss']
 })
 export class OrderPaymentsComponent implements OnInit, OnDestroy {
   @Input() orderId!: string;

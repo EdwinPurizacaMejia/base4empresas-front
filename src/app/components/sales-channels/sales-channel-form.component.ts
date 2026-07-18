@@ -26,7 +26,7 @@ import { NotificationService } from '../../services/notification.service';
     MatProgressSpinnerModule
   ],
   templateUrl: './sales-channel-form.component.html',
-  styleUrl: './sales-channel-form.component.scss'
+  styleUrls: ['./sales-channel-form.component.scss']
 })
 export class SalesChannelFormComponent implements OnInit {
   form: FormGroup;

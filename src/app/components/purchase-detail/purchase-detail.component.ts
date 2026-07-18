@@ -33,7 +33,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     AppCurrencyPipe,
   ],
   templateUrl: './purchase-detail.component.html',
-  styleUrl: './purchase-detail.component.css',
+  styleUrls: ['./purchase-detail.component.css'],
 })
 export class PurchaseDetailComponent implements OnInit {
   purchase: Purchase | null = null;

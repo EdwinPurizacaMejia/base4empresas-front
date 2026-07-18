@@ -120,11 +120,31 @@
           <td mat-cell *matCellDef="let order">
             <button
               mat-icon-button
-              color="primary"
               (click)="viewDetail(order.id)"
               matTooltip="Ver detalle"
             >
               <mat-icon>visibility</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="generateElectronicDocument(order)"
+              matTooltip="Generar Comprobante Electrónico"
+            >
+              <mat-icon>receipt_long</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="editOrder(order)"
+              matTooltip="Editar pedido"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="deleteOrder(order)"
+              matTooltip="Eliminar pedido"
+            >
+              <mat-icon>delete</mat-icon>
             </button>
           </td>
         </ng-container>

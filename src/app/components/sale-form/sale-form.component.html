@@ -1,5 +1,6 @@
+<!-- ── TÍTULO ─────────────────────────────────────────────────── -->
 <h2 mat-dialog-title class="dialog-title">
-  Nueva Venta
+  {{ dialogTitle }}
   <button
     mat-icon-button
     type="button"
@@ -13,167 +14,230 @@
 </h2>
 
 <mat-dialog-content class="dialog-content">
-  <p class="subtitle">
-    Ingresa los datos de la venta para registrar la salida de stock
-  </p>
 
+  <!-- Error -->
   <div class="error-message" *ngIf="errorMessage">
-    <span class="error-icon">⚠</span>
-    {{ errorMessage }}
+    <mat-icon class="error-icon">warning</mat-icon>
+    <span>{{ errorMessage }}</span>
   </div>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
-    <div class="sale-main-grid">
-      <div class="sale-field native-input-field">
-        <label class="native-input-label" for="sale-warehouse">Almacén *</label>
-        <div class="native-input-control">
-          <mat-icon>warehouse</mat-icon>
-          <input
-            id="sale-warehouse"
-            type="text"
-            formControlName="warehouse_id"
-            placeholder="Ej: warehouse-1"
-            [attr.aria-invalid]="form.get('warehouse_id')?.invalid && form.get('warehouse_id')?.touched"
-          />
-        </div>
-        <div class="native-field-error" *ngIf="form.get('warehouse_id')?.invalid && form.get('warehouse_id')?.touched">
-          Almacén es requerido
-        </div>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <!-- ══ SECCIÓN: DATOS GENERALES ══════════════════════════════════════ -->
+    <div class="form-section">
+      <div class="section-label">
+        <mat-icon>info_outline</mat-icon>
+        Datos generales
       </div>
 
-      <div class="sale-field native-input-field">
-        <label class="native-input-label" for="sale-customer">Cliente</label>
-        <div class="native-input-control">
-          <mat-icon>person</mat-icon>
+      <div class="fields-row two-cols">
+
+        <!-- Almacén -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Almacén{{ isEditMode ? ' (no editable)' : ' *' }}</mat-label>
+          <mat-icon matPrefix>warehouse</mat-icon>
           <input
-            id="sale-customer"
-            type="text"
-            formControlName="customer_id"
-            placeholder="Ej: customer-uuid"
+            matInput
+            [formControl]="warehouseSearch"
+            [matAutocomplete]="warehouseAuto"
+            placeholder="Buscar almacén..."
+            [readonly]="isEditMode"
           />
-        </div>
+          <mat-spinner matSuffix diameter="18" *ngIf="loadingWarehouses"></mat-spinner>
+          <mat-autocomplete
+            #warehouseAuto="matAutocomplete"
+            (optionSelected)="onWarehouseSelected($event.option.value)"
+          >
+            <mat-option *ngFor="let w of filteredWarehouses" [value]="w">
+              <mat-icon style="font-size:16px;vertical-align:middle;margin-right:6px">warehouse</mat-icon>
+              {{ w.name }}
+            </mat-option>
+            <mat-option disabled *ngIf="filteredWarehouses.length === 0 && !loadingWarehouses">
+              Sin resultados
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="form.get('warehouse_id')?.invalid && form.get('warehouse_id')?.touched">
+            Almacén requerido
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Cliente -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cliente</mat-label>
+          <mat-icon matPrefix>person</mat-icon>
+          <input
+            matInput
+            [formControl]="customerSearch"
+            [matAutocomplete]="customerAuto"
+            placeholder="Buscar cliente..."
+          />
+          <mat-spinner matSuffix diameter="18" *ngIf="loadingCustomers"></mat-spinner>
+          <mat-autocomplete
+            #customerAuto="matAutocomplete"
+            (optionSelected)="onCustomerSelected($event.option.value)"
+          >
+            <mat-option *ngFor="let c of filteredCustomers" [value]="c">
+              <mat-icon style="font-size:16px;vertical-align:middle;margin-right:6px">person</mat-icon>
+              {{ getCustomerLabel(c) }}
+            </mat-option>
+            <mat-option disabled *ngIf="filteredCustomers.length === 0 && !loadingCustomers">
+              Sin resultados
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
       </div>
 
-      <div class="description-field native-notes-field">
-        <label class="native-notes-label" for="sale-notes">Notas</label>
-        <div class="native-notes-control">
-          <mat-icon>note</mat-icon>
-          <textarea
-            id="sale-notes"
-            formControlName="notes"
-            rows="3"
-            placeholder="Notas adicionales sobre esta venta"
-          ></textarea>
-        </div>
-      </div>
+      <!-- Notas (fila completa) -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Notas</mat-label>
+        <mat-icon matPrefix>note</mat-icon>
+        <textarea
+          matInput
+          formControlName="notes"
+          rows="2"
+          placeholder="Observaciones adicionales sobre esta venta"
+        ></textarea>
+      </mat-form-field>
+
     </div>
 
-    <div class="items-section">
+    <!-- ══ SECCIÓN: ITEMS ════════════════════════════════════════════════ -->
+    <div class="form-section items-section">
       <div class="section-header">
-        <h3>Items de Venta</h3>
+        <div class="section-label">
+          <mat-icon>shopping_cart</mat-icon>
+          Items de Venta
+        </div>
         <button
           type="button"
           mat-mini-fab
           color="primary"
           (click)="addItem()"
           [disabled]="loading"
-          title="Agregar nuevo item"
+          matTooltip="Agregar producto"
         >
           <mat-icon>add</mat-icon>
         </button>
       </div>
 
-      <div formArrayName="items">
-        <div *ngFor="let item of items.controls; let i = index" class="item-card">
-          <div [formGroupName]="i" class="item-form">
-            <div class="item-field product-field native-input-field">
-              <label class="native-input-label" [attr.for]="'sale-product-' + i">Producto *</label>
-              <div class="native-input-control">
-                <mat-icon>inventory_2</mat-icon>
-                <input
-                  [id]="'sale-product-' + i"
-                  type="text"
-                  formControlName="product_id"
-                  placeholder="Producto"
-                  [attr.aria-invalid]="item.get('product_id')?.invalid && item.get('product_id')?.touched"
-                />
-              </div>
-              <div class="native-field-error" *ngIf="item.get('product_id')?.invalid && item.get('product_id')?.touched">
-                Requerido
-              </div>
-            </div>
+      <div formArrayName="items" class="items-list">
+        <div
+          *ngFor="let item of items.controls; let i = index"
+          class="item-card"
+          [formGroupName]="i"
+        >
+          <!-- Número de ítem -->
+          <div class="item-index">#{{ i + 1 }}</div>
 
-            <div class="item-field quantity-field native-input-field">
-              <label class="native-input-label" [attr.for]="'sale-quantity-' + i">Cantidad *</label>
-              <div class="native-input-control">
-                <mat-icon>numbers</mat-icon>
+          <div class="item-fields">
+            <!-- Fila 1: Producto -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Producto *</mat-label>
+              <mat-icon matPrefix>inventory_2</mat-icon>
+              <input
+                matInput
+                [formControl]="productSearchControls[i]"
+                [matAutocomplete]="productAuto"
+                placeholder="Buscar producto..."
+              />
+              <mat-spinner matSuffix diameter="18" *ngIf="loadingProducts[i]"></mat-spinner>
+              <mat-autocomplete
+                #productAuto="matAutocomplete"
+                (optionSelected)="onProductSelected($event.option.value, i)"
+              >
+                <mat-option *ngFor="let p of filteredProducts[i]" [value]="p">
+                  <strong>{{ p.name }}</strong>
+                  <small *ngIf="p.sku" style="color:#64748b;margin-left:6px">{{ p.sku }}</small>
+                </mat-option>
+                <mat-option disabled *ngIf="filteredProducts[i]?.length === 0 && !loadingProducts[i]">
+                  Sin resultados
+                </mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf="item.get('product_id')?.invalid && item.get('product_id')?.touched">
+                Selecciona un producto
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Fila 2: Cantidad + Precio + Subtotal + Eliminar -->
+            <div class="item-details-row">
+
+              <mat-form-field appearance="outline" class="field-qty">
+                <mat-label>Cantidad *</mat-label>
+                <mat-icon matPrefix>numbers</mat-icon>
                 <input
-                  [id]="'sale-quantity-' + i"
+                  matInput
                   type="number"
                   formControlName="quantity"
                   min="1"
-                  [attr.aria-invalid]="item.get('quantity')?.invalid && item.get('quantity')?.touched"
+                  placeholder="1"
                 />
-              </div>
-              <div class="native-field-error" *ngIf="item.get('quantity')?.invalid && item.get('quantity')?.touched">
-                > 0
-              </div>
-            </div>
+                <mat-error *ngIf="item.get('quantity')?.invalid && item.get('quantity')?.touched">
+                  Mín. 1
+                </mat-error>
+              </mat-form-field>
 
-            <div class="item-field price-field native-input-field">
-              <label class="native-input-label" [attr.for]="'sale-unit-price-' + i">Precio Unitario *</label>
-              <div class="native-input-control">
-                <span class="native-input-prefix">S/</span>
+              <mat-form-field appearance="outline" class="field-price">
+                <mat-label>Precio Unit. *</mat-label>
+                <span matPrefix class="prefix-text">S/&nbsp;</span>
                 <input
-                  [id]="'sale-unit-price-' + i"
+                  matInput
                   type="number"
                   formControlName="unit_price"
                   min="0"
                   step="0.01"
-                  [attr.aria-invalid]="item.get('unit_price')?.invalid && item.get('unit_price')?.touched"
+                  placeholder="0.00"
                 />
-              </div>
-              <div class="native-field-error" *ngIf="item.get('unit_price')?.invalid && item.get('unit_price')?.touched">
-                >= 0
-              </div>
-            </div>
+                <mat-error *ngIf="item.get('unit_price')?.invalid && item.get('unit_price')?.touched">
+                  Mín. 0
+                </mat-error>
+              </mat-form-field>
 
-            <div class="item-actions-cell">
-              <div class="item-subtotal">
-                <span class="subtotal-label">Subtotal:</span>
-                <span class="subtotal-value">S/{{ getItemSubtotal(i).toFixed(2) }}</span>
+              <div class="item-subtotal-box">
+                <span class="subtotal-lbl">Subtotal</span>
+                <span class="subtotal-amt">S/ {{ getItemSubtotal(i).toFixed(2) }}</span>
               </div>
 
               <button
                 type="button"
                 mat-icon-button
                 color="warn"
-                class="remove-item-button"
+                class="btn-remove"
                 (click)="removeItem(i)"
                 [disabled]="loading || items.length === 1"
-                title="Eliminar este item"
+                matTooltip="Eliminar ítem"
               >
-                <mat-icon>delete</mat-icon>
+                <mat-icon>delete_outline</mat-icon>
               </button>
+
             </div>
           </div>
         </div>
       </div>
 
-      <div class="native-field-error items-error" *ngIf="form.get('items')?.invalid && (form.get('items')?.dirty || form.get('items')?.touched)">
+      <div
+        class="items-error"
+        *ngIf="form.get('items')?.invalid && (form.get('items')?.dirty || form.get('items')?.touched)"
+      >
+        <mat-icon>error_outline</mat-icon>
         Debe tener al menos 1 artículo
       </div>
     </div>
 
-    <div class="total-section">
-      <span class="total-label">Total de Venta:</span>
-      <span class="total-value">S/{{ calculateTotal.toFixed(2) }}</span>
+    <!-- ══ TOTAL ═══════════════════════════════════════════════════════ -->
+    <div class="total-bar">
+      <span class="total-bar__label">TOTAL DE VENTA</span>
+      <span class="total-bar__amount">S/ {{ calculateTotal.toFixed(2) }}</span>
     </div>
+
   </form>
 </mat-dialog-content>
 
+<!-- ── ACCIONES ─────────────────────────────────────────────────── -->
 <mat-dialog-actions align="end" class="dialog-actions">
-  <button mat-button type="button" (click)="onCancel()" [disabled]="loading">Cancelar</button>
+  <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="loading">
+    Cancelar
+  </button>
   <button
     mat-raised-button
     color="primary"
@@ -182,6 +246,7 @@
     [disabled]="loading || form.invalid"
   >
     <mat-icon *ngIf="!loading">save</mat-icon>
-    {{ loading ? "Guardando..." : "Guardar Venta" }}
+    <mat-spinner *ngIf="loading" diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
+    {{ loading ? 'Guardando...' : submitLabel }}
   </button>
 </mat-dialog-actions>

@@ -1,11 +1,21 @@
 <div class="page">
-  <h2>Configuración de costeo</h2>
+  <h2>Configuración de Costeo</h2>
+  <p class="subtitle">Selecciona un almacén para ver o modificar su método de valuación de inventario.</p>
 
-  <div class="row">
+  <div class="row" *ngIf="loadingWarehouses">
+    <mat-spinner diameter="24"></mat-spinner>
+    <span class="muted">Cargando almacenes...</span>
+  </div>
+
+  <div class="row" *ngIf="!loadingWarehouses">
     <mat-form-field appearance="outline" class="field">
       <mat-label>Almacén</mat-label>
-      <mat-select [(ngModel)]="selectedWarehouseId" (selectionChange)="onSelectWarehouse($event.value)">
-        <mat-option value="">-- Selecciona --</mat-option>
+      <mat-select
+        name="warehouse"
+        [(ngModel)]="selectedWarehouseId"
+        (ngModelChange)="onSelectWarehouse($event)"
+      >
+        <mat-option value="">-- Selecciona un almacén --</mat-option>
         <mat-option *ngFor="let w of warehouses" [value]="w.id">
           {{ w.name }}
         </mat-option>
@@ -14,7 +24,11 @@
 
     <mat-form-field appearance="outline" class="field">
       <mat-label>Método de costeo</mat-label>
-      <mat-select [(ngModel)]="selectedMethod" [disabled]="!selectedWarehouseId || loadingConfig || saving">
+      <mat-select
+        name="method"
+        [(ngModel)]="selectedMethod"
+        [disabled]="!selectedWarehouseId || loadingConfig || saving"
+      >
         <mat-option *ngFor="let m of costingMethods" [value]="m.value">
           {{ m.label }}
         </mat-option>
@@ -27,18 +41,18 @@
       (click)="onSave()"
       [disabled]="!selectedWarehouseId || loadingConfig || saving"
     >
-      Guardar
+      <mat-spinner *ngIf="saving" diameter="18" style="display:inline-block;margin-right:6px"></mat-spinner>
+      {{ saving ? 'Guardando...' : 'Guardar' }}
     </button>
   </div>
 
-  <div class="row" *ngIf="loadingWarehouses || loadingConfig || saving">
-    <mat-spinner diameter="28"></mat-spinner>
-    <span class="muted">
-      {{ loadingWarehouses ? 'Cargando almacenes...' : (loadingConfig ? 'Cargando configuración...' : 'Guardando...') }}
-    </span>
+  <div class="row" *ngIf="loadingConfig">
+    <mat-spinner diameter="24"></mat-spinner>
+    <span class="muted">Cargando configuración...</span>
   </div>
 
-  <div class="row muted" *ngIf="selectedWarehouseId && currentConfig">
-    Config actual: <b>{{ currentConfig.method }}</b>
+  <div class="config-badge" *ngIf="selectedWarehouseId && currentConfig && !loadingConfig">
+    <span class="muted">Método actual:</span>
+    <strong>{{ currentConfig.method }}</strong>
   </div>
 </div>

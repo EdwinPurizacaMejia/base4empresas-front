@@ -32,7 +32,7 @@ import { ErrorStateComponent } from '../shared/error-state.component';
     ErrorStateComponent,
   ],
   templateUrl: './stock-detail.component.html',
-  styleUrl: './stock-detail.component.css',
+  styleUrls: ['./stock-detail.component.css'],
 })
 export class StockDetailComponent implements OnInit {
   stock: Stock | null = null;

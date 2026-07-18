@@ -57,7 +57,7 @@ import { LoadingSpinnerComponent } from '../../shared/loading-spinner.component'
     LoadingSpinnerComponent
   ],
   templateUrl: './order-shipments.component.html',
-  styleUrl: './order-shipments.component.scss'
+  styleUrls: ['./order-shipments.component.scss']
 })
 export class OrderShipmentsComponent implements OnInit, OnDestroy {
   @Input() orderId!: string;

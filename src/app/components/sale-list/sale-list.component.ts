@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { SalesService } from '../../services/sales.service';
 import { SearchService } from '../../services/search.service';
@@ -12,11 +13,13 @@ import { SaleListItem } from '../../models/sale.model';
 import { GenericDataTableComponent, TableConfig } from '../generic-data-table/generic-data-table.component';
 import { WarehouseService } from '../../services/warehouse.service';
 import { SuppliersService } from '../../services/suppliers.service';
+import { ElectronicDocumentsService } from '../../services/electronic-documents.service';
+import { GenerateDocumentDialogComponent, GenerateDocumentDialogResult } from '../electronic-documents/generate-document-dialog.component';
 
 @Component({
   selector: 'app-sale-list',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, GenericDataTableComponent],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, GenericDataTableComponent],
   templateUrl: './sale-list.component.html',
   styleUrls: ['./sale-list.component.css']
 })
@@ -80,6 +83,7 @@ export class SaleListComponent implements OnInit, OnDestroy {
     actions: [
       { id: 'view', label: 'Ver detalle', icon: 'visibility' },
       { id: 'edit', label: 'Editar', icon: 'edit' },
+      { id: 'generate_doc', label: 'Generar Comprobante', icon: 'receipt_long', color: 'primary' },
       { id: 'delete', label: 'Eliminar', icon: 'delete', color: 'danger' }
     ],
     actionsDisplay: 'buttons',
@@ -94,8 +98,10 @@ export class SaleListComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     private warehouseService: WarehouseService,
     private suppliersService: SuppliersService,
+    private electronicDocumentsService: ElectronicDocumentsService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -253,19 +259,77 @@ export class SaleListComponent implements OnInit, OnDestroy {
       case 'edit':
         this.onEditSale(event.row);
         break;
+      case 'generate_doc':
+        this.onGenerateElectronicDocument(event.row);
+        break;
       case 'delete':
         this.onDeleteSale(event.row);
         break;
     }
   }
 
+  onGenerateElectronicDocument(sale: SaleListItem): void {
+    const dialogRef = this.dialog.open(GenerateDocumentDialogComponent, {
+      width: '440px',
+      disableClose: false,
+      data: { saleNumber: sale.number },
+    });
+
+    dialogRef.afterClosed().subscribe((result: GenerateDocumentDialogResult | undefined) => {
+      if (!result) return;
+
+      const typeLabels: Record<string, string> = {
+        invoice: 'Factura/Boleta',
+        credit_note: 'Nota de Crédito',
+        debit_note: 'Nota de Débito',
+      };
+      const tipoLabel = typeLabels[result.documentType] || result.documentType;
+
+      this.electronicDocumentsService.createFromSale(sale.id, result.documentType).subscribe({
+        next: (doc) => {
+          this.successMessage = `✔ ${tipoLabel} ${doc.full_number || ''} generada correctamente (estado: ${doc.status})`;
+          setTimeout(() => { this.successMessage = ''; }, 6000);
+          this.snackBar.open(
+            `${tipoLabel} ${doc.full_number || 'creada'} — emítela desde el detalle de venta`,
+            'Ver',
+            { duration: 6000, panelClass: 'snack-success' }
+          );
+        },
+        error: (err) => {
+          const msg = err?.error?.detail || 'Error al generar el comprobante';
+          this.snackBar.open(`Error: ${msg}`, 'Cerrar', { duration: 8000, panelClass: 'snack-error' });
+        }
+      });
+    });
+  }
+
   onViewSale(sale: SaleListItem): void {
-    // Rutas del sistema están en español: /ventas/:id
-    this.router.navigate(['/ventas', sale.id]);
+    this.router.navigate(['/ventas/ventas', sale.id]);
   }
 
   onEditSale(sale: SaleListItem): void {
-    console.log('Editar venta:', sale);
+    const dialogRef = this.dialog.open(SaleFormComponent, {
+      width: '760px',
+      minWidth: '300px',
+      maxWidth: '95vw',
+      height: 'auto',
+      minHeight: '400px',
+      maxHeight: '95vh',
+      disableClose: true,
+      autoFocus: false,
+      restoreFocus: false,
+      panelClass: 'crm-dialog-panel',
+      backdropClass: 'crm-dialog-backdrop',
+      data: { sale }, // ← pasa la venta para modo edición
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === true) {
+        this.successMessage = 'Venta actualizada exitosamente';
+        this.loadSales();
+        setTimeout(() => { this.successMessage = ''; }, 4000);
+      }
+    });
   }
 
   onDeleteSale(sale: SaleListItem): void {

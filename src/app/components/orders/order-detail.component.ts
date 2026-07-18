@@ -15,6 +15,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { OrderFormComponent } from './order-form.component';
 
 import { Order, OrderStatus, getOrderStatusLabel, getOrderStatusColor } from '../../models/order.model';
 import { OrdersService } from '../../services/orders.service';
@@ -25,6 +27,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 import { OrderPaymentsComponent } from './order-payments/order-payments.component';
 import { OrderShipmentsComponent } from './order-shipments/order-shipments.component';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
+import { ElectronicDocumentPanelComponent } from '../electronic-documents/electronic-document-panel.component';
 
 @Component({
   selector: 'app-order-detail',
@@ -43,13 +46,15 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     MatProgressSpinnerModule,
     MatDividerModule,
     MatTooltipModule,
+    MatDialogModule,
     LoadingSpinnerComponent,
     OrderPaymentsComponent,
     OrderShipmentsComponent,
-    AppCurrencyPipe
+    AppCurrencyPipe,
+    ElectronicDocumentPanelComponent
   ],
   templateUrl: './order-detail.component.html',
-  styleUrl: './order-detail.component.scss'
+  styleUrls: ['./order-detail.component.scss']
 })
 export class OrderDetailComponent implements OnInit, OnDestroy {
   order: Order | null = null;
@@ -71,7 +76,8 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
     private ordersService: OrdersService,
     private customersService: CustomersService,
     private channelsService: SalesChannelsService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -265,7 +271,21 @@ export class OrderDetailComponent implements OnInit, OnDestroy {
   }
 
   editOrder(): void {
-    // Placeholder for future edit functionality
-    this.notificationService.warning('Función de edición será implementada en una fase posterior');
+    if (!this.order) return;
+    const dialogRef = this.dialog.open(OrderFormComponent, {
+      width: '760px',
+      minWidth: '300px',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      disableClose: true,
+      autoFocus: false,
+      data: { order: this.order },
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        this.notificationService.success('Pedido actualizado correctamente');
+        this.loadOrder(this.order!.id);
+      }
+    });
   }
 }
