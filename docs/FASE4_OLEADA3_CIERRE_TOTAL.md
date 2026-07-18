@@ -6,7 +6,7 @@
 **Rama:** `feat/ui-fase-4-formularios-dialogos`  
 **Alcance Oleada 3:** Canales de Venta · Costeo · Pagos · Envíos  
 **Cobertura:** 100% de formularios con SCSS activos migrados  
-**Build Status:** ✅ EXITOSO (cambios CSS-only)
+**Build Status:** ✅ EXITOSO (cambios SCSS + activación de styleUrls)
 
 ---
 
@@ -39,13 +39,18 @@
 | Envíos pedido | `order-shipments.component.scss`     | 3      | ✅ Variables sistema                   |
 | Confirmación  | `confirmation-dialog.component.scss` | 4 base | ✅ Variables sistema                   |
 
-### ✅ SCSS preparados (activar styleUrls en Fase 5 / limpieza)
+### ✅ Activaciones completadas (Opción A aplicada)
 
-| Módulo     | SCSS listo                       | TS pendiente                   | Riesgo activación                  |
-| ---------- | -------------------------------- | ------------------------------ | ---------------------------------- |
-| Categorías | `categories-list.component.scss` | Cambiar `styles` → `styleUrls` | BAJO — solo inline styles de lista |
-| Unidades   | `units-list.component.scss`      | Ídem                           | BAJO                               |
-| Almacenes  | `warehouses-list.component.scss` | Ídem                           | BAJO                               |
+| Módulo     | Componente TS                  | Estado actual           |
+| ---------- | ------------------------------ | ----------------------- |
+| Categorías | `categories-list.component.ts` | ✅ `styleUrls` activado |
+| Unidades   | `units-list.component.ts`      | ✅ `styleUrls` activado |
+| Almacenes  | `warehouses-list.component.ts` | ✅ `styleUrls` activado |
+
+Nota técnica:
+
+- Los 3 componentes mantienen `styles: [...]` inline por compatibilidad visual temporal.
+- En Fase 5/limpieza se puede retirar ese bloque inline y dejar solo `styleUrls`.
 
 ### 📋 Formularios SIN estilo propio (sin modal = sin SCSS necesario)
 
@@ -92,15 +97,15 @@
 
 ## 5. MEJORAS FUTURAS NO BLOQUEANTES
 
-| Prioridad | Mejora                                             | Detalle                                                                     |
-| --------- | -------------------------------------------------- | --------------------------------------------------------------------------- |
-| ALTA      | Activar `styleUrls` en categories/units/warehouses | Cambiar `styles: [...]` → `styleUrls` en 3 TS (ver Oleada 2 doc)            |
-| MEDIA     | Aplicar `.form-compact-fields` en templates HTML   | Para activar campos 48px en formularios modales                             |
-| MEDIA     | Aplicar `.field-readonly` en templates HTML        | Para diferenciar campos read-only visualmente                               |
-| BAJA      | Eliminar archivos CSS legacy                       | `sale-form.component.css`, `purchase-form.component.css` (archivos muertos) |
-| BAJA      | Migrar `kardex.component.css` a `.scss`            | No tiene formulario, solo tabla                                             |
-| BAJA      | Auditar `adjustments-list` inline formulario       | Puede necesitar SCSS si tiene alta/edición inline                           |
-| MUY BAJA  | Resolver 3 warnings NG8107 restantes               | En `order-create.component.html` y `order-form.component.ts`                |
+| Prioridad | Mejora                                           | Detalle                                                                        |
+| --------- | ------------------------------------------------ | ------------------------------------------------------------------------------ |
+| ALTA      | Retirar `styles` inline legacy en listados       | Categories/Units/Warehouses ya tienen `styleUrls` activos; falta cleanup final |
+| MEDIA     | Aplicar `.form-compact-fields` en templates HTML | Para activar campos 48px en formularios modales                                |
+| MEDIA     | Aplicar `.field-readonly` en templates HTML      | Para diferenciar campos read-only visualmente                                  |
+| BAJA      | Eliminar archivos CSS legacy                     | `sale-form.component.css`, `purchase-form.component.css` (archivos muertos)    |
+| BAJA      | Migrar `kardex.component.css` a `.scss`          | No tiene formulario, solo tabla                                                |
+| BAJA      | Auditar `adjustments-list` inline formulario     | Puede necesitar SCSS si tiene alta/edición inline                              |
+| MUY BAJA  | Resolver 3 warnings NG8107 restantes             | En `order-create.component.html` y `order-form.component.ts`                   |
 
 ---
 
@@ -108,12 +113,12 @@
 
 ### Resumen de las 3 Oleadas:
 
-| Oleada       | Módulos                                                | Archivos migrados           | Estado               |
-| ------------ | ------------------------------------------------------ | --------------------------- | -------------------- |
-| 1 — Críticos | Ventas, Compras, Productos, Pedidos                    | 4 SCSS + `_modal-form.scss` | ✅                   |
-| 2 — Maestros | Clientes, Proveedores, Categorías, Unidades, Almacenes | 5 SCSS                      | ✅                   |
-| 3 — Resto    | Canales venta, Costeo, Pagos, Envíos                   | 4 SCSS                      | ✅                   |
-| **Total**    | **13 módulos**                                         | **13 SCSS + 1 global**      | ✅ **100% cubierto** |
+| Oleada       | Módulos                                                | Archivos migrados                          | Estado               |
+| ------------ | ------------------------------------------------------ | ------------------------------------------ | -------------------- |
+| 1 — Críticos | Ventas, Compras, Productos, Pedidos                    | 4 SCSS + `_modal-form.scss`                | ✅                   |
+| 2 — Maestros | Clientes, Proveedores, Categorías, Unidades, Almacenes | 5 SCSS + 3 activaciones TS                 | ✅                   |
+| 3 — Resto    | Canales venta, Costeo, Pagos, Envíos                   | 4 SCSS                                     | ✅                   |
+| **Total**    | **13 módulos**                                         | **13 SCSS + 1 global + 3 activaciones TS** | ✅ **100% cubierto** |
 
 ### Sistema de formularios al cierre de Fase 4:
 
