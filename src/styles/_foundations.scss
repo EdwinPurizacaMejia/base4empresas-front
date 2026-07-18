@@ -247,7 +247,25 @@ select:not([class]) {
 }
 
 // ============================================================================
-// PAGE HEADER — Encabezado estándar de páginas de módulo
+// HEADER SUBTITLE — Para componentes con .header > h1 (clientes, proveedores, etc.)
+// ============================================================================
+
+.header-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.header-subtitle {
+  margin: $space-1 0 0;
+  font-size: $font-size-sm;
+  color: $color-text-medium;
+  font-weight: $font-weight-normal;
+  line-height: 1.4;
+}
+
+// ============================================================================
+// PAGE HEADER
 // ============================================================================
 
 .page-header {
