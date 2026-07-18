@@ -1,64 +1,166 @@
+// ============================================================================
+// SUPPLIER FORM COMPONENT — Formulario de proveedor (modal)
+// Fase 4 / Oleada 2 — Base4Empresas
+//
+// Migrado desde colores hardcoded a variables del sistema
+// Criterios Oleada 1: campos compactos, footer uniforme, validación visual
+// ============================================================================
+
+@import '../../../styles/variables';
+
+// ============================================================================
+// SECCIONES DEL FORMULARIO
+// ============================================================================
+
 .form-section {
-  margin-bottom: 24px;
+  margin-bottom: $spacing-lg;
 
   h3 {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
     text-transform: uppercase;
-    color: #666;
-    margin: 0 0 16px 0;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
+    letter-spacing: 0.06em;
+    color: $color-text-medium;
+    margin: 0 0 $spacing-md;
+    padding-bottom: $space-2;
+    border-bottom: 1px solid $color-border-light;
   }
 }
 
+// ============================================================================
+// FILAS DE CAMPOS
+// ============================================================================
+
 .form-row {
   display: flex;
-  gap: 12px;
+  gap: $space-3;
   align-items: flex-end;
-  margin-bottom: 16px;
+  margin-bottom: $spacing-md;
+
+  @media (max-width: #{$breakpoint-md}) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-sm;
+  }
 }
 
 .full-width {
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: $space-3;
 }
 
 .document-input {
   flex: 1;
 }
 
+// ============================================================================
+// BOTÓN DE VALIDACIÓN — Oleada 1: altura compacta
+// ============================================================================
+
 .validate-btn {
   white-space: nowrap;
-  height: 56px;
+  height: 48px !important; // Oleada 1: compacto (vs 56px anterior)
+  min-width: 120px;
 }
 
 mat-spinner {
   display: inline-block;
-  margin-right: 8px;
+  margin-right: $space-2;
 }
 
+// ============================================================================
+// ESTADO DE VALIDACIÓN
+// ============================================================================
+
 .validation-status {
-  margin-bottom: 16px;
+  margin-bottom: $spacing-md;
 
   .validation-chip {
-    background-color: #4caf50 !important;
+    background-color: $color-success !important;
+    color: white;
+  }
+
+  .validation-chip-warn {
+    background-color: $color-warning !important;
+    color: white;
+  }
+
+  .validation-chip-error {
+    background-color: $color-danger !important;
     color: white;
   }
 }
 
-mat-dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 24px;
-}
+// ============================================================================
+// FORMULARIO — Campos al 100%
+// ============================================================================
 
 mat-form-field {
   width: 100%;
 }
 
+// ============================================================================
+// FOOTER DE ACCIONES — Oleada 1: footer uniforme y compacto
+// ============================================================================
+
+mat-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+  padding: $space-3 0 0 !important;
+  border-top: 1px solid $color-border;
+
+  button {
+    min-width: 100px;
+    font-weight: $font-weight-semibold !important;
+    font-size: $font-size-sm !important;
+    border-radius: $border-radius-md !important;
+    padding: $space-2 $space-4 !important;
+    transition: all $transition-base;
+
+    &:first-child {
+      background-color: transparent !important;
+      color: $color-text-medium !important;
+      border: 1px solid $color-text-lighter !important;
+
+      &:not(:disabled):hover {
+        background-color: $color-background !important;
+        color: $color-text-dark !important;
+        border-color: $color-text-dark !important;
+      }
+    }
+
+    &:last-child {
+      background-color: $color-primary !important;
+      color: white !important;
+      border: none !important;
+
+      &:not(:disabled):hover {
+        background-color: $color-primary-dark !important;
+        transform: translateY(-1px);
+        box-shadow: $shadow-sm;
+      }
+    }
+  }
+}
+
+// Clase de acento — migrada del color Material v1 al sistema
 .accent {
-  background-color: #3f51b5;
-  color: white;
+  background-color: $color-primary !important;
+  color: white !important;
+}
+
+// ============================================================================
+// OLEADA 1 — Spinners en inputs numéricos eliminados
+// ============================================================================
+
+input[type='number'] {
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }
