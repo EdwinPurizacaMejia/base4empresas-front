@@ -78,7 +78,6 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
               <th mat-header-cell *matHeaderCellDef>NOMBRE</th>
               <td mat-cell *matCellDef="let warehouse">
                 <span class="item-name">
-                  <mat-icon class="item-icon warehouse-icon">warehouse</mat-icon>
                   {{ warehouse.name }}
                 </span>
               </td>
