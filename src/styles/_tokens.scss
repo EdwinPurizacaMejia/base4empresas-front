@@ -1,0 +1,155 @@
+// ============================================================================
+// TOKENS.SCSS — CSS Custom Properties (Capa 1 del sistema de diseño)
+// Fase 1 — Fundaciones UI — Base4Empresas
+//
+// Expone las variables SCSS como CSS Custom Properties en :root para:
+//   - Theming dinámico (dark mode, multi-tenant)
+//   - Componentes que no pueden usar SCSS (Web Components, iframes)
+//   - Inspección en DevTools
+//
+// USO SCSS:  color: $color-primary;          (build-time, recomendado)
+// USO CSS:   color: var(--color-primary);    (runtime, theming dinámico)
+// ============================================================================
+
+@import 'variables';
+
+:root {
+  // ==========================================================================
+  // COLORES PRIMARIOS
+  // ==========================================================================
+  --color-primary-dark: #{$color-primary-dark};
+  --color-primary: #{$color-primary};
+  --color-primary-light: #{$color-primary-light};
+  --color-primary-lighter: #{$color-primary-lighter};
+
+  // ==========================================================================
+  // COLORES SECUNDARIOS
+  // ==========================================================================
+  --color-secondary: #{$color-secondary};
+  --color-secondary-light: #{$color-secondary-light};
+  --color-secondary-lighter: #{$color-secondary-lighter};
+
+  // ==========================================================================
+  // COLORES NEUTRALES
+  // ==========================================================================
+  --color-background: #{$color-background};
+  --color-surface: #{$color-surface};
+  --color-surface-variant: #{$color-surface-variant};
+  --color-surface-hover: #{$color-surface-hover};
+  --color-border: #{$color-border};
+  --color-border-light: #{$color-border-light};
+
+  // ==========================================================================
+  // COLORES DE TEXTO
+  // ==========================================================================
+  --color-text-dark: #{$color-text-dark};
+  --color-text-medium: #{$color-text-medium};
+  --color-text-light: #{$color-text-light};
+  --color-text-lighter: #{$color-text-lighter};
+
+  // ==========================================================================
+  // COLORES DE ESTADO
+  // ==========================================================================
+  --color-success: #{$color-success};
+  --color-success-light: #{$color-success-light};
+  --color-success-variant: #{$color-success-variant};
+
+  --color-warning: #{$color-warning};
+  --color-warning-light: #{$color-warning-light};
+  --color-warning-variant: #{$color-warning-variant};
+
+  --color-danger: #{$color-danger};
+  --color-danger-light: #{$color-danger-light};
+  --color-danger-variant: #{$color-danger-variant};
+
+  --color-info: #{$color-info};
+  --color-info-light: #{$color-info-light};
+
+  // ==========================================================================
+  // SPACING
+  // ==========================================================================
+  --space-0: #{$space-0};
+  --space-1: #{$space-1};
+  --space-2: #{$space-2};
+  --space-3: #{$space-3};
+  --space-4: #{$space-4};
+  --space-5: #{$space-5};
+  --space-6: #{$space-6};
+  --space-8: #{$space-8};
+  --space-10: #{$space-10};
+  --space-12: #{$space-12};
+  --space-16: #{$space-16};
+
+  --spacing-xs: #{$spacing-xs};
+  --spacing-sm: #{$spacing-sm};
+  --spacing-md: #{$spacing-md};
+  --spacing-lg: #{$spacing-lg};
+  --spacing-xl: #{$spacing-xl};
+
+  // ==========================================================================
+  // TIPOGRAFÍA
+  // ==========================================================================
+  --font-family-primary: #{$font-family-primary};
+  --font-family-monospace: #{$font-family-monospace};
+
+  --font-size-xs: #{$font-size-xs};
+  --font-size-sm: #{$font-size-sm};
+  --font-size-base: #{$font-size-base};
+  --font-size-lg: #{$font-size-lg};
+  --font-size-xl: #{$font-size-xl};
+  --font-size-2xl: #{$font-size-2xl};
+
+  --font-weight-light: #{$font-weight-light};
+  --font-weight-regular: #{$font-weight-regular};
+  --font-weight-medium: #{$font-weight-medium};
+  --font-weight-semibold: #{$font-weight-semibold};
+  --font-weight-bold: #{$font-weight-bold};
+
+  --line-height-tight: #{$line-height-tight};
+  --line-height-normal: #{$line-height-normal};
+
+  // ==========================================================================
+  // BORDER RADIUS
+  // ==========================================================================
+  --border-radius-sm: #{$border-radius-sm};
+  --border-radius-md: #{$border-radius-md};
+  --border-radius-lg: #{$border-radius-lg};
+  --border-radius-xl: #{$border-radius-xl};
+  --border-radius-full: #{$border-radius-full};
+
+  // ==========================================================================
+  // SOMBRAS
+  // ==========================================================================
+  --shadow-none: #{$shadow-none};
+  --shadow-xs: #{$shadow-xs};
+  --shadow-sm: #{$shadow-sm};
+  --shadow-md: #{$shadow-md};
+  --shadow-lg: #{$shadow-lg};
+  --shadow-xl: #{$shadow-xl};
+
+  // ==========================================================================
+  // TRANSICIONES
+  // ==========================================================================
+  --transition-fast: #{$transition-fast};
+  --transition-base: #{$transition-base};
+  --transition-slow: #{$transition-slow};
+
+  // ==========================================================================
+  // DIMENSIONES Y LAYOUT
+  // ==========================================================================
+  --sidebar-width: #{$sidebar-width};
+  --sidebar-width-collapsed: #{$sidebar-width-collapsed};
+  --toolbar-height: #{$toolbar-height};
+  --container-max-width: #{$container-max-width};
+
+  // ==========================================================================
+  // Z-INDEX SCALE
+  // ==========================================================================
+  --z-dropdown: #{$z-dropdown};
+  --z-sticky: #{$z-sticky};
+  --z-fixed: #{$z-fixed};
+  --z-modal-backdrop: #{$z-modal-backdrop};
+  --z-modal: #{$z-modal};
+  --z-tooltip: #{$z-tooltip};
+  --z-notification: #{$z-notification};
+}
