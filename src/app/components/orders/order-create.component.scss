@@ -1,57 +1,65 @@
+// ============================================================================
+// ORDER CREATE COMPONENT — Formulario de pedido (página + modo diálogo)
+// Fase 4 / Oleada 1 — Base4Empresas
+//
+// Migrado desde colores hardcoded a variables del sistema
+// Criterios Oleada 1: campos compactos, sin spinners, readonly diferenciado
+// ============================================================================
+
+@import '../../../styles/variables';
+
+// ============================================================================
+// MODO PÁGINA — Contenedor general
+// ============================================================================
+
 .container {
-  padding: 24px;
+  padding: $space-6;
   max-width: 1200px;
   margin: 0 auto;
+
+  @media (max-width: #{$breakpoint-md}) {
+    padding: $space-4;
+  }
 }
 
 .header {
-  margin-bottom: 24px;
+  margin-bottom: $spacing-lg;
 
   h1 {
     margin: 0;
-    font-size: 24px;
-    font-weight: 500;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-medium;
+    color: $color-text-dark;
   }
 }
+
+.page-header h1 {
+  margin: 0 0 $spacing-lg;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-medium;
+  color: $color-text-dark;
+}
+
+// ============================================================================
+// LAYOUT PÁGINA — FILAS DE CAMPOS
+// ============================================================================
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-mat-card {
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  mat-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-  }
-
-  mat-card-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0;
-  }
-
-  mat-card-content {
-    padding-top: 0;
-  }
+  gap: $spacing-lg;
 }
 
 .form-row {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
 
   mat-form-field {
     flex: 1;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: #{$breakpoint-md}) {
     flex-direction: column;
 
     mat-form-field {
@@ -64,20 +72,40 @@ mat-card {
   width: 100%;
 }
 
-.items-section {
+// ============================================================================
+// MAT-CARD EN MODO PÁGINA
+// ============================================================================
+
+mat-card {
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-sm;
+
   mat-card-header {
+    display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: $spacing-md;
   }
 
-  .add-item-btn {
-    white-space: nowrap;
+  mat-card-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-dark;
+    margin: 0;
+  }
+
+  mat-card-content {
+    padding-top: 0;
   }
 }
 
+// ============================================================================
+// TABLA DE ITEMS — MODO PÁGINA
+// ============================================================================
+
 .table-container {
   overflow-x: auto;
-  margin: 16px 0;
+  margin: $spacing-md 0;
 }
 
 .items-table {
@@ -85,17 +113,20 @@ mat-card {
   border-collapse: collapse;
 
   th {
-    background-color: #f5f5f5;
-    padding: 12px 8px;
+    background-color: $color-surface-variant;
+    padding: $space-3 $space-2;
     text-align: left;
-    font-weight: 600;
-    font-size: 13px;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-xs;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $color-text-medium;
   }
 
   td {
-    padding: 12px 8px;
-    border-bottom: 1px solid #eee;
+    padding: $space-3 $space-2;
+    border-bottom: 1px solid $color-border-light;
+    color: $color-text-medium;
   }
 
   .cell-field {
@@ -103,113 +134,175 @@ mat-card {
   }
 
   .subtotal-cell {
-    font-weight: 600;
-    color: #1976d2;
+    font-weight: $font-weight-semibold;
+    color: $color-primary-dark;
   }
 }
 
-.empty-state {
-  padding: 32px;
-  text-align: center;
-  color: #999;
-  font-style: italic;
+.items-section mat-card-header {
+  justify-content: space-between;
+  align-items: center;
 }
 
+.add-item-btn {
+  white-space: nowrap;
+}
+
+// ============================================================================
+// EMPTY STATE — MODO PÁGINA
+// ============================================================================
+
+.empty-state {
+  padding: $spacing-2xl;
+  text-align: center;
+  color: $color-text-light;
+  font-style: italic;
+  font-size: $font-size-sm;
+}
+
+// ============================================================================
+// RESUMEN — MODO PÁGINA
+// ============================================================================
+
 .summary-section {
-  background-color: #fafafa;
+  background-color: $color-background;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  font-size: 14px;
+  padding: $space-2 0;
+  font-size: $font-size-sm;
 
   &:not(:last-child) {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 12px;
-    margin-bottom: 12px;
+    border-bottom: 1px solid $color-border-light;
+    padding-bottom: $space-3;
+    margin-bottom: $space-3;
   }
 
   span {
-    color: #666;
+    color: $color-text-medium;
   }
 
   strong {
-    color: #1976d2;
-    font-size: 16px;
+    color: $color-primary-dark;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
   }
 }
+
+// ============================================================================
+// ACCIONES — MODO PÁGINA
+// ============================================================================
 
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
 
   button {
     min-width: 120px;
+  }
+
+  @media (max-width: #{$breakpoint-md}) {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
   }
 }
 
 mat-spinner {
   display: inline-block;
-  margin-right: 8px;
+  margin-right: $space-2;
 }
 
-/* ── Estilos modo diálogo ──────────────────────────────── */
+// ============================================================================
+// MODO DIÁLOGO — Componentes específicos del modo modal
+// ============================================================================
+
 .oc-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 0;
-  padding: 20px 24px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #0f172a;
-  background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  padding: $space-5 $space-6;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-dark;
+  background-color: $color-surface;
+  border-bottom: 1px solid $color-border;
 }
 
-.oc-close { color: #94a3b8; }
+.oc-close {
+  color: $color-text-light;
+
+  &:hover {
+    color: $color-text-medium;
+    background-color: $color-surface-hover;
+  }
+}
 
 .oc-dialog-content {
-  padding: 20px 24px 8px;
-  background: #f8fafc;
+  padding: $space-5 $space-6 $space-3;
+  background-color: $color-background;
   max-height: 72vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $spacing-md;
+
+  // Scrollbar sutil
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $color-border;
+    border-radius: $border-radius-full;
+  }
 
   form {
-    gap: 16px;
+    gap: $spacing-md;
   }
 }
 
+// ============================================================================
+// SECCIONES DEL DIÁLOGO — Oleada 1
+// ============================================================================
+
 .oc-section {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 20px;
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $space-5;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $spacing-md;
 }
 
 .oc-section-label {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #64748b;
+  gap: $space-2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: $color-text-medium;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #f1f5f9;
+  letter-spacing: 0.06em;
+  padding-bottom: $space-2;
+  border-bottom: 1px solid $color-border-light;
 
-  mat-icon { font-size: 18px; width: 18px; height: 18px; color: #3b82f6; }
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: $color-primary;
+  }
 }
 
 .oc-section-header {
@@ -218,19 +311,44 @@ mat-spinner {
   align-items: center;
 }
 
-.oc-two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.oc-fw { width: 100%; }
+// Grid de campos
+.oc-two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
 
-.oc-items-list { display: flex; flex-direction: column; gap: 12px; }
+  @media (max-width: #{$breakpoint-sm}) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.oc-fw {
+  width: 100%;
+}
+
+// ============================================================================
+// ITEMS — MODO DIÁLOGO
+// ============================================================================
+
+.oc-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
 
 .oc-item-card {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 16px;
+  gap: $space-3;
+  background-color: $color-background;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  padding: $space-4;
+  transition: border-color $transition-fast;
+
+  &:hover {
+    border-color: $color-text-lighter;
+  }
 }
 
 .oc-item-idx {
@@ -239,104 +357,179 @@ mat-spinner {
   justify-content: center;
   min-width: 28px;
   height: 28px;
-  background: #3b82f6;
-  color: #fff;
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: 700;
-  margin-top: 14px;
+  background-color: $color-primary;
+  color: white;
+  border-radius: $border-radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  margin-top: $space-3;
   flex-shrink: 0;
 }
 
-.oc-item-fields { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.oc-item-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  min-width: 0;
+}
 
 .oc-item-row2 {
   display: grid;
   grid-template-columns: 1fr 1fr auto auto;
   align-items: center;
-  gap: 12px;
+  gap: $space-3;
+
+  @media (max-width: #{$breakpoint-sm}) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
 }
 
-.oc-qty, .oc-price { width: 100%; }
-.oc-prefix { font-weight: 600; color: #475569; font-size: 14px; }
+.oc-qty,
+.oc-price {
+  width: 100%;
+}
 
+.oc-prefix {
+  font-weight: $font-weight-semibold;
+  color: $color-text-medium;
+  font-size: $font-size-sm;
+}
+
+// Subtotal box
 .oc-subtotal {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  padding: 6px 12px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 8px;
+  padding: $space-2 $space-3;
+  background-color: $color-primary-lighter;
+  border: 1px solid $color-primary-light;
+  border-radius: $border-radius-md;
   white-space: nowrap;
   min-width: 110px;
 }
 
-.oc-sub-lbl { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; }
-.oc-sub-amt { font-size: 15px; font-weight: 700; color: #1d4ed8; }
+.oc-sub-lbl {
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  color: $color-text-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.oc-sub-amt {
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  color: $color-primary-dark;
+  line-height: $line-height-tight;
+}
+
+// ============================================================================
+// TOTAL BAR — MODO DIÁLOGO
+// ============================================================================
 
 .oc-total-bar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border: 1px solid #bfdbfe;
-  border-radius: 12px;
+  gap: $space-2;
+  padding: $space-4 $space-5;
+  background: linear-gradient(135deg, $color-primary-lighter 0%, $color-primary-light 100%);
+  border: 1px solid $color-primary-light;
+  border-radius: $border-radius-lg;
 }
 
 .oc-total-row {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 20px;
+  gap: $space-5;
 }
 
-.oc-total-lbl { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; }
-.oc-total-amt { font-size: 26px; font-weight: 800; color: #1d4ed8; min-width: 120px; text-align: right; }
-.oc-balance { color: #059669; }
+.oc-total-lbl {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: $color-text-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.oc-total-amt {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-extrabold;
+  color: $color-primary-dark;
+  min-width: 120px;
+  text-align: right;
+}
+
+.oc-balance {
+  color: $color-success-variant;
+  font-weight: $font-weight-bold;
+}
+
+// ============================================================================
+// ACCIONES — MODO DIÁLOGO (FOOTER COMPACTO)
+// ============================================================================
 
 .oc-page-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 8px;
+  gap: $spacing-sm;
+  margin-top: $space-2;
 }
 
 .oc-dialog-actions {
-  padding: 16px 24px !important;
-  border-top: 1px solid #e2e8f0 !important;
-  background: #fff !important;
-  gap: 12px !important;
+  padding: $space-3 $space-6 !important;
+  border-top: 1px solid $color-border !important;
+  background-color: $color-surface !important;
+  gap: $spacing-sm !important;
 
-  button { min-width: 130px; font-weight: 600 !important; border-radius: 8px !important; }
-}
+  button {
+    min-width: 120px;
+    font-weight: $font-weight-semibold !important;
+    font-size: $font-size-sm !important;
+    border-radius: $border-radius-md !important;
+    padding: $space-2 $space-5 !important;
+    transition: all $transition-base;
 
-.page-header h1 {
-  margin: 0 0 24px;
-  font-size: 24px;
-  font-weight: 500;
-}
+    &:first-child {
+      background-color: transparent !important;
+      color: $color-text-medium !important;
+      border: 1px solid $color-text-lighter !important;
 
-@media (max-width: 640px) {
-  .oc-two-cols { grid-template-columns: 1fr; }
-  .oc-item-row2 { grid-template-columns: 1fr 1fr; }
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 16px;
-  }
-
-  .form-row {
-    flex-direction: column;
-  }
-
-  .actions {
-    flex-direction: column;
-
-    button {
-      width: 100%;
+      &:not(:disabled):hover {
+        background-color: $color-background !important;
+        color: $color-text-dark !important;
+        border-color: $color-text-dark !important;
+        transform: translateY(-1px);
+      }
     }
+
+    &:last-child {
+      background-color: $color-primary !important;
+      color: white !important;
+      border: none !important;
+      box-shadow: $shadow-sm;
+
+      &:not(:disabled):hover {
+        background-color: $color-primary-dark !important;
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// OLEADA 1 — INPUTS NUMÉRICOS SIN SPINNER
+// ============================================================================
+
+input[type='number'] {
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }

@@ -1,0 +1,107 @@
+// ============================================================================
+// UNITS LIST COMPONENT — Lista de unidades de medida + formulario inline
+// Fase 4 / Oleada 2 — Base4Empresas
+//
+// Migrado desde inline styles en TypeScript a archivo externo
+// Criterios Oleada 2: variables del sistema, formulario inline hereda _modal-form
+// ============================================================================
+
+@import '../../../styles/variables';
+
+// ============================================================================
+// LAYOUT DE PÁGINA
+// ============================================================================
+
+.container {
+  padding: $space-6;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: #{$breakpoint-md}) {
+    padding: $space-4;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+
+  h1 {
+    margin: 0;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-medium;
+    color: $color-text-dark;
+  }
+}
+
+// ============================================================================
+// TABLA
+// ============================================================================
+
+.table-card {
+  padding: 0;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.units-table {
+  width: 100%;
+
+  th {
+    background-color: $color-surface-variant;
+    font-weight: $font-weight-semibold;
+    color: $color-text-dark;
+    font-size: $font-size-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.unit-row {
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $color-surface-hover;
+  }
+}
+
+.unit-name {
+  font-weight: $font-weight-medium;
+  color: $color-text-dark;
+}
+
+.unit-symbol {
+  font-family: $font-family-monospace;
+  font-size: $font-size-sm;
+  color: $color-text-medium;
+  background-color: $color-surface-variant;
+  padding: 2px $space-2;
+  border-radius: $border-radius-sm;
+  border: 1px solid $color-border-light;
+}
+
+.no-units {
+  padding: $spacing-2xl;
+  text-align: center;
+  color: $color-text-light;
+  font-style: italic;
+  font-size: $font-size-sm;
+}
+
+// ============================================================================
+// FORMULARIO INLINE — Hereda criterios Oleada 1 desde _modal-form.scss
+// ============================================================================
+
+input[type='number'] {
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}

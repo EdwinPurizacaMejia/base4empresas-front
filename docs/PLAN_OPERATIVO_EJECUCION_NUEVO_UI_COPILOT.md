@@ -208,13 +208,19 @@ Requerimientos:
 3. Diferenciar campos editables vs read-only visualmente.
 4. Reemplazar confirmaciones nativas por dialogo de confirmacion reutilizable.
 5. Aplicar primero en formularios de ventas, pedidos, compras y productos.
-6. Optimizar CSS para no exceder presupuestos.
-7. Ejecutar build y reportar warnings o mejoras.
+6. Propagar obligatoriamente el mismo patron visual a todos los formularios de ALTA/EDICION del sistema (catalogos, inventario, logistica, ventas, compras, configuracion).
+7. Mantener consistencia de densidad visual:
+   - altura de inputs/selects estandar
+   - textarea con altura moderada
+   - sin spinners en campos numericos de monto/cantidad/precio
+8. Optimizar CSS para no exceder presupuestos.
+9. Ejecutar build y reportar warnings o mejoras.
 
 Entregame:
 
 - Antes y despues tecnico por componente
 - Estado de budget CSS
+- Matriz de cobertura de formularios ALTA/EDICION (migrado/pendiente)
 - Lista de pendientes para Fase 5
 
 ## Fase 5 - Dashboard y cierre de consistencia
@@ -255,6 +261,7 @@ Checklist tecnico minimo:
 - Sin regresiones visuales severas
 - Cambios documentados
 - QA manual basico ejecutado
+- Cobertura de formularios ALTA/EDICION objetivo: 100%
 
 Checklist UX minimo:
 
@@ -307,6 +314,51 @@ Instrucciones:
 - Menor riesgo de roturas globales.
 - Mejor trazabilidad de cambios.
 - Posibilidad real de copy paste fase por fase en Copilot hasta completar el nuevo UI.
+- Experiencia consistente en todos los formularios de ALTA/EDICION (sin excepciones visuales).
+
+## 9.1 Criterios visuales obligatorios para todos los formularios ALTA/EDICION
+
+Aplicar estos criterios como estandar transversal:
+
+- Campos mas compactos y limpios (evitar altura excesiva).
+- Inputs numericos de cantidad/precio/monto sin controles spinner.
+- Selects con altura equivalente a inputs.
+- Textareas con altura moderada (no dominante).
+- Espaciado consistente entre filas y columnas.
+- Footer de acciones compacto y uniforme.
+
+Nota:
+
+- Si un formulario no cumple estos criterios, la fase se considera incompleta.
+
+## 9.2 Estrategia de propagacion por oleadas (formularios)
+
+Oleada 1 (criticos de negocio):
+
+- Productos
+- Pedidos
+- Ventas
+- Compras
+
+Oleada 2 (operacion extendida):
+
+- Clientes
+- Proveedores
+- Almacenes
+- Unidades
+- Categorias
+
+Oleada 3 (resto de modulos):
+
+- Inventario
+- Logistica
+- Configuracion y formularios administrativos
+
+Salida obligatoria al final de cada oleada:
+
+- Lista de formularios migrados
+- Lista de formularios pendientes
+- Evidencia de build y validacion visual
 
 ## 10. Flujo Git sugerido (paso a paso)
 
