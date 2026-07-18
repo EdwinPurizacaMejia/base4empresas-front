@@ -161,6 +161,18 @@ $toolbar-height: 64px;
 $container-max-width: 1400px;
 
 // ============================================================================
+// COLORES ADICIONALES — Fase 5 Dashboard
+// Tokens que el dashboard usa y no tenían variable exacta
+// ============================================================================
+$color-text-slate: #64748b;      // slate-500: subtítulos y metadatos del dashboard
+$color-dash-primary: #2563eb;    // blue-600: color primario del dashboard (variante más oscura)
+$color-dash-primary-dark: #1d4ed8; // blue-700: totales y énfasis del dashboard
+$color-dash-success-text: #166534; // green-800: texto en badges de éxito
+$color-dash-danger-text: #991b1b;  // red-800: texto en badges de error
+$color-bg-dash: #f5f7fb;         // fondo ligeramente diferente del dashboard
+$color-dash-warning-text: #92400e; // amber-800: texto en badges de advertencia
+
+// ============================================================================
 // OPACIDADES
 // ============================================================================
 $opacity-0: 0;
