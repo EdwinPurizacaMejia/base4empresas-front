@@ -1,0 +1,314 @@
+// ============================================================================
+// SIDEBAR COMPONENT — Navegación lateral
+// Fase 2 — Layout, Menú y Navegación — Base4Empresas
+//
+// Extraído desde inline styles en sidebar.component.ts
+// Iconografía migrada de emojis a Material Icons
+// ============================================================================
+
+@import '../../styles/variables';
+
+// ============================================================================
+// CONTENEDOR PRINCIPAL DEL NAV
+// ============================================================================
+
+.nav-list {
+  padding: $space-4 0 $space-6;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+// ============================================================================
+// CABECERA DEL SIDEBAR (logo + marca)
+// ============================================================================
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4 $space-5 $space-6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: $space-2;
+
+  .nav-brand__icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: $border-radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: white;
+    }
+  }
+
+  .nav-brand__text {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    color: white;
+    line-height: $line-height-tight;
+  }
+
+  .nav-brand__sub {
+    font-size: $font-size-xs;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 2px;
+  }
+}
+
+// ============================================================================
+// ETIQUETA DE SECCIÓN
+// ============================================================================
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+  padding: $space-3 $space-5 $space-1;
+  margin-top: $space-2;
+}
+
+// ============================================================================
+// ITEMS DE MENÚ SIMPLES (leaf items — sin submenú)
+// ============================================================================
+
+mat-list-item.nav-item {
+  border-radius: $border-radius-md !important;
+  margin: 0 $space-3 !important;
+  height: 44px !important;
+  transition: background-color $transition-fast, color $transition-fast;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+
+  // Estado: normal
+  &:hover:not(.nav-item--disabled) {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: white;
+  }
+
+  // Estado: activo (routerLinkActive)
+  &.active {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    font-weight: $font-weight-semibold;
+
+    .nav-icon {
+      color: white !important;
+      opacity: 1;
+    }
+
+    // Indicador de elemento activo
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      background: white;
+      border-radius: $border-radius-full 0 0 $border-radius-full;
+    }
+  }
+
+  // Estado: disabled
+  &.nav-item--disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+// ============================================================================
+// ICONO DE NAV ITEM
+// ============================================================================
+
+.nav-icon {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  transition: color $transition-fast;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ============================================================================
+// LABEL DEL ITEM
+// ============================================================================
+
+.nav-label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ============================================================================
+// BADGE (notificaciones)
+// ============================================================================
+
+.nav-badge {
+  background-color: $color-danger;
+  color: white;
+  border-radius: $border-radius-full;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  margin-left: auto;
+  flex-shrink: 0;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+// ============================================================================
+// PANELS DE EXPANSIÓN (items con submenú)
+// ============================================================================
+
+mat-expansion-panel.submenu-panel {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  margin: 0 $space-3 2px !important;
+  border-radius: $border-radius-md !important;
+  overflow: visible !important;
+
+  &.mat-expanded {
+    background-color: rgba(0, 0, 0, 0.15) !important;
+    border-radius: $border-radius-md !important;
+  }
+}
+
+// ============================================================================
+// ENCABEZADO DEL PANEL DE EXPANSIÓN
+// ============================================================================
+
+.submenu-header {
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 $space-4 !important;
+  border-radius: $border-radius-md !important;
+  transition: background-color $transition-fast !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+  }
+
+  // Panel expandido
+  .mat-expanded & {
+    color: white !important;
+  }
+}
+
+.submenu-title {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  width: 100%;
+  color: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+// ============================================================================
+// ITEMS DE SUBMENÚ
+// ============================================================================
+
+.submenu-body {
+  padding: $space-1 0 $space-2;
+}
+
+mat-list-item.submenu-item {
+  height: 38px !important;
+  margin: 0 $space-2 1px !important;
+  border-radius: $border-radius-sm !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  transition: background-color $transition-fast, color $transition-fast;
+  cursor: pointer;
+
+  &:hover:not(.submenu-item--disabled) {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+  }
+
+  // Estado: activo
+  &.active {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    color: white !important;
+    font-weight: $font-weight-semibold;
+  }
+
+  // Estado: disabled
+  &.submenu-item--disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.submenu-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: inherit;
+  opacity: 0.8;
+  margin-left: $space-3;
+  flex-shrink: 0;
+}
+
+.submenu-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ============================================================================
+// FLECHA DE EXPANSIÓN — override para color blanco
+// ============================================================================
+
+::ng-deep .submenu-panel {
+  .mat-expansion-indicator::after {
+    color: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  &.mat-expanded .mat-expansion-indicator::after {
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.9) !important;
+  }
+}
+
+// ============================================================================
+// PIE DEL SIDEBAR (versión / info)
+// ============================================================================
+
+.nav-footer {
+  padding: $space-4 $space-5;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto;
+
+  .nav-footer__version {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+    font-family: $font-family-monospace;
+  }
+}

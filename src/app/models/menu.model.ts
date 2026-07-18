@@ -1,6 +1,9 @@
 /**
  * Modelo tipado para elementos de menú jerárquico
  * Soporta menús anidados con navegación, iconos y control de acceso
+ *
+ * Fase 2: iconos migrados de emojis a Material Icons (librería única)
+ * Referencia: https://fonts.google.com/icons
  */
 
 export interface MenuItem {
@@ -10,7 +13,8 @@ export interface MenuItem {
   label: string;
 
   /**
-   * Icono (emoji o clase Material Icon)
+   * Nombre del icono Material Icons (ej: 'dashboard', 'inventory')
+   * Fase 2: reemplaza emojis por iconos de una sola librería
    */
   icon: string;
 
@@ -50,6 +54,8 @@ export interface MenuItem {
  * Configuración global del menú principal
  * Estructura centralizada para la navegación de la aplicación
  * Agrupa pantallas por dominio de negocio y 5 fases implementadas
+ *
+ * Fase 2: iconos actualizados a Material Icons para iconografía unificada
  */
 export const MAIN_MENU: MenuItem[] = [
   // ========================================
@@ -57,7 +63,7 @@ export const MAIN_MENU: MenuItem[] = [
   // ========================================
   {
     label: 'Dashboard',
-    icon: '📊',
+    icon: 'dashboard',
     route: '/dashboard',
     tooltip: 'Panel principal de control',
   },
@@ -67,50 +73,50 @@ export const MAIN_MENU: MenuItem[] = [
   // ========================================
   {
     label: 'Catálogos',
-    icon: '📚',
+    icon: 'category',
     tooltip: 'Gestión de datos maestros',
     children: [
       {
         label: 'Productos',
-        icon: '📦',
+        icon: 'inventory_2',
         route: '/catalogos/productos',
         tooltip: 'ABM de productos',
       },
       {
         label: 'Categorías',
-        icon: '🏷️',
+        icon: 'label',
         route: '/catalogos/categorias',
         tooltip: 'Categorías de productos',
       },
       {
         label: 'Unidades',
-        icon: '⚖️',
+        icon: 'straighten',
         route: '/catalogos/unidades',
         tooltip: 'Unidades de medida',
       },
       {
         label: 'Almacenes',
-        icon: '🏢',
+        icon: 'warehouse',
         route: '/catalogos/almacenes',
         tooltip: 'Gestión de almacenes',
       },
       {
         label: 'Canales de venta',
-        icon: '🛒',
+        icon: 'storefront',
         route: '/catalogos/canales-venta',
-        tooltip: 'Canales de distribución (FASE 1)',
+        tooltip: 'Canales de distribución',
       },
       {
         label: 'Clientes',
-        icon: '👥',
+        icon: 'people',
         route: '/catalogos/clientes',
-        tooltip: 'ABM de clientes validados (FASE 1)',
+        tooltip: 'ABM de clientes',
       },
       {
         label: 'Proveedores',
-        icon: '🚚',
+        icon: 'local_shipping',
         route: '/catalogos/proveedores',
-        tooltip: 'ABM de proveedores validados (FASE 1)',
+        tooltip: 'ABM de proveedores',
       },
     ],
   },
@@ -120,30 +126,30 @@ export const MAIN_MENU: MenuItem[] = [
   // ========================================
   {
     label: 'Ventas',
-    icon: '💰',
+    icon: 'point_of_sale',
     tooltip: 'Gestión de pedidos, pagos y transacciones',
     children: [
       {
         label: 'Ventas',
-        icon: '🛒',
+        icon: 'shopping_cart',
         route: '/ventas/ventas',
         tooltip: 'Lista de ventas realizadas',
       },
       {
         label: 'Pedidos',
-        icon: '📋',
+        icon: 'receipt_long',
         route: '/ventas/pedidos',
-        tooltip: 'Órdenes de venta (FASE 2)',
+        tooltip: 'Órdenes de venta',
       },
       {
         label: 'Pagos',
-        icon: '💳',
+        icon: 'payments',
         route: '/ventas/pagos',
-        tooltip: 'Gestión y validación de pagos (FASE 3)',
+        tooltip: 'Gestión y validación de pagos',
       },
       {
         label: 'Documentos Electrónicos',
-        icon: '📄',
+        icon: 'description',
         route: '/ventas/documentos-electronicos',
         tooltip: 'Facturas, boletas y comprobantes electrónicos',
       },
@@ -155,30 +161,30 @@ export const MAIN_MENU: MenuItem[] = [
   // ========================================
   {
     label: 'Inventario',
-    icon: '📦',
+    icon: 'inventory',
     tooltip: 'Control de stock, valuación y movimientos',
     children: [
       {
         label: 'Stock actual',
-        icon: '📊',
+        icon: 'bar_chart',
         route: '/inventario/stock',
         tooltip: 'Vista de stock actual por almacén',
       },
       {
         label: 'Kardex',
-        icon: '📝',
+        icon: 'history',
         route: '/inventario/kardex',
         tooltip: 'Historial de movimientos de inventario',
       },
       {
         label: 'Ajustes de stock',
-        icon: '⚙️',
+        icon: 'tune',
         route: '/inventario/ajustes',
         tooltip: 'Registrar correcciones de inventario',
       },
       {
         label: 'Transferencias',
-        icon: '↔️',
+        icon: 'swap_horiz',
         route: '/inventario/transferencias',
         tooltip: 'Transferir entre almacenes',
       },
@@ -190,14 +196,14 @@ export const MAIN_MENU: MenuItem[] = [
   // ========================================
   {
     label: 'Logística',
-    icon: '🚚',
+    icon: 'local_post_office',
     tooltip: 'Gestión de envíos y entrega de pedidos',
     children: [
       {
         label: 'Envíos',
-        icon: '📮',
+        icon: 'move_to_inbox',
         route: '/logistica/envios',
-        tooltip: 'Crear y rastrear envíos (FASE 4)',
+        tooltip: 'Crear y rastrear envíos',
       },
     ],
   },
@@ -207,12 +213,12 @@ export const MAIN_MENU: MenuItem[] = [
   // ========================================
   {
     label: 'Compras',
-    icon: '🛍️',
+    icon: 'shopping_bag',
     tooltip: 'Gestión de órdenes de compra',
     children: [
       {
         label: 'Órdenes de compra',
-        icon: '📦',
+        icon: 'assignment',
         route: '/compras/ordenes',
         tooltip: 'ABM de órdenes de compra',
       },
@@ -224,24 +230,24 @@ export const MAIN_MENU: MenuItem[] = [
   // ========================================
   {
     label: 'Configuración',
-    icon: '⚙️',
+    icon: 'settings',
     tooltip: 'Auditoría, seguridad y configuración del sistema',
     children: [
       {
         label: 'Auditoría',
-        icon: '📋',
+        icon: 'manage_search',
         route: '/config/auditoria',
-        tooltip: 'Historial de auditoría y actividades (FASE 5)',
+        tooltip: 'Historial de auditoría y actividades',
       },
       {
         label: 'Seguridad',
-        icon: '🔒',
+        icon: 'security',
         route: '/config/seguridad',
-        tooltip: 'Gestión de roles, permisos y 2FA (FASE 5)',
+        tooltip: 'Gestión de roles, permisos y 2FA',
       },
       {
         label: 'Configuración de costeo',
-        icon: '💹',
+        icon: 'calculate',
         route: '/config/costeo',
         tooltip: 'Configuración de métodos de valuación de inventario',
       },
