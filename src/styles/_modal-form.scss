@@ -391,3 +391,144 @@
   font-size: $font-size-sm;
   color: $color-text-medium;
 }
+
+// ============================================================================
+// OLEADA 1 — CRITERIOS VISUALES UNIFICADOS
+// Fase 4 / Oleada 1 — Productos, Pedidos, Ventas, Compras
+//
+// Aplicables a TODOS los formularios modales de la Oleada 1:
+//   - Campos más compactos (48px height)
+//   - Inputs numéricos sin spinner visual
+//   - Selects con misma altura que inputs
+//   - Textarea moderada (80px)
+//   - Read-only diferenciado visualmente
+// ============================================================================
+
+// ---- Campos compactos (forma estandarizada Oleada 1) ----
+.form-compact-fields {
+  // Aplica a mat-form-field dentro del contexto compacto
+  ::ng-deep .mat-mdc-form-field-infix {
+    min-height: 48px !important;
+    padding-top: $space-3 !important;
+    padding-bottom: $space-2 !important;
+  }
+
+  // Selects: misma altura que inputs
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mat-mdc-form-field-infix {
+    min-height: 48px !important;
+    padding-top: $space-3 !important;
+    padding-bottom: $space-2 !important;
+  }
+
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mat-mdc-select-trigger {
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+  }
+
+  ::ng-deep .mat-mdc-form-field-type-mat-select .mat-mdc-select-value {
+    display: flex;
+    align-items: center;
+    line-height: $line-height-normal;
+  }
+
+  // Textarea moderada
+  ::ng-deep textarea.mat-mdc-input-element {
+    min-height: 80px !important;
+    max-height: 160px !important;
+    resize: vertical;
+    line-height: $line-height-normal;
+  }
+}
+
+// ---- Supresión global de spinners en inputs numéricos ----
+// Aplica globalmente a todos los formularios de la oleada
+input[type='number'] {
+  -moz-appearance: textfield;
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+// ---- Read-only field diferenciado (Oleada 1) ----
+// Clase semántica para wrap del mat-form-field en modo lectura
+.field-readonly {
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background-color: $color-surface-variant !important;
+  }
+
+  ::ng-deep .mat-mdc-floating-label,
+  ::ng-deep .mat-mdc-form-field-label {
+    color: $color-text-light !important;
+  }
+
+  ::ng-deep input.mat-mdc-input-element,
+  ::ng-deep textarea.mat-mdc-input-element {
+    color: $color-text-medium !important;
+    cursor: default !important;
+  }
+
+  ::ng-deep .mdc-notched-outline__leading,
+  ::ng-deep .mdc-notched-outline__notch,
+  ::ng-deep .mdc-notched-outline__trailing {
+    border-color: $color-border-light !important;
+    border-style: dashed !important;
+  }
+}
+
+// ---- Espaciado consistente entre filas de campos ----
+.form-rows-uniform {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-3;
+
+    @media (max-width: #{$breakpoint-md}) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: $space-3;
+
+    @media (max-width: #{$breakpoint-md}) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: #{$breakpoint-sm}) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ---- Validaciones visuales unificadas ----
+.field-error-msg {
+  display: flex;
+  align-items: center;
+  gap: $space-1;
+  font-size: $font-size-xs;
+  color: $color-danger;
+  margin-top: 2px;
+  font-weight: $font-weight-medium;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.field-hint-msg {
+  font-size: $font-size-xs;
+  color: $color-text-light;
+  margin-top: 2px;
+}
