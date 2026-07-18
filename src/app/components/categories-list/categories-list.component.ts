@@ -1,12 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 
 import { CategoriesService, CategoryDto } from '../../services/categories.service';
 import { NotificationService } from '../../services/notification.service';
@@ -15,6 +16,7 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 /**
  * Componente para listar categorías de productos
  * Fix Causa 2+3: template migrado al patrón visual del sistema + inline styles eliminados
+ * + MatPaginator reemplaza el pie de tabla de estadísticas
  */
 @Component({
   selector: 'app-categories-list',
@@ -26,10 +28,10 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
     MatTableModule,
     MatCardModule,
     MatTooltipModule,
+    MatPaginatorModule,
     LoadingSpinnerComponent,
   ],
   template: `
-    <!-- Patrón page-header consistente con el sistema de diseño -->
     <div class="list-page">
 
       <div class="page-header">
@@ -50,13 +52,12 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
         </div>
       </div>
 
-      <!-- Tabla -->
       <div class="list-table-card">
         <app-loading-spinner *ngIf="loading" message="Cargando categorías..."></app-loading-spinner>
 
         <ng-container *ngIf="!loading">
           <!-- Estado vacío -->
-          <div class="empty-state" *ngIf="categories.length === 0">
+          <div class="empty-state" *ngIf="dataSource.data.length === 0">
             <mat-icon class="empty-state__icon">category</mat-icon>
             <h3 class="empty-state__title">Sin categorías</h3>
             <p class="empty-state__message">No hay categorías registradas en el sistema</p>
@@ -65,9 +66,9 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
           <!-- Tabla de categorías -->
           <table
             mat-table
-            [dataSource]="categories"
+            [dataSource]="dataSource"
             class="list-table"
-            *ngIf="categories.length > 0"
+            *ngIf="dataSource.data.length > 0"
           >
             <!-- Nombre -->
             <ng-container matColumnDef="name">
@@ -108,13 +109,16 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="data-row"></tr>
           </table>
-        </ng-container>
 
-        <!-- Estadísticas pie de tabla -->
-        <div class="table-footer" *ngIf="!loading && categories.length > 0">
-          <mat-icon class="footer-icon">category</mat-icon>
-          <strong>{{ categories.length }}</strong>&nbsp;categorías registradas
-        </div>
+          <!-- Paginador — reemplaza el pie de tabla de estadísticas -->
+          <mat-paginator
+            *ngIf="dataSource.data.length > 0"
+            [pageSizeOptions]="[5, 10, 25]"
+            [pageSize]="10"
+            showFirstLastButtons
+            aria-label="Seleccionar página de categorías"
+          ></mat-paginator>
+        </ng-container>
       </div>
 
     </div>
@@ -122,11 +126,13 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
   // Fix Causa 3: eliminado bloque `styles: [...]` — solo styleUrls externo
   styleUrls: ['./categories-list.component.scss'],
 })
-export class CategoriesListComponent implements OnInit, OnDestroy {
-  categories: CategoryDto[] = [];
+export class CategoriesListComponent implements OnInit, AfterViewInit, OnDestroy {
+  dataSource = new MatTableDataSource<CategoryDto>();
   loading = false;
 
   displayedColumns = ['name', 'actions'];
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   private destroy$ = new Subject<void>();
 
@@ -137,6 +143,10 @@ export class CategoriesListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCategories();
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
   }
 
   ngOnDestroy(): void {
@@ -152,14 +162,14 @@ export class CategoriesListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (categories) => {
-          this.categories = categories || [];
+          this.dataSource.data = categories || [];
           this.loading = false;
         },
         error: (err) => {
           console.error('Error loading categories:', err);
           this.notificationService.error('Error al cargar las categorías');
           this.loading = false;
-          this.categories = [];
+          this.dataSource.data = [];
         },
       });
   }

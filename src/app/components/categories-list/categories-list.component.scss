@@ -133,25 +133,11 @@
 // PIE DE TABLA — ESTADÍSTICAS
 // ============================================================================
 
-.table-footer {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  padding: $space-3 $space-4;
-  background-color: $color-surface-variant;
-  border-top: 1px solid $color-border;
-  font-size: $font-size-sm;
-  color: $color-text-medium;
+// ============================================================================
+// PAGINADOR — borde superior para separarlo de la tabla
+// ============================================================================
 
-  .footer-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    color: $color-primary;
-  }
-
-  strong {
-    color: $color-text-dark;
-    font-weight: $font-weight-bold;
-  }
+mat-paginator {
+  border-top: 1px solid $color-border-light;
+  background-color: $color-surface;
 }

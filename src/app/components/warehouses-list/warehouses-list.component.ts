@@ -1,13 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 
 import { WarehouseService } from '../../services/warehouse.service';
 import { Warehouse } from '../../models/warehouse.model';
@@ -16,7 +17,8 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 
 /**
  * Componente para listar almacenes
- * Muestra todos los almacenes disponibles en el sistema
+ * Fix Causa 2+3: template migrado al patrón visual del sistema + inline styles eliminados
+ * + MatPaginator reemplaza el pie de tabla de estadísticas
  */
 @Component({
   selector: 'app-warehouses-list',
@@ -29,48 +31,62 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
     MatCardModule,
     MatTooltipModule,
     MatChipsModule,
-    LoadingSpinnerComponent
+    MatPaginatorModule,
+    LoadingSpinnerComponent,
   ],
   template: `
-    <div class="container">
-      <div class="header">
-        <h1>🏢 Almacenes</h1>
-        <button 
-          mat-raised-button 
-          color="primary"
-          matTooltip="Próximamente: Crear nuevo almacén"
-          disabled
-        >
-          <mat-icon>add</mat-icon>
-          Nuevo Almacén
-        </button>
+    <div class="list-page">
+
+      <div class="page-header">
+        <div class="page-header__title-group">
+          <h1 class="page-header__title">Almacenes</h1>
+          <p class="page-header__subtitle">Gestión de almacenes y ubicaciones de inventario</p>
+        </div>
+        <div class="page-header__actions">
+          <button
+            mat-raised-button
+            color="primary"
+            matTooltip="Próximamente: Crear nuevo almacén"
+            disabled
+          >
+            <mat-icon>add</mat-icon>
+            Nuevo Almacén
+          </button>
+        </div>
       </div>
 
-      <mat-card class="table-card">
+      <div class="list-table-card">
         <app-loading-spinner *ngIf="loading" message="Cargando almacenes..."></app-loading-spinner>
 
-        <div class="table-container" *ngIf="!loading">
+        <ng-container *ngIf="!loading">
           <!-- Estado vacío -->
-          <div class="empty-state" *ngIf="warehouses.length === 0">
-            <mat-icon>warehouse</mat-icon>
-            <p>No hay almacenes registrados</p>
-            <p class="empty-subtitle">Los almacenes permiten organizar tu inventario por ubicación</p>
+          <div class="empty-state" *ngIf="dataSource.data.length === 0">
+            <mat-icon class="empty-state__icon">warehouse</mat-icon>
+            <h3 class="empty-state__title">Sin almacenes</h3>
+            <p class="empty-state__message">No hay almacenes registrados en el sistema</p>
           </div>
 
           <!-- Tabla de almacenes -->
-          <table mat-table [dataSource]="warehouses" class="warehouses-table" *ngIf="warehouses.length > 0">
+          <table
+            mat-table
+            [dataSource]="dataSource"
+            class="list-table"
+            *ngIf="dataSource.data.length > 0"
+          >
             <!-- Nombre -->
             <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef>Nombre</th>
-              <td mat-cell *matCellDef="let warehouse" class="warehouse-name">
-                <mat-icon class="warehouse-icon">warehouse</mat-icon>
-                {{ warehouse.name }}
+              <th mat-header-cell *matHeaderCellDef>NOMBRE</th>
+              <td mat-cell *matCellDef="let warehouse">
+                <span class="item-name">
+                  <mat-icon class="item-icon warehouse-icon">warehouse</mat-icon>
+                  {{ warehouse.name }}
+                </span>
               </td>
             </ng-container>
 
             <!-- Dirección -->
             <ng-container matColumnDef="address">
-              <th mat-header-cell *matHeaderCellDef>Dirección</th>
+              <th mat-header-cell *matHeaderCellDef>DIRECCIÓN</th>
               <td mat-cell *matCellDef="let warehouse">
                 <span *ngIf="warehouse.address">{{ warehouse.address }}</span>
                 <span *ngIf="!warehouse.address" class="no-data">—</span>
@@ -79,212 +95,66 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner.component';
 
             <!-- Estado -->
             <ng-container matColumnDef="is_active">
-              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <th mat-header-cell *matHeaderCellDef>ESTADO</th>
               <td mat-cell *matCellDef="let warehouse">
-                <mat-chip 
-                  [class.active-chip]="warehouse.is_active"
-                  [class.inactive-chip]="!warehouse.is_active"
-                  selected
-                >
+                <span class="status-badge" [class.active]="warehouse.is_active" [class.inactive]="!warehouse.is_active">
                   {{ warehouse.is_active ? 'Activo' : 'Inactivo' }}
-                </mat-chip>
+                </span>
               </td>
             </ng-container>
 
             <!-- Acciones -->
             <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <th mat-header-cell *matHeaderCellDef>ACCIONES</th>
               <td mat-cell *matCellDef="let warehouse">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  matTooltip="Editar"
-                  disabled
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="accent"
-                  matTooltip="Ver inventario"
-                  disabled
-                >
-                  <mat-icon>inventory</mat-icon>
-                </button>
+                <div class="row-actions">
+                  <button
+                    mat-icon-button
+                    class="action-btn edit"
+                    matTooltip="Editar almacén"
+                    disabled
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    class="action-btn"
+                    matTooltip="Ver inventario"
+                    disabled
+                  >
+                    <mat-icon>inventory</mat-icon>
+                  </button>
+                </div>
               </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="warehouse-row"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="data-row"></tr>
           </table>
-        </div>
 
-        <!-- Estadísticas -->
-        <div class="stats" *ngIf="!loading && warehouses.length > 0">
-          <span class="stat-item">
-            <mat-icon>warehouse</mat-icon>
-            <strong>{{ warehouses.length }}</strong> almacenes totales
-          </span>
-          <span class="stat-item" *ngIf="getActiveCount() > 0">
-            <mat-icon>check_circle</mat-icon>
-            <strong>{{ getActiveCount() }}</strong> activos
-          </span>
-        </div>
-      </mat-card>
+          <!-- Paginador -->
+          <mat-paginator
+            *ngIf="dataSource.data.length > 0"
+            [pageSizeOptions]="[5, 10, 25]"
+            [pageSize]="10"
+            showFirstLastButtons
+            aria-label="Seleccionar página de almacenes"
+          ></mat-paginator>
+        </ng-container>
+      </div>
+
     </div>
   `,
+  // Fix Causa 3: eliminado bloque `styles: [...]` — solo styleUrls externo
   styleUrls: ['./warehouses-list.component.scss'],
-  styles: [`
-    .container {
-      padding: 24px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 500;
-      color: #1a237e;
-    }
-
-    .table-card {
-      padding: 0;
-    }
-
-    .table-container {
-      overflow-x: auto;
-    }
-
-    .warehouses-table {
-      width: 100%;
-    }
-
-    .warehouses-table th {
-      background-color: #f5f5f5;
-      font-weight: 600;
-      color: #424242;
-    }
-
-    .warehouse-row {
-      transition: background-color 0.2s;
-    }
-
-    .warehouse-row:hover {
-      background-color: #f5f5f5;
-    }
-
-    .warehouse-name {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 500;
-    }
-
-    .warehouse-icon {
-      color: #ff6f00;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-
-    .no-data {
-      color: #999;
-      font-style: italic;
-    }
-
-    .active-chip {
-      background-color: #4caf50 !important;
-      color: white !important;
-    }
-
-    .inactive-chip {
-      background-color: #757575 !important;
-      color: white !important;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .empty-state mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      color: #bdbdbd;
-      margin-bottom: 16px;
-    }
-
-    .empty-state p {
-      font-size: 18px;
-      color: #424242;
-      margin: 8px 0;
-    }
-
-    .empty-subtitle {
-      font-size: 14px !important;
-      color: #999 !important;
-    }
-
-    .stats {
-      padding: 16px 24px;
-      background-color: #f5f5f5;
-      border-top: 1px solid #e0e0e0;
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .stat-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      color: #666;
-    }
-
-    .stat-item mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-      color: #ff6f00;
-    }
-
-    .stat-item:last-child mat-icon {
-      color: #4caf50;
-    }
-
-    .stat-item strong {
-      color: #1a237e;
-      font-size: 16px;
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 16px;
-      }
-
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-      }
-    }
-  `]
 })
-export class WarehousesListComponent implements OnInit, OnDestroy {
-  warehouses: Warehouse[] = [];
+export class WarehousesListComponent implements OnInit, AfterViewInit, OnDestroy {
+  dataSource = new MatTableDataSource<Warehouse>();
   loading = false;
 
   displayedColumns = ['name', 'address', 'is_active', 'actions'];
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   private destroy$ = new Subject<void>();
 
@@ -295,6 +165,10 @@ export class WarehousesListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadWarehouses();
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
   }
 
   ngOnDestroy(): void {
@@ -310,19 +184,15 @@ export class WarehousesListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (warehouses) => {
-          this.warehouses = warehouses || [];
+          this.dataSource.data = warehouses || [];
           this.loading = false;
         },
         error: (err) => {
           console.error('Error loading warehouses:', err);
           this.notificationService.error('Error al cargar los almacenes');
           this.loading = false;
-          this.warehouses = [];
-        }
+          this.dataSource.data = [];
+        },
       });
-  }
-
-  getActiveCount(): number {
-    return this.warehouses.filter(w => w.is_active).length;
   }
 }
