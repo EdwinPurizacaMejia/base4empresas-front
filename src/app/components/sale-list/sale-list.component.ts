@@ -14,6 +14,7 @@ import { GenericDataTableComponent, TableConfig } from '../generic-data-table/ge
 import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { WarehouseService } from '../../services/warehouse.service';
 import { SuppliersService } from '../../services/suppliers.service';
+import { CustomersService } from '../../services/customers.service';
 import { ElectronicDocumentsService } from '../../services/electronic-documents.service';
 import { GenerateDocumentDialogComponent, GenerateDocumentDialogResult } from '../electronic-documents/generate-document-dialog.component';
 
@@ -63,7 +64,7 @@ export class SaleListComponent implements OnInit, OnDestroy {
         type: 'currency',
         sortable: true,
         width: '130px',
-        formatter: (val) => (val === null || val === undefined ? '—' : val),
+        formatter: (val) => (val === null || val === undefined ? '—' : Number(val).toFixed(2)),
       },
       {
         key: 'gross_profit',
@@ -71,7 +72,7 @@ export class SaleListComponent implements OnInit, OnDestroy {
         type: 'currency',
         sortable: true,
         width: '130px',
-        formatter: (val) => (val === null || val === undefined ? '—' : val),
+        formatter: (val) => (val === null || val === undefined ? '—' : Number(val).toFixed(2)),
       },
       {
         key: 'gross_margin_pct',
@@ -99,6 +100,7 @@ export class SaleListComponent implements OnInit, OnDestroy {
     private searchService: SearchService,
     private warehouseService: WarehouseService,
     private suppliersService: SuppliersService,
+    private customersService: CustomersService,
     private electronicDocumentsService: ElectronicDocumentsService,
     private router: Router,
     private dialog: MatDialog,
@@ -125,15 +127,14 @@ export class SaleListComponent implements OnInit, OnDestroy {
   private loadLookups(): void {
     forkJoin({
       warehouses: this.warehouseService.getWarehouses({ isActive: true }),
-      // OJO: si luego existe CustomersService, reemplazar esta llamada.
-      customers: this.suppliersService.getSuppliers(),
+      customers: this.customersService.getCustomers(),
     })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: ({ warehouses, customers }) => {
           this.warehouseNameById = Object.fromEntries((warehouses ?? []).map((w: any) => [w.id, w.name]));
           this.customerNameById = Object.fromEntries(
-            (customers ?? []).map((c: any) => [c.id, c.business_name || c.name || c.id]),
+            (customers ?? []).map((c: any) => [c.id, c.full_name || c.business_name || c.name || c.id]),
           );
         },
         error: () => {
