@@ -25,53 +25,6 @@
     </div>
   </div>
 
-  <div class="dash-header__right">
-    <!-- Search -->
-    <mat-form-field class="dash-search" appearance="outline">
-      <mat-icon matPrefix>search</mat-icon>
-      <input
-        matInput
-        placeholder="Buscar en el sistema..."
-        [(ngModel)]="searchQuery"
-        (keyup.enter)="onSearch()"
-      />
-      <button mat-icon-button matSuffix *ngIf="searchQuery" (click)="clearSearch()" aria-label="Limpiar">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
-
-    <!-- Notificaciones -->
-    <button
-      mat-icon-button
-      class="dash-icon-btn"
-      matTooltip="Notificaciones"
-    >
-      <mat-icon [matBadge]="3" matBadgeColor="warn">notifications</mat-icon>
-    </button>
-
-    <!-- Usuario -->
-    <button mat-button [matMenuTriggerFor]="userMenu" class="dash-user">
-      <span class="dash-user__avatar">EP</span>
-      <span class="dash-user__name">Edwin</span>
-      <mat-icon class="dash-user__chev">expand_more</mat-icon>
-    </button>
-
-    <mat-menu #userMenu="matMenu">
-      <button mat-menu-item>
-        <mat-icon>person</mat-icon>
-        <span>Perfil</span>
-      </button>
-      <button mat-menu-item>
-        <mat-icon>settings</mat-icon>
-        <span>Configuración</span>
-      </button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item>
-        <mat-icon>logout</mat-icon>
-        <span>Salir</span>
-      </button>
-    </mat-menu>
-  </div>
 </header>
 
 <!-- Loading -->
