@@ -1,0 +1,58 @@
+// ============================================================================
+// SALE LIST COMPONENT — Módulo de Ventas
+// Fase 3 — Listados y Filtros — Base4Empresas
+//
+// Migrado desde sale-list.component.css
+// Usa clases globales de _foundations.scss:
+//   .page-header, .page-header__title, .page-header__actions, etc.
+// ============================================================================
+
+@import '../../../styles/variables';
+
+// ============================================================================
+// CONTENEDOR DE PÁGINA
+// ============================================================================
+
+.list-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: $space-6;
+
+  @media (max-width: #{$breakpoint-md}) {
+    padding: $space-4;
+  }
+
+  @media (max-width: #{$breakpoint-sm}) {
+    padding: $space-3;
+    gap: $spacing-sm;
+  }
+}
+
+// ============================================================================
+// MENSAJE DE ÉXITO
+// ============================================================================
+
+.sale-success-alert {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background-color: $color-success-light;
+  color: $color-success-variant;
+  border-left: 4px solid $color-success;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  animation: fadeIn 300ms ease-out;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: $color-success;
+  }
+}

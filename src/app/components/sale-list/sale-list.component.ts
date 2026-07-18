@@ -11,6 +11,7 @@ import { SearchService } from '../../services/search.service';
 import { SaleFormComponent } from '../sale-form/sale-form.component';
 import { SaleListItem } from '../../models/sale.model';
 import { GenericDataTableComponent, TableConfig } from '../generic-data-table/generic-data-table.component';
+import { FilterBarComponent } from '../shared/filter-bar/filter-bar.component';
 import { WarehouseService } from '../../services/warehouse.service';
 import { SuppliersService } from '../../services/suppliers.service';
 import { ElectronicDocumentsService } from '../../services/electronic-documents.service';
@@ -19,9 +20,9 @@ import { GenerateDocumentDialogComponent, GenerateDocumentDialogResult } from '.
 @Component({
   selector: 'app-sale-list',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, GenericDataTableComponent],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatSnackBarModule, GenericDataTableComponent, FilterBarComponent],
   templateUrl: './sale-list.component.html',
-  styleUrls: ['./sale-list.component.css']
+  styleUrls: ['./sale-list.component.scss']
 })
 export class SaleListComponent implements OnInit, OnDestroy {
   sales: SaleListItem[] = [];

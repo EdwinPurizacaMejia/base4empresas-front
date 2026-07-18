@@ -1,0 +1,484 @@
+// ============================================================================
+// GENERIC DATA TABLE COMPONENT — Tabla de datos genérica mejorada
+// Fase 3 — Listados y Filtros — Base4Empresas
+//
+// Migrado desde generic-data-table.component.css
+// Cambios: colores hardcoded → variables del sistema, mejor legibilidad
+// ============================================================================
+
+@import '../../../styles/variables';
+
+// ============================================================================
+// CONTENEDOR PRINCIPAL
+// ============================================================================
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+// ============================================================================
+// SECCIÓN DE BÚSQUEDA (búsqueda interna del componente, si showSearch=true)
+// ============================================================================
+
+.search-section {
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+  padding: 0;
+  margin-bottom: $spacing-md;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+  background: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  transition: border-color $transition-fast, box-shadow $transition-fast;
+  padding: 0 $space-3;
+
+  &:hover {
+    border-color: $color-text-lighter;
+    box-shadow: $shadow-xs;
+  }
+
+  &:focus-within {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 3px $color-primary-light;
+  }
+}
+
+.search-icon {
+  color: $color-text-light;
+  margin-right: $space-2;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: $space-3 0;
+  font-size: $font-size-sm;
+  color: $color-text-dark;
+  outline: none;
+  font-family: $font-family-primary;
+
+  &::placeholder {
+    color: $color-text-lighter;
+  }
+}
+
+.clear-btn {
+  margin-left: $space-2;
+  color: $color-text-light;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+
+  &:hover {
+    color: $color-text-medium;
+    background: $color-surface-hover;
+  }
+}
+
+// ============================================================================
+// ESTADO LOADING
+// ============================================================================
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  min-height: 280px;
+  background-color: $color-surface;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-lg;
+  padding: $spacing-2xl $spacing-xl;
+
+  p {
+    color: $color-text-medium;
+    font-size: $font-size-sm;
+    margin: 0;
+  }
+}
+
+// ============================================================================
+// ESTADO ERROR
+// ============================================================================
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $spacing-md;
+  background-color: $color-danger-light;
+  border-left: 4px solid $color-danger;
+  border-radius: $border-radius-md;
+  color: $color-danger-variant;
+  font-size: $font-size-sm;
+  margin-bottom: $spacing-md;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+}
+
+// ============================================================================
+// WRAPPER DE LA TABLA
+// ============================================================================
+
+.table-wrapper {
+  background-color: $color-surface;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+  border: 1px solid $color-border;
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+// ============================================================================
+// TABLA DE DATOS
+// ============================================================================
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  // Encabezado
+  thead {
+    background-color: $color-surface-variant;
+    border-bottom: 2px solid $color-border;
+  }
+
+  th {
+    padding: $space-4 $space-4;
+    text-align: left;
+    font-weight: $font-weight-bold;
+    color: $color-text-dark;
+    font-size: $font-size-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  // Filas del cuerpo
+  tbody tr {
+    border-bottom: 1px solid $color-border;
+    transition: background-color $transition-fast;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.data-row {
+      cursor: pointer;
+
+      &:hover {
+        background-color: $color-surface-hover;
+      }
+    }
+  }
+
+  td {
+    padding: $space-4 $space-4;
+    font-size: $font-size-sm;
+    color: $color-text-medium;
+    vertical-align: middle;
+  }
+
+  // Columnas especiales
+  .column-number {
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+    font-family: $font-family-monospace;
+    font-size: $font-size-sm;
+  }
+
+  .column-status,
+  .column-payment_status,
+  .column-actions {
+    text-align: center;
+  }
+
+  .column-total,
+  .column-cost_total,
+  .column-gross_profit {
+    color: $color-text-dark;
+    font-weight: $font-weight-semibold;
+    white-space: nowrap;
+    text-align: right;
+  }
+}
+
+// ============================================================================
+// BADGES DE ESTADO
+// ============================================================================
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-3;
+  border-radius: $border-radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: $border-radius-full;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+// Estado: completado / confirmado / pagado → verde
+.badge-completed,
+.badge-confirmed,
+.badge-paid,
+.badge-active {
+  background-color: $color-success-light;
+  color: $color-success-variant;
+}
+
+.dot-completed,
+.dot-confirmed,
+.dot-paid,
+.dot-active {
+  background-color: $color-success;
+}
+
+// Estado: pendiente / parcial → amarillo
+.badge-pending,
+.badge-partial {
+  background-color: $color-warning-light;
+  color: $color-warning-variant;
+}
+
+.dot-pending,
+.dot-partial {
+  background-color: $color-warning;
+}
+
+// Estado: cancelado / inactivo → rojo
+.badge-cancelled,
+.badge-inactive,
+.badge-rejected {
+  background-color: $color-danger-light;
+  color: $color-danger-variant;
+}
+
+.dot-cancelled,
+.dot-inactive,
+.dot-rejected {
+  background-color: $color-danger;
+}
+
+// Estado: borrador / info / procesando → azul
+.badge-draft,
+.badge-processing {
+  background-color: $color-info-light;
+  color: $color-info;
+}
+
+.dot-draft,
+.dot-processing {
+  background-color: $color-info;
+}
+
+// ============================================================================
+// ESTADO VACÍO
+// ============================================================================
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  padding: $spacing-2xl $spacing-xl;
+  text-align: center;
+  color: $color-text-light;
+  background-color: $color-surface;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: $color-text-lighter;
+    opacity: 0.6;
+  }
+
+  .empty-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $color-text-dark;
+    margin: 0;
+  }
+
+  .empty-message {
+    font-size: $font-size-sm;
+    color: $color-text-medium;
+    margin: 0;
+  }
+}
+
+// ============================================================================
+// PAGINADOR
+// ============================================================================
+
+.paginator-section {
+  display: block;
+  padding: 0;
+  background-color: $color-surface-variant;
+  border-top: 1px solid $color-border;
+}
+
+::ng-deep .paginator-section .mat-mdc-paginator {
+  background: transparent;
+  padding: 0;
+  width: 100%;
+}
+
+::ng-deep .paginator-section .mat-mdc-paginator-container {
+  justify-content: space-between;
+  padding: 0 $space-4;
+}
+
+// ============================================================================
+// ACCIONES DE FILA — Botones por icono compactos
+// ============================================================================
+
+.inline-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-1;
+  width: 100%;
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  border-radius: $border-radius-sm;
+  color: $color-text-lighter;
+  transition: color $transition-fast, background-color $transition-fast;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  // View
+  &.view:hover {
+    color: $color-info;
+    background-color: $color-info-light;
+  }
+
+  // Edit
+  &.edit:hover {
+    color: $color-primary;
+    background-color: $color-primary-light;
+  }
+
+  // Delete / Danger
+  &.delete:hover,
+  &.danger:hover {
+    color: $color-danger;
+    background-color: $color-danger-light;
+  }
+
+  // Primary (generate doc, etc.)
+  &.primary:hover {
+    color: $color-primary-dark;
+    background-color: $color-primary-light;
+  }
+
+  // Success
+  &.success:hover {
+    color: $color-success-variant;
+    background-color: $color-success-light;
+  }
+}
+
+// Menú de acciones
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  font-size: $font-size-sm;
+
+  &.danger {
+    color: $color-danger;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+
+@media (max-width: #{$breakpoint-md}) {
+  .data-table {
+    th,
+    td {
+      padding: $space-3 $space-3;
+      font-size: $font-size-xs;
+    }
+  }
+
+  .empty-state {
+    padding: $spacing-xl $spacing-md;
+  }
+}
+
+@media (max-width: #{$breakpoint-sm}) {
+  .data-table {
+    th,
+    td {
+      padding: $space-2 $space-2;
+      font-size: $font-size-xs;
+    }
+  }
+
+  .badge {
+    padding: 2px $space-2;
+    font-size: 10px;
+  }
+
+  .action-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+  }
+}
